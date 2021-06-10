@@ -160,6 +160,15 @@ SbbrAllocAndGetMemoryMap (
     if (Status != EFI_BUFFER_TOO_SMALL){
       return EFI_NOT_FOUND;
     }
+
+    //
+    // The memory size needs to be increased, because there is a call to
+    // SctAllocatePool() before the second GetMemoryMap(), the action of allocate
+    // pool might increase the MemoryMapSize. Increasing by 1KB should be enough
+    // for anyone.
+    //
+    *MemoryMapSize += 1024;
+
     *MemoryMap = SctAllocatePool(*MemoryMapSize);
     if (*MemoryMap == NULL) {
       return EFI_OUT_OF_RESOURCES;
