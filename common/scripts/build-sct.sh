@@ -59,9 +59,9 @@ CROSS_COMPILE=$TOP_DIR/$GCC
 BBR=$1
 BUILD_TYPE=$2
 
-if ! [[ $BBR = IR ]] && ! [[ $BBR = ES ]] ; then
+if ! [[ $BBR = IR ]] && ! [[ $BBR = ES ]] && ! [[ $BBR = BBSR ]] ; then
     echo "Please provide a target."
-    echo "Usage build-sct.sh <IR/ES> <BUILD_TYPE>"
+    echo "Usage build-sct.sh <IR/ES/BBSR> <BUILD_TYPE>"
     exit
 fi
 
@@ -88,7 +88,7 @@ do_build()
    
     pushd $TOP_DIR/$SCT_PATH
     CROSS_COMPILE_DIR=$(dirname $CROSS_COMPILE)
-    PATH="$PATH:$CROSS_COMPILE_DIR"
+    export PATH="$TOP_DIR/efitools:$PATH:$CROSS_COMPILE_DIR"
 
     export EDK2_TOOLCHAIN=$UEFI_TOOLCHAIN
     export ${UEFI_TOOLCHAIN}_AARCH64_PREFIX=$CROSS_COMPILE
@@ -96,6 +96,7 @@ do_build()
     export PACKAGES_PATH=$TOP_DIR/$UEFI_PATH
     export PYTHON_COMMAND=/usr/bin/python3
     export WORKSPACE=$TOP_DIR/$SCT_PATH/uefi-sct
+    export KEYS_DIR=$TOP_DIR/bbsr-acs-keys
     #export HOST_ARCH = `uname -m`
     #MACHINE=`uname -m`
 
@@ -104,11 +105,13 @@ do_build()
     make -C $TOP_DIR/$UEFI_PATH/BaseTools
     
     #Copy over extra files needed for SBBR tests
-    cp -r $SBBR_TEST_DIR/SbbrBootServices uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/
-    cp -r $SBBR_TEST_DIR/SbbrEfiSpecVerLvl $SBBR_TEST_DIR/SbbrRequiredUefiProtocols $SBBR_TEST_DIR/SbbrSmbios $SBBR_TEST_DIR/SbbrSysEnvConfig uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/
-    cp -r $SBBR_TEST_DIR/SBBRRuntimeServices uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/
-    cp $SBBR_TEST_DIR/BBR_SCT.dsc uefi-sct/SctPkg/UEFI/
-    cp $SBBR_TEST_DIR/build_bbr.sh uefi-sct/SctPkg/
+    if [[ $BBR != BBSR ]] ; then
+        cp -r $SBBR_TEST_DIR/SbbrBootServices uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/
+        cp -r $SBBR_TEST_DIR/SbbrEfiSpecVerLvl $SBBR_TEST_DIR/SbbrRequiredUefiProtocols $SBBR_TEST_DIR/SbbrSmbios $SBBR_TEST_DIR/SbbrSysEnvConfig uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/
+        cp -r $SBBR_TEST_DIR/SBBRRuntimeServices uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/
+        cp $SBBR_TEST_DIR/BBR_SCT.dsc uefi-sct/SctPkg/UEFI/
+        cp $SBBR_TEST_DIR/build_bbr.sh uefi-sct/SctPkg/
+    fi
     
     #Startup/runtime files.
     mkdir -p uefi-sct/SctPkg/BBR
@@ -117,20 +120,26 @@ do_build()
     cp $BBR_DIR/ebbr/config/EBBRStartup.nsh uefi-sct/SctPkg/BBR/
     cp $BBR_DIR/ebbr/config/EBBR.seq uefi-sct/SctPkg/BBR/
     cp $BBR_DIR/ebbr/config/EfiCompliant_EBBR.ini uefi-sct/SctPkg/BBR/
-    else
+    elif [ $BBR = ES ]; then
     #SBBR
     cp $BBR_DIR/sbbr/config/SBBRStartup.nsh uefi-sct/SctPkg/BBR/
     cp $BBR_DIR/sbbr/config/SBBR.seq uefi-sct/SctPkg/BBR/
     cp $BBR_DIR/sbbr/config/EfiCompliant_SBBR.ini  uefi-sct/SctPkg/BBR/
     fi
 
-    if ! patch -R -p1 -s -f --dry-run < $BBR_DIR/common/patches/edk2-test-bbr.patch; then
-        echo "Applying SCT patch ..."
-        patch  -p1  < $BBR_DIR/common/patches/edk2-test-bbr.patch
+    if [[ $BBR != BBSR ]] ; then
+        if ! patch -R -p1 -s -f --dry-run < $BBR_DIR/common/patches/edk2-test-bbr.patch; then
+            echo "Applying SCT patch ..."
+            patch  -p1  < $BBR_DIR/common/patches/edk2-test-bbr.patch
+        fi
     fi
 
     pushd uefi-sct
-    ./SctPkg/build_bbr.sh $TARGET_ARCH GCC $UEFI_BUILD_MODE
+    if [[ $BBR = BBSR ]] ; then
+        ./SctPkg/build.sh $TARGET_ARCH GCC $UEFI_BUILD_MODE
+    else
+        ./SctPkg/build_bbr.sh $TARGET_ARCH GCC $UEFI_BUILD_MODE
+    fi
     
     popd
 }
@@ -156,20 +165,24 @@ do_package ()
     pushd $TOP_DIR/$SCT_PATH/uefi-sct
 
     mkdir -p ${TARGET_ARCH}_SCT/SCT
-    cp -r Build/bbrSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}/${TARGET_ARCH}/* ${TARGET_ARCH}_SCT/SCT/
 
     if [ $BBR = IR ]; then
         #EBBR
+        cp -r Build/bbrSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}/${TARGET_ARCH}/* ${TARGET_ARCH}_SCT/SCT/
         cp Build/bbrSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}/EBBRStartup.nsh ${TARGET_ARCH}_SCT/SctStartup.nsh
         cp SctPkg/BBR/EfiCompliant_EBBR.ini ${TARGET_ARCH}_SCT/SCT/Dependency/EfiCompliantBBTest/EfiCompliant.ini
         #rm ${TARGET_ARCH}_SCT/SCT/Sequence/SBBR.seq
 
-    else
+    elif [ $BBR = ES ]; then
         #SBBR
+        cp -r Build/bbrSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}/${TARGET_ARCH}/* ${TARGET_ARCH}_SCT/SCT/
         cp Build/bbrSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}/SBBRStartup.nsh ${TARGET_ARCH}_SCT/SctStartup.nsh
         cp SctPkg/BBR/EfiCompliant_SBBR.ini ${TARGET_ARCH}_SCT/SCT/Dependency/EfiCompliantBBTest/EfiCompliant.ini
         #rm ${TARGET_ARCH}_SCT/SCT/Sequence/EBBR.seq
-
+    else # BBSR
+        cp -r Build/UefiSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}/${TARGET_ARCH}/* ${TARGET_ARCH}_SCT/SCT/
+        cp $BBR_DIR/bbsr/config/BBSRStartup.nsh ${TARGET_ARCH}_SCT/SctStartup.nsh
+        cp $BBR_DIR/bbsr/config/BBSR.seq  ${TARGET_ARCH}_SCT/SCT/Sequence
     fi
 
     pushd $TOP_DIR
