@@ -57,6 +57,10 @@ do_build()
     NAME=TestDB1
     openssl req -x509 -sha256 -newkey rsa:2048 -subj /CN=TEST_DB/  -keyout $NAME.key -out $NAME.crt -nodes -days 4000
     openssl x509 -outform der -in $NAME.crt -out $NAME.der
+    # Convert TestDB1 to gpg form and import to gpg toolchain for use in signing grub
+    cat TestDB1.key | PEM2OPENPGP_USAGE_FLAGS=certify,sign pem2openpgp "TestDB1"  > TestDB1.gpgkey
+    gpg --import --allow-secret-key-import TestDB1.gpgkey
+    gpg --export > TestDB1.pubgpg
 
     # generate TestDBX1
     NAME=TestDBX1
@@ -69,6 +73,12 @@ do_build()
 do_clean()
 {
     echo "do_clean: build-bbsr-acs-keys"
+
+    # delete gpg keys from previous runs
+    keyname=$(gpg --list-keys "TestDB1" | head -2 | tail -1 | sed 's/^ *//g')
+    gpg --batch --yes --delete-secret-keys $keyname
+    gpg --batch --yes --delete-keys $keyname
+
     rm -rf $KEYS_DIR
 }
 
