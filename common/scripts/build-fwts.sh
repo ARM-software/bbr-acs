@@ -128,10 +128,15 @@ do_package ()
     echo "Packaging FWTS... $VARIANT";
     if [[ $BUILD_TYPE = F ]]; then
         sed -i '/ir_bbr_fwts_tests.ini/d' $TOP_DIR/ramdisk/files.txt
+        sed -i '/bbsr_fwts_tests.ini/d' $TOP_DIR/ramdisk/files.txt
         if [ "$BUILD_PLAT" = "IR" ]; then
           #Add the entry in file.txt of ramdisk
           echo "file /bin/ir_bbr_fwts_tests.ini         ./fwts_output/bin/ir_bbr_fwts_tests.ini                   766 0 0" >> $TOP_DIR/ramdisk/files.txt
           cp $BBR_DIR/ebbr/config/ir_bbr_fwts_tests.ini $TOP_DIR/$FWTS_PATH/$FWTS_BINARY/bin
+        elif [ "$BUILD_PLAT" = "BBSR" ]; then
+          sed -i '/linux-bsa/d' $TOP_DIR/ramdisk/files.txt
+          echo "file /bin/bbsr_fwts_tests.ini         ./fwts_output/bin/bbsr_fwts_tests.ini                   766 0 0" >> $TOP_DIR/ramdisk/files.txt
+          cp $BBR_DIR/bbsr/config/bbsr_fwts_tests.ini $TOP_DIR/$FWTS_PATH/$FWTS_BINARY/bin
         fi
     fi
     cp -R $TOP_DIR/$FWTS_PATH/$FWTS_BINARY ramdisk
