@@ -96,7 +96,7 @@ do_build()
     export PACKAGES_PATH=$TOP_DIR/$UEFI_PATH
     export PYTHON_COMMAND=/usr/bin/python3
     export WORKSPACE=$TOP_DIR/$SCT_PATH/uefi-sct
-    export KEYS_DIR=$TOP_DIR/bbsr-acs-keys
+    export KEYS_DIR=$TOP_DIR/security-extension-acs-keys
     #export HOST_ARCH = `uname -m`
     #MACHINE=`uname -m`
 

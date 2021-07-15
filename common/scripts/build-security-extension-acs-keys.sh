@@ -35,11 +35,11 @@
 # KEYS_DIR - directory where secure boot keys are generated
 
 TOP_DIR=`pwd`
-KEYS_DIR=$TOP_DIR/bbsr-acs-keys
+KEYS_DIR=$TOP_DIR/security-extension-acs-keys
 
 do_build()
 {
-    echo "do_build: build-bbsr-acs-keys"
+    echo "do_build: security-extension-acs-keys"
     mkdir -p $KEYS_DIR
     pushd $KEYS_DIR
 
@@ -72,7 +72,7 @@ do_build()
 
 do_clean()
 {
-    echo "do_clean: build-bbsr-acs-keys"
+    echo "do_clean: security-extension-acs-keys"
 
     # delete gpg keys from previous runs
     keyname=$(gpg --list-keys "TestDB1" | head -2 | tail -1 | sed 's/^ *//g')
@@ -84,7 +84,7 @@ do_clean()
 
 do_package()
 {
-    echo "do_package: build-bbsr-acs-keys: nothing to do"
+    echo "do_package: security-extension-acs-keys: nothing to do"
 }
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
