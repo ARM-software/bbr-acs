@@ -59,9 +59,9 @@ CROSS_COMPILE=$TOP_DIR/$GCC
 BBR=$1
 BUILD_TYPE=$2
 
-if ! [[ $BBR = IR ]] && ! [[ $BBR = ES ]] && ! [[ $BBR = BBSR ]] ; then
+if ! [[ $BBR = IR ]] && ! [[ $BBR = ES ]] && ! [[ $BBR = SE ]] ; then
     echo "Please provide a target."
-    echo "Usage build-sct.sh <IR/ES/BBSR> <BUILD_TYPE>"
+    echo "Usage build-sct.sh <IR/ES/SE> <BUILD_TYPE>"
     exit
 fi
 
@@ -105,7 +105,7 @@ do_build()
     make -C $TOP_DIR/$UEFI_PATH/BaseTools
     
     #Copy over extra files needed for SBBR tests
-    if [[ $BBR != BBSR ]] ; then
+    if [[ $BBR != SE ]] ; then
         cp -r $SBBR_TEST_DIR/SbbrBootServices uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/
         cp -r $SBBR_TEST_DIR/SbbrEfiSpecVerLvl $SBBR_TEST_DIR/SbbrRequiredUefiProtocols $SBBR_TEST_DIR/SbbrSmbios $SBBR_TEST_DIR/SbbrSysEnvConfig uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/
         cp -r $SBBR_TEST_DIR/SBBRRuntimeServices uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/
@@ -127,7 +127,7 @@ do_build()
     cp $BBR_DIR/sbbr/config/EfiCompliant_SBBR.ini  uefi-sct/SctPkg/BBR/
     fi
 
-    if [[ $BBR != BBSR ]] ; then
+    if [[ $BBR != SE ]] ; then
         if ! patch -R -p1 -s -f --dry-run < $BBR_DIR/common/patches/edk2-test-bbr.patch; then
             echo "Applying SCT patch ..."
             patch  -p1  < $BBR_DIR/common/patches/edk2-test-bbr.patch
@@ -135,7 +135,7 @@ do_build()
     fi
 
     pushd uefi-sct
-    if [[ $BBR = BBSR ]] ; then
+    if [[ $BBR = SE ]] ; then
         ./SctPkg/build.sh $TARGET_ARCH GCC $UEFI_BUILD_MODE
     else
         ./SctPkg/build_bbr.sh $TARGET_ARCH GCC $UEFI_BUILD_MODE
@@ -179,10 +179,13 @@ do_package ()
         cp Build/bbrSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}/SBBRStartup.nsh ${TARGET_ARCH}_SCT/SctStartup.nsh
         cp SctPkg/BBR/EfiCompliant_SBBR.ini ${TARGET_ARCH}_SCT/SCT/Dependency/EfiCompliantBBTest/EfiCompliant.ini
         #rm ${TARGET_ARCH}_SCT/SCT/Sequence/EBBR.seq
-    else # BBSR
+    elif [ $BBR = SE ]; then
         cp -r Build/UefiSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}/${TARGET_ARCH}/* ${TARGET_ARCH}_SCT/SCT/
         cp $BBR_DIR/bbsr/config/BBSRStartup.nsh ${TARGET_ARCH}_SCT/SctStartup.nsh
         cp $BBR_DIR/bbsr/config/BBSR.seq  ${TARGET_ARCH}_SCT/SCT/Sequence
+    else # error
+        echo "Error: unexpected platform type"
+        exit
     fi
 
     pushd $TOP_DIR
