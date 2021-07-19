@@ -1,0 +1,265 @@
+From 6fbd2632d78c989a73ad2df9a7993e5263d6f2cf Mon Sep 17 00:00:00 2001
+From: Joseph Hemann <Joseph.hemann@arm.com>
+Date: Mon, 17 May 2021 15:43:07 -0500
+Subject: [PATCH 10/22] uefi-sct/SctPkg: TCG2 Protocol: add GetActivePcrBanks
+ test
+
+Signed-off-by: Joseph Hemann <Joseph.hemann@arm.com>
+Signed-off-by: Stuart Yoder <stuart.yoder@arm.com>
+---
+ .../Protocol/TCG2Protocol/BlackBoxTest/Guid.c |   4 +
+ .../Protocol/TCG2Protocol/BlackBoxTest/Guid.h |  10 ++
+ .../BlackBoxTest/TCG2ProtocolBBTest.h         |  23 +++
+ .../TCG2ProtocolBBTestConformance.c           | 136 ++++++++++++++++++
+ .../BlackBoxTest/TCG2ProtocolBBTestMain.c     |   9 ++
+ 5 files changed, 182 insertions(+)
+
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.c
+index 206662ee..53809330 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.c
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.c
+@@ -33,3 +33,7 @@ EFI_GUID gTcg2ConformanceTestAssertionGuid001 = EFI_TEST_TCG2CONFORMANCE_ASSERTI
+ EFI_GUID gTcg2ConformanceTestAssertionGuid002 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_002_GUID;
+ 
+ EFI_GUID gTcg2ConformanceTestAssertionGuid003 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_003_GUID;
++
++EFI_GUID gTcg2ConformanceTestAssertionGuid004 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_004_GUID;
++
++EFI_GUID gTcg2ConformanceTestAssertionGuid005 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_005_GUID;
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.h b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.h
+index b675756b..f470255c 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.h
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.h
+@@ -41,3 +41,13 @@ extern EFI_GUID gTcg2ConformanceTestAssertionGuid002;
+ 
+ extern EFI_GUID gTcg2ConformanceTestAssertionGuid003;
+ 
++#define EFI_TEST_TCG2CONFORMANCE_ASSERTION_004_GUID \
++{ 0x7a1e79a3, 0x4064, 0x4372, {0xbb, 0x64, 0x55, 0xb8, 0xf2, 0xa5, 0xa3, 0x26 }}
++
++extern EFI_GUID gTcg2ConformanceTestAssertionGuid004;
++
++#define EFI_TEST_TCG2CONFORMANCE_ASSERTION_005_GUID \
++{ 0xb0e717c4, 0xb1e2, 0x49f7, {0xb2, 0xd7, 0x60, 0x58, 0x97, 0x7d, 0x09, 0x2c }}
++
++extern EFI_GUID gTcg2ConformanceTestAssertionGuid005;
++
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.h b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.h
+index 727a4c8e..67723f30 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.h
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.h
+@@ -39,6 +39,9 @@ extern EFI_HANDLE   mImageHandle;
+ #define EFI_TCG2_PROTOCOL_TEST_ENTRY_GUID0101 \
+  {0x39ff9c71, 0x4b41, 0x4e5b, {0xae, 0xd7, 0x87, 0xc7, 0x94, 0x18, 0x7d, 0x67} }
+ 
++#define EFI_TCG2_PROTOCOL_TEST_ENTRY_GUID0102 \
++ {0x847f1ae0, 0xb429, 0x49f1, {0x9e, 0x0c, 0x8f, 0x43, 0xfb, 0x55, 0x34, 0x54} }
++
+ EFI_STATUS
+ EFIAPI
+ BBTestTCG2ProtocolUnload (
+@@ -63,6 +66,18 @@ BBTestGetCapabilityConformanceTestCheckpoint3 (
+   IN EFI_TCG2_PROTOCOL                     *TCG2
+   );
+ 
++EFI_STATUS
++BBTestGetActivePcrBanksConformanceTestCheckpoint1 (
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
++  IN EFI_TCG2_PROTOCOL                     *TCG2
++  );
++
++EFI_STATUS
++BBTestGetActivePcrBanksConformanceTestCheckpoint2 (
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
++  IN EFI_TCG2_PROTOCOL                     *TCG2
++  );
++
+ EFI_STATUS
+ BBTestGetCapabilityConformanceTest (
+   IN EFI_BB_TEST_PROTOCOL       *This,
+@@ -71,3 +86,11 @@ BBTestGetCapabilityConformanceTest (
+   IN EFI_HANDLE                 SupportHandle
+   );
+ 
++EFI_STATUS
++BBTestGetActivePcrBanksConformanceTest (
++  IN EFI_BB_TEST_PROTOCOL       *This,
++  IN VOID                       *ClientInterface,
++  IN EFI_TEST_LEVEL             TestLevel,
++  IN EFI_HANDLE                 SupportHandle
++  );
++
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestConformance.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestConformance.c
+index ee9830d6..3e307095 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestConformance.c
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestConformance.c
+@@ -78,6 +78,52 @@ BBTestGetCapabilityConformanceTest (
+   return EFI_SUCCESS;
+ }
+ 
++/**
++ *  @brief Entrypoint for GetActivePcrBanks() Function Test.
++ *         3 checkpoints will be tested.
++ *  @param This a pointer of EFI_BB_TEST_PROTOCOL
++ *  @param ClientInterface A pointer to the interface array under test
++ *  @param TestLevel Test "thoroughness" control
++ *  @param SupportHandle A handle containing protocols required
++ *  @return EFI_SUCCESS
++ *  @return EFI_NOT_FOUND
++ */
++
++EFI_STATUS
++BBTestGetActivePcrBanksConformanceTest (
++  IN EFI_BB_TEST_PROTOCOL       *This,
++  IN VOID                       *ClientInterface,
++  IN EFI_TEST_LEVEL             TestLevel,
++  IN EFI_HANDLE                 SupportHandle
++  )
++{
++  EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib;
++  EFI_STATUS                            Status;
++  EFI_TCG2_PROTOCOL                     *TCG2;
++  //
++  // init
++  //
++  TCG2 = (EFI_TCG2_PROTOCOL*)ClientInterface;
++
++  // Get the Standard Library Interface
++  //
++  Status = gtBS->HandleProtocol (
++                   SupportHandle,
++                   &gEfiStandardTestLibraryGuid,
++                   (VOID **) &StandardLib
++                   );
++  if (EFI_ERROR(Status)) {
++    return Status;
++  }
++
++  //Test Using NULL Pointer
++  BBTestGetActivePcrBanksConformanceTestCheckpoint1 (StandardLib, TCG2);
++
++  //Test with correct size field
++ BBTestGetActivePcrBanksConformanceTestCheckpoint2 (StandardLib, TCG2);
++
++  return EFI_SUCCESS;
++}
+ 
+ EFI_STATUS
+ BBTestGetCapabilityConformanceTestCheckpoint1 (
+@@ -287,3 +333,93 @@ BBTestGetCapabilityConformanceTestCheckpoint3 (
+   return EFI_SUCCESS;
+ }
+ 
++EFI_STATUS
++BBTestGetActivePcrBanksConformanceTestCheckpoint1 (
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
++  IN EFI_TCG2_PROTOCOL                     *TCG2
++  )
++{
++  EFI_TEST_ASSERTION                    AssertionType;
++  EFI_STATUS                            Status;
++
++  EFI_TCG2_EVENT_ALGORITHM_BITMAP *ActivePcrBanks = NULL;
++  Status = TCG2->GetActivePcrBanks (
++                           TCG2,
++                           ActivePcrBanks);
++
++  // Ensure GetCapablity returns Invalid Parameter when passing in NULL pointer
++  if (EFI_INVALID_PARAMETER == Status) {
++    AssertionType = EFI_TEST_ASSERTION_PASSED;
++  } else {
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 AssertionType,
++                 gTcg2ConformanceTestAssertionGuid004,
++                 L"TCG2_PROTOCOL.GetActivePcrBanks - GetActivePcrBanks() returns EFI_INVALID_PARAMETER with NULL pointer Passed in",
++                 L"%a:%d: Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
++  return EFI_SUCCESS;
++}
++
++EFI_STATUS
++BBTestGetActivePcrBanksConformanceTestCheckpoint2 (
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
++  IN EFI_TCG2_PROTOCOL                     *TCG2
++  )
++{
++  EFI_TEST_ASSERTION                    AssertionType;
++  EFI_STATUS                            Status;
++
++  EFI_TCG2_EVENT_ALGORITHM_BITMAP ActivePcrBanks;
++  Status = TCG2->GetActivePcrBanks (
++                           TCG2,
++                           &ActivePcrBanks);
++
++  // Ensure GetActivePcrBanks returns EFI_SUCCESS
++  if (Status == EFI_SUCCESS) {
++    AssertionType = EFI_TEST_ASSERTION_PASSED;
++  } else {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol GetActivePcrBanks Test: GetActivePcrBanks should return EFI_SUCCESS",
++                     ActivePcrBanks
++                     );
++
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  EFI_TCG2_EVENT_ALGORITHM_BITMAP BitMapAlgos =  EFI_TCG2_BOOT_HASH_ALG_SHA256 | EFI_TCG2_BOOT_HASH_ALG_SHA384 | EFI_TCG2_BOOT_HASH_ALG_SHA512;
++
++  // Ensure ActivePcrBanks has SHA256/384/512 in its Bitmap
++  if (!(ActivePcrBanks & BitMapAlgos)) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol GetActivePcrBanks Test: GetActiVePcrBanks should have SHA256/384/512 Algorithm in its Bitmap. ActivePcrBanks = %x",
++                     ActivePcrBanks
++                     );
++
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 AssertionType,
++                 gTcg2ConformanceTestAssertionGuid005,
++                 L"TCG2_PROTOCOL.GetActivePcrBanks - GetActivePcrBanks should return with EFI_SUCCESS and have SHA256/384/512 Algoritms in its Bitmap",
++                 L"%a:%d: Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
++  return EFI_SUCCESS;
++}
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestMain.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestMain.c
+index 146d2ae8..c9f47379 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestMain.c
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestMain.c
+@@ -49,6 +49,15 @@ EFI_BB_TEST_ENTRY_FIELD gBBTestEntryField[] = {
+     EFI_TEST_CASE_AUTO,
+     BBTestGetCapabilityConformanceTest
+   },
++  {
++    EFI_TCG2_PROTOCOL_TEST_ENTRY_GUID0102,
++    L"GetActivePcrBanks_Conf",
++    L"Test the GetActivePcrBanks API",
++    EFI_TEST_LEVEL_DEFAULT,
++    gSupportProtocolGuid1,
++    EFI_TEST_CASE_AUTO,
++    BBTestGetActivePcrBanksConformanceTest
++  },
+   0
+ };
+ 
+-- 
+2.17.1
+

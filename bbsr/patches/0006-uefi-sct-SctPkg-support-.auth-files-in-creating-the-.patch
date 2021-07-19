@@ -1,0 +1,29 @@
+From c096f301eab408281018dc9cd922147ded1ec81c Mon Sep 17 00:00:00 2001
+From: Stuart Yoder <stuart.yoder@arm.com>
+Date: Mon, 14 Jun 2021 11:35:10 -0500
+Subject: [PATCH 06/22] uefi-sct/SctPkg: support .auth files in creating the
+ test package
+
+.auth files are signed UEFI variable updates.  Update the CommonGenFramework
+so they are copied from the build to the test package
+
+Signed-off-by: Stuart Yoder <stuart.yoder@arm.com>
+---
+ uefi-sct/SctPkg/CommonGenFramework.sh | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/uefi-sct/SctPkg/CommonGenFramework.sh b/uefi-sct/SctPkg/CommonGenFramework.sh
+index 72c52ae5..ca596fa4 100755
+--- a/uefi-sct/SctPkg/CommonGenFramework.sh
++++ b/uefi-sct/SctPkg/CommonGenFramework.sh
+@@ -95,6 +95,7 @@ CopyDependency()
+     ls -h $ProcessorType/$1_*.cmp   >> temp.txt 2>NUL
+     ls -h $ProcessorType/$1_*.ucmp  >> temp.txt 2>NUL
+     ls -h $ProcessorType/$1_*.der  >> temp.txt 2>NUL
++    ls -h $ProcessorType/$1_*.auth  >> temp.txt 2>NUL
+ 
+     while read line 
+       do 
+-- 
+2.17.1
+

@@ -1,0 +1,345 @@
+From 31671549957ec8c5dd9e73d66978a0e54de6bfb5 Mon Sep 17 00:00:00 2001
+From: Joseph Hemann <Joseph.hemann@arm.com>
+Date: Mon, 21 Jun 2021 15:23:30 -0500
+Subject: [PATCH 13/22] uefi-sct/SctPkg: TCG2 Protocol: add SubmitCommand test
+
+Signed-off-by: Joseph Hemann <Joseph.hemann@arm.com>
+Signed-off-by: Stuart Yoder <stuart.yoder@arm.com>
+---
+ .../Protocol/TCG2Protocol/BlackBoxTest/Guid.c |   4 +
+ .../Protocol/TCG2Protocol/BlackBoxTest/Guid.h |  10 +
+ .../BlackBoxTest/TCG2ProtocolBBTest.h         |  49 +++++
+ .../TCG2ProtocolBBTestConformance.c           | 176 +++++++++++++++++-
+ .../BlackBoxTest/TCG2ProtocolBBTestMain.c     |  10 +
+ 5 files changed, 248 insertions(+), 1 deletion(-)
+
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.c
+index 89c41517..b5a4e5c7 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.c
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.c
+@@ -53,3 +53,7 @@ EFI_GUID gTcg2ConformanceTestAssertionGuid011 = EFI_TEST_TCG2CONFORMANCE_ASSERTI
+ EFI_GUID gTcg2ConformanceTestAssertionGuid012 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_012_GUID;
+ 
+ EFI_GUID gTcg2ConformanceTestAssertionGuid013 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_013_GUID;
++
++EFI_GUID gTcg2ConformanceTestAssertionGuid014 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_014_GUID;
++
++EFI_GUID gTcg2ConformanceTestAssertionGuid015 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_015_GUID;
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.h b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.h
+index fab9f9b9..b031857d 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.h
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.h
+@@ -95,3 +95,13 @@ extern EFI_GUID gTcg2ConformanceTestAssertionGuid012;
+ { 0x45fa1a42, 0x912a, 0x5124, {0x84, 0xf4, 0x41, 0x67, 0xab, 0xb5, 0x89, 0x90 }}
+ 
+ extern EFI_GUID gTcg2ConformanceTestAssertionGuid013;
++
++#define EFI_TEST_TCG2CONFORMANCE_ASSERTION_014_GUID \
++{ 0x1689bc3a, 0x2298, 0xa116, {0x28, 0x4c, 0xc1, 0xdd, 0xaa, 0xd8, 0xef, 0x51 }}
++
++extern EFI_GUID gTcg2ConformanceTestAssertionGuid014;
++
++#define EFI_TEST_TCG2CONFORMANCE_ASSERTION_015_GUID \
++{ 0x126a789a, 0x1932, 0x3234, {0x21, 0xab, 0x42, 0x64, 0x8a, 0x7b, 0x63, 0x76 }}
++
++extern EFI_GUID gTcg2ConformanceTestAssertionGuid015;
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.h b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.h
+index d1b73509..5d9829ab 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.h
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.h
+@@ -45,6 +45,9 @@ extern EFI_HANDLE   mImageHandle;
+ #define EFI_TCG2_PROTOCOL_TEST_ENTRY_GUID0103 \
+  {0x907a7878, 0xb294, 0xf147, {0xe9, 0x0a, 0x65, 0x43, 0xab, 0x55, 0x76, 0x46} }
+ 
++#define EFI_TCG2_PROTOCOL_TEST_ENTRY_GUID0104 \
++ {0x9087ad78, 0x9ad2, 0x4172, {0x9a, 0xbc, 0x98, 0x23, 0x08, 0xf5, 0x6d, 0x26} }
++
+ #define EV_POST_CODE 0x01
+ 
+ #define EV_NO_ACTION 0x03
+@@ -53,6 +56,39 @@ extern EFI_HANDLE   mImageHandle;
+ 
+ #define PE_COFF_IMAGE 0x0000000000000010
+ 
++// ST_NO_SESSION as definied in Table 19 of TPM Library Part 2: Structures
++#define ST_NO_SESSIONS (UINT16) 0x8001
++
++// TPM_RC_SUCCESS as definied in Table 16 of TPM Library Spec Part 2: Structures
++#define TPM_RC_SUCCESS (UINT32) 0x0000000
++
++// TPM_CC_GetRandom as definied in Table 12 of TPM Library Spec Part 2: Structures
++#define TPM_CC_GetRandom (UINT32) 0x0000017B
++
++#pragma pack(1)
++// TPM2B_DIGEST as definied in Table 73 of TPM Library Spec Part 2: Structures
++typedef struct {
++  UINT16 size;
++  UINT8  digest[8];  // Size of buffer in spec is defined to be variable length but for this test will always be 8
++} TPM2B_DIGEST;
++
++// GetRandomCommand Structure as defined in Sectin 16.1 of TPM Spec Part 3: Commands
++typedef struct {
++  UINT16 Tag;
++  UINT32 CommandSize;
++  UINT32 CommandCode;
++  UINT16 BytesRequested;
++} GET_RANDOM_COMMAND;
++
++// GetRandomResponse Structure as defined in Sectin 16.1 of TPM Spec Part 3: Commands
++typedef struct {
++  UINT16 Tag;
++  UINT32 ResponseSize;
++  UINT32 ResponseCode;
++  TPM2B_DIGEST randomBytes;
++} GET_RANDOM_RESPONSE;
++#pragma
++
+ EFI_STATUS
+ EFIAPI
+ BBTestTCG2ProtocolUnload (
+@@ -113,6 +149,12 @@ BBTestHashLogExtendEventConformanceTestCheckpoint4 (
+   IN EFI_TCG2_PROTOCOL                     *TCG2
+   );
+ 
++EFI_STATUS
++BBTestSubmitCommandConformanceTestCheckpoint1 (
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
++  IN EFI_TCG2_PROTOCOL                     *TCG2
++  );
++
+ EFI_STATUS
+ BBTestGetCapabilityConformanceTest (
+   IN EFI_BB_TEST_PROTOCOL       *This,
+@@ -137,3 +179,10 @@ BBTestHashLogExtendEventConformanceTest (
+   IN EFI_HANDLE                 SupportHandle
+   );
+ 
++EFI_STATUS
++BBTestSubmitCommandConformanceTest (
++  IN EFI_BB_TEST_PROTOCOL       *This,
++  IN VOID                       *ClientInterface,
++  IN EFI_TEST_LEVEL             TestLevel,
++  IN EFI_HANDLE                 SupportHandle
++  );
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestConformance.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestConformance.c
+index e4559bc3..31b31f87 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestConformance.c
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestConformance.c
+@@ -178,6 +178,50 @@ BBTestHashLogExtendEventConformanceTest (
+   return EFI_SUCCESS;
+ }
+ 
++/**
++ *  @brief Entrypoint for SubmitCommand() Function Test.
++ *         1 checkpoint will be tested.
++ *  @param This a pointer of EFI_BB_TEST_PROTOCOL
++ *  @param ClientInterface A pointer to the interface array under test
++ *  @param TestLevel Test "thoroughness" control
++ *  @param SupportHandle A handle containing protocols required
++ *  @return EFI_SUCCESS
++ *  @return EFI_NOT_FOUND
++ */
++
++EFI_STATUS
++BBTestSubmitCommandConformanceTest (
++  IN EFI_BB_TEST_PROTOCOL       *This,
++  IN VOID                       *ClientInterface,
++  IN EFI_TEST_LEVEL             TestLevel,
++  IN EFI_HANDLE                 SupportHandle
++  )
++{
++  EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib;
++  EFI_STATUS                            Status;
++  EFI_TCG2_PROTOCOL                     *TCG2;
++  //
++  // init
++  //
++  TCG2 = (EFI_TCG2_PROTOCOL*)ClientInterface;
++
++  // Get the Standard Library Interface
++  //
++  Status = gtBS->HandleProtocol (
++                   SupportHandle,
++                   &gEfiStandardTestLibraryGuid,
++                   (VOID **) &StandardLib
++                   );
++  if (EFI_ERROR(Status)) {
++    return Status;
++  }
++
++  // Test GetRandom TPM Command
++  BBTestSubmitCommandConformanceTestCheckpoint1 (StandardLib, TCG2);
++
++  return EFI_SUCCESS;
++}
++
+ EFI_STATUS
+ BBTestGetCapabilityConformanceTestCheckpoint1 (
+   IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
+@@ -795,7 +839,6 @@ BBTestHashLogExtendEventConformanceTestCheckpoint4 (
+ 
+   }
+ 
+-
+   StandardLib->RecordAssertion (
+                  StandardLib,
+                  AssertionType,
+@@ -899,3 +942,134 @@ BBTestHashLogExtendEventConformanceTestCheckpoint4 (
+ 
+   return EFI_SUCCESS;
+ }
++
++EFI_STATUS
++BBTestSubmitCommandConformanceTestCheckpoint1 (
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
++  IN EFI_TCG2_PROTOCOL                     *TCG2
++  )
++{
++  EFI_TEST_ASSERTION                    AssertionType;
++  EFI_STATUS                            Status;
++  GET_RANDOM_RESPONSE                   CommandResponse;
++  GET_RANDOM_COMMAND                    CommandInput;
++  int IsNonZero = 0;
++
++  CommandInput.Tag = SctSwapBytes16(ST_NO_SESSIONS);
++  CommandInput.CommandSize = SctSwapBytes32(sizeof(GET_RANDOM_COMMAND));
++  CommandInput.CommandCode = SctSwapBytes32(TPM_CC_GetRandom);
++  CommandInput.BytesRequested = SctSwapBytes16(8);
++
++  // zero out randomBytes to ensure SubmitCommand returns random bytes
++  SctZeroMem(&CommandResponse, sizeof(GET_RANDOM_RESPONSE));
++
++  Status = TCG2->SubmitCommand (
++                           TCG2,
++                           sizeof(GET_RANDOM_COMMAND),
++                           &CommandInput,
++                           sizeof(GET_RANDOM_RESPONSE),
++                           &CommandResponse);
++
++  AssertionType = EFI_TEST_ASSERTION_PASSED;
++
++  // Verify SubmitCommand returns EFI_SUCCESS
++  if (Status != EFI_SUCCESS) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol SubmitCommand Test: SubmitCommand should return EFI_SUCCESS, Status = %r",
++                     Status
++                     );
++
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 AssertionType,
++                 gTcg2ConformanceTestAssertionGuid014,
++                 L"TCG2_PROTOCOL.SubmitCommand - SubmitCommand() should return EFI_SUCCESS",
++                 L"%a:%d: Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
++  AssertionType = EFI_TEST_ASSERTION_PASSED;
++
++  // Verify SubmitCommand returns correct Response Tag
++  if (SctSwapBytes16(CommandResponse.Tag) != ST_NO_SESSIONS) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol SubmitCommand Test: SubmitCommand should return ST_NO_SESSIONS response Tag"
++                     );
++
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  if (SctSwapBytes32(CommandResponse.ResponseCode) != TPM_RC_SUCCESS) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol SubmitCommand Test: SubmitCommand should return Correct ResponseCode, ResponseCode = %x",
++                     SctSwapBytes32(CommandResponse.ResponseCode)
++                     );
++
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  if (SctSwapBytes32(CommandResponse.ResponseSize) != sizeof(GET_RANDOM_RESPONSE)) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol SubmitCommand Test: SubmitCommand should return Correct ResponseSize, Size = %x",
++                     SctSwapBytes32(CommandResponse.ResponseSize)
++                     );
++
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  // Check that number of random bytes returned equals amount requested
++  if (SctSwapBytes16(CommandResponse.randomBytes.size) != 8) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol SubmitCommand Test: SubmitCommand should return correct amount of random bytes, Size = %x",
++                     SctSwapBytes16(CommandResponse.randomBytes.size)
++                     );
++
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  // If random bytes are returned at least one should be non-zero
++  for (int i = 0; i < 8; i++) {
++    if (CommandResponse.randomBytes.digest[i] != 0) {
++      IsNonZero = 1;
++    }
++  }
++
++  if (!IsNonZero) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol SubmitCommand Test: SubmitCommand should return RandomBytes",
++                     Status
++                     );
++
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 AssertionType,
++                 gTcg2ConformanceTestAssertionGuid015,
++                 L"TCG2_PROTOCOL.SubmitCommand - SubmitCommand() should return EFI_SUCCESS",
++                 L"%a:%d: Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
++  return EFI_SUCCESS;
++}
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestMain.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestMain.c
+index 89f110dd..953cbaa0 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestMain.c
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestMain.c
+@@ -67,6 +67,16 @@ EFI_BB_TEST_ENTRY_FIELD gBBTestEntryField[] = {
+     EFI_TEST_CASE_AUTO,
+     BBTestHashLogExtendEventConformanceTest
+   },
++  {
++    EFI_TCG2_PROTOCOL_TEST_ENTRY_GUID0104,
++    L"SubmitCommand_Conf",
++    L"Test the SubmitCommmand API",
++    EFI_TEST_LEVEL_DEFAULT,
++    gSupportProtocolGuid1,
++    EFI_TEST_CASE_AUTO,
++    BBTestSubmitCommandConformanceTest
++  },
++
+   0
+ };
+ 
+-- 
+2.17.1
+

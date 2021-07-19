@@ -1,0 +1,370 @@
+From 52ef025e62b100f892bd6cf347e9df5da04e760a Mon Sep 17 00:00:00 2001
+From: Joseph Hemann <Joseph.hemann@arm.com>
+Date: Thu, 10 Jun 2021 10:41:58 -0500
+Subject: [PATCH 12/22] uefi-sct/SctPkg: TCG2 Protocol: add GetEventLog test
+
+Signed-off-by: Joseph Hemann <Joseph.hemann@arm.com>
+Signed-off-by: Stuart Yoder <stuart.yoder@arm.com>
+---
+ .../Protocol/TCG2Protocol/BlackBoxTest/Guid.c |   8 +
+ .../Protocol/TCG2Protocol/BlackBoxTest/Guid.h |  19 ++
+ .../BlackBoxTest/TCG2ProtocolBBTest.h         |  14 ++
+ .../TCG2ProtocolBBTestConformance.c           | 198 ++++++++++++++++++
+ uefi-sct/SctPkg/UEFI/Protocol/TCG2.h          |  46 ++++
+ 5 files changed, 285 insertions(+)
+
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.c
+index 32438f96..89c41517 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.c
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.c
+@@ -45,3 +45,11 @@ EFI_GUID gTcg2ConformanceTestAssertionGuid007 = EFI_TEST_TCG2CONFORMANCE_ASSERTI
+ EFI_GUID gTcg2ConformanceTestAssertionGuid008 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_008_GUID;
+ 
+ EFI_GUID gTcg2ConformanceTestAssertionGuid009 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_009_GUID;
++
++EFI_GUID gTcg2ConformanceTestAssertionGuid010 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_010_GUID;
++
++EFI_GUID gTcg2ConformanceTestAssertionGuid011 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_011_GUID;
++
++EFI_GUID gTcg2ConformanceTestAssertionGuid012 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_012_GUID;
++
++EFI_GUID gTcg2ConformanceTestAssertionGuid013 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_013_GUID;
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.h b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.h
+index a740f7a3..fab9f9b9 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.h
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.h
+@@ -76,3 +76,22 @@ extern EFI_GUID gTcg2ConformanceTestAssertionGuid008;
+ 
+ extern EFI_GUID gTcg2ConformanceTestAssertionGuid009;
+ 
++#define EFI_TEST_TCG2CONFORMANCE_ASSERTION_010_GUID \
++{ 0x0363d22f, 0xc66a, 0x4872, {0xa5, 0x46, 0x06, 0x7f, 0x6a, 0x0d, 0xdb, 0xcd }}
++
++extern EFI_GUID gTcg2ConformanceTestAssertionGuid010;
++
++#define EFI_TEST_TCG2CONFORMANCE_ASSERTION_011_GUID \
++{ 0x9cd6d636, 0x603a, 0x4b78, {0x80, 0xa3, 0xa3, 0xb9, 0xcc, 0x6a, 0x0b, 0x08 }}
++
++extern EFI_GUID gTcg2ConformanceTestAssertionGuid011;
++
++#define EFI_TEST_TCG2CONFORMANCE_ASSERTION_012_GUID \
++{ 0xfc80408e, 0x9a3c, 0x4054, {0x96, 0xf9, 0x31, 0x23, 0x35, 0xc2, 0x31, 0x35 }}
++
++extern EFI_GUID gTcg2ConformanceTestAssertionGuid012;
++
++#define EFI_TEST_TCG2CONFORMANCE_ASSERTION_013_GUID \
++{ 0x45fa1a42, 0x912a, 0x5124, {0x84, 0xf4, 0x41, 0x67, 0xab, 0xb5, 0x89, 0x90 }}
++
++extern EFI_GUID gTcg2ConformanceTestAssertionGuid013;
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.h b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.h
+index 44ff6641..d1b73509 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.h
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.h
+@@ -47,6 +47,8 @@ extern EFI_HANDLE   mImageHandle;
+ 
+ #define EV_POST_CODE 0x01
+ 
++#define EV_NO_ACTION 0x03
++
+ #define EFI_TCG2_EXTEND_ONLY 0x0000000000000001
+ 
+ #define PE_COFF_IMAGE 0x0000000000000010
+@@ -99,6 +101,18 @@ BBTestHashLogExtendEventConformanceTestCheckpoint2 (
+   IN EFI_TCG2_PROTOCOL                     *TCG2
+   );
+ 
++EFI_STATUS
++BBTestHashLogExtendEventConformanceTestCheckpoint3 (
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
++  IN EFI_TCG2_PROTOCOL                     *TCG2
++  );
++
++EFI_STATUS
++BBTestHashLogExtendEventConformanceTestCheckpoint4 (
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
++  IN EFI_TCG2_PROTOCOL                     *TCG2
++  );
++
+ EFI_STATUS
+ BBTestGetCapabilityConformanceTest (
+   IN EFI_BB_TEST_PROTOCOL       *This,
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestConformance.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestConformance.c
+index a99a3e6b..e4559bc3 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestConformance.c
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestConformance.c
+@@ -169,6 +169,12 @@ BBTestHashLogExtendEventConformanceTest (
+   //Test with correct size field
+   BBTestHashLogExtendEventConformanceTestCheckpoint2 (StandardLib, TCG2);
+ 
++  // Test GetEventLog using invalid EventLog Format
++  BBTestHashLogExtendEventConformanceTestCheckpoint3 (StandardLib, TCG2);
++
++  // Test GetEventLog using valid EventLog Format
++  BBTestHashLogExtendEventConformanceTestCheckpoint4 (StandardLib, TCG2);
++
+   return EFI_SUCCESS;
+ }
+ 
+@@ -701,3 +707,195 @@ BBTestHashLogExtendEventConformanceTestCheckpoint2 (
+   
+   return EFI_SUCCESS;
+ }
++
++#define EFI_TCG2_INVALID_EVENT_LOG_FORMAT 0x20
++EFI_STATUS
++BBTestHashLogExtendEventConformanceTestCheckpoint3 (
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
++  IN EFI_TCG2_PROTOCOL                     *TCG2
++  )
++{
++  EFI_TEST_ASSERTION                    AssertionType;
++  EFI_STATUS                            Status;
++  EFI_TCG2_EVENT_LOG_FORMAT             EventLogFormat;
++  EFI_PHYSICAL_ADDRESS                  *EventLogLocation;
++  EFI_PHYSICAL_ADDRESS                  *EventLogLastEntry;
++  BOOLEAN                               *EventLogTruncated;
++
++  // Ensure Get EventLog returns Invalid Parameter when passed invalid format
++  EventLogFormat = EFI_TCG2_INVALID_EVENT_LOG_FORMAT;
++
++  Status = TCG2->GetEventLog (
++                           TCG2,
++                           EventLogFormat,
++                           EventLogLocation,
++                           EventLogLastEntry,
++                           EventLogTruncated);
++
++  if (EFI_INVALID_PARAMETER != Status) {
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  } else {
++    AssertionType = EFI_TEST_ASSERTION_PASSED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 AssertionType,
++                 gTcg2ConformanceTestAssertionGuid010,
++                 L"TCG2_PROTOCOL.GetEventLog - GetEventLog() should return EFI_INVALID_PARAMETER when passed in invalid EventLog Format",
++                 L"%a:%d: Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
++  return EFI_SUCCESS;
++}
++
++EFI_STATUS
++BBTestHashLogExtendEventConformanceTestCheckpoint4 (
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
++  IN EFI_TCG2_PROTOCOL                     *TCG2
++  )
++{
++  EFI_TEST_ASSERTION                    AssertionType;
++  EFI_STATUS                            Status;
++  EFI_TCG2_EVENT_LOG_FORMAT             EventLogFormat;
++  EFI_PHYSICAL_ADDRESS                  EventLogLocation;
++  EFI_PHYSICAL_ADDRESS                  EventLogLastEntry;
++  BOOLEAN                               EventLogTruncated;
++  TCG_PCR_EVENT                         *EventLogHeader;
++  TCG_EfiSpecIDEventStruct              *EventLogHeaderSpecEvent;
++  TCG_PCR_EVENT2                        *LastEvent;
++  UINT8 *data = "Spec ID Event03\0\0";
++
++  EventLogFormat = EFI_TCG2_EVENT_LOG_FORMAT_TCG_2;
++
++  // Call GetEventLog with valid EventLogFormat
++  Status = TCG2->GetEventLog (
++                           TCG2,
++                           EventLogFormat,
++                           &EventLogLocation,
++                           &EventLogLastEntry,
++                           &EventLogTruncated);
++
++
++  AssertionType = EFI_TEST_ASSERTION_PASSED;
++
++  // Verify GetEventLog returns EFI_SUCCESS
++  if (Status != EFI_SUCCESS) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol GetEventLog Test: GetEventLog should return EFI_SUCCESS with valid EventLogFormat, Status = %r",
++                     Status
++                     );
++
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++
++  }
++
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 AssertionType,
++                 gTcg2ConformanceTestAssertionGuid011,
++                 L"TCG2_PROTOCOL.GetEventLog - GetEventLog() should return EFI_SUCCESS",
++                 L"%a:%d: Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
++  // If GetEventLog doesn't return EFI_SUCCESS abort test
++  if (Status != EFI_SUCCESS) {
++    return Status;
++  }
++
++  EventLogHeader = (TCG_PCR_EVENT *) EventLogLocation;
++  EventLogHeaderSpecEvent = (TCG_EfiSpecIDEventStruct *) EventLogHeader->Event;
++
++  AssertionType = EFI_TEST_ASSERTION_PASSED;
++
++  // Verify EventLogHeader PCR index = 0
++  if (EventLogHeader->PCRIndex != 0) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol GetEventLog Test: EventLogHeader should have PCR index = 0"
++                     );
++
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  // Verify EventLogHeader event type = EV_NO_ACTION
++  if (EventLogHeader->EventType != EV_NO_ACTION) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol GetEventLog Test: EventLogHeader should be EventType = EV_NO_ACTION"
++                     );
++
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  Status = SctStrCmp(EventLogHeaderSpecEvent->signature, data);
++  // Verify EventLog Signature
++  if (Status != EFI_SUCCESS) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol GetEventLog Test: EventLogHeader Signature did not match \'Spec ID Event03\'"
++                     );
++
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 AssertionType,
++                 gTcg2ConformanceTestAssertionGuid012,
++                 L"TCG2_PROTOCOL.GetEventLog - GetEventLog() should return correct EventLogHeader",
++                 L"%a:%d: Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
++  LastEvent = (TCG_PCR_EVENT2 *) EventLogLastEntry;
++
++  // Verify Last Event PCR = 16
++  if (LastEvent->PCRIndex != 16) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol GetEventLog Test: PCR Index of Last event should be 16"
++                     );
++
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  // Verify last event type = EV_POST_CODE
++  if (LastEvent->EventType != EV_POST_CODE) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol GetEventLog Test: PCR Index of last event should be type EV_POST_CODE"
++                     );
++
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 AssertionType,
++                 gTcg2ConformanceTestAssertionGuid013,
++                 L"TCG2_PROTOCOL.GetEventLog - GetEventLog() should record Event from Checkpoint2 as last EventLogEntry",
++                 L"%a:%d: Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
++  return EFI_SUCCESS;
++}
+diff --git a/uefi-sct/SctPkg/UEFI/Protocol/TCG2.h b/uefi-sct/SctPkg/UEFI/Protocol/TCG2.h
+index 643ce672..f8316643 100644
+--- a/uefi-sct/SctPkg/UEFI/Protocol/TCG2.h
++++ b/uefi-sct/SctPkg/UEFI/Protocol/TCG2.h
+@@ -45,6 +45,7 @@ typedef struct _EFI_TCG2_PROTOCOL EFI_TCG2_PROTOCOL;
+ #define EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2 0x00000001
+ 
+ #define EFI_TCG2_EVENT_LOG_FORMAT_TCG_2 0x00000002
++#define HASH_NUMBER 0x04
+ 
+ typedef UINT64 EFI_PHYSICAL_ADDRESS;
+ 
+@@ -107,6 +108,51 @@ typedef struct tdEFI_TCG2_EVENT {
+   EFI_TCG2_EVENT_HEADER Header;
+   UINT8 Event[];
+ } EFI_TCG2_EVENT;
++
++typedef struct {
++  UINT16     hashAlg;
++  UINT8      digest[];
++} TPMT_HA;
++
++typedef struct tdTPML_DIGEST_VALUES {
++  UINT32 Count;                    // number of digests
++  TPMT_HA Digests[HASH_NUMBER];    // Count digests
++} TPML_DIGEST_VALUES;
++
++
++// This Declaration is for parsing the eventlog header which is defined to be 20 bytes in TCG EFI Protocol Spec
++typedef UINT8 TCG_DIGEST[20];
++
++typedef struct tdTCG_PCR_EVENT2 {
++  TCG_PCRINDEX PCRIndex;       // PCRIndex event extended to
++  TCG_EVENTTYPE EventType;     // Type of event (see [2])
++  TPML_DIGEST_VALUES Digests;  // List of digests extended to //PCRIndex
++  UINT32 EventSize;            // Size of the event data
++  UINT8 *Event;                // The event data
++} TCG_PCR_EVENT2;
++
++typedef struct tdTCG_PCR_EVENT {
++  UINT32 PCRIndex; // PCRIndex event extended to
++  UINT32 EventType; // Type of event (see EFI specs)
++  TCG_DIGEST Digest; // Value extended into PCRIndex
++  UINT32 EventSize; // Size of the event data
++  UINT8 Event[0]; // The event data
++} TCG_PCR_EVENT;
++// Structure to be added to the Event Log
++
++typedef struct tdTCG_EfiSpecIdEventAlgorithmSize {
++  UINT16 algorithmId;
++  UINT16 digestSize;
++} TCG_EfiSpecIdEventAlgorithmSize;
++
++typedef struct tdTCG_EfiSpecIdEventStruct {
++   UINT8 signature[16];
++   UINT32 platformClass;
++   UINT8 specVersionMinor;
++   UINT8 specVersionMajor;
++   UINT8 specErrata;
++   UINT8 uintnSize;
++} TCG_EfiSpecIDEventStruct;
+ #pragma pack()
+ 
+ typedef
+-- 
+2.17.1
+

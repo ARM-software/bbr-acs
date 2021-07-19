@@ -1,0 +1,751 @@
+From d4949ca77db82a1a17e40408fcb2c0fae97c3b9c Mon Sep 17 00:00:00 2001
+From: Stuart Yoder <stuart.yoder@arm.com>
+Date: Mon, 24 May 2021 15:30:25 -0500
+Subject: [PATCH 02/22] uefi-sct/SctPkg: add test infrastructure for Secure
+ Boot test
+
+-build rules in SecureBootBBTest.inf
+
+-black box test framework in SecureBootBBTestMain.[ch]
+
+-initially mostly empty Guid.c, Guid.h
+
+-support functions in SecureBootBBTestSupport.[ch] with helpers to support
+ loading dependency files for the test
+
+Signed-off-by: Stuart Yoder <stuart.yoder@arm.com>
+---
+ .../SecureBoot/BlackBoxTest/Guid.c            |  33 +++
+ .../SecureBoot/BlackBoxTest/Guid.h            |  36 +++
+ .../BlackBoxTest/SecureBootBBTest.inf         |  55 +++++
+ .../BlackBoxTest/SecureBootBBTestMain.c       | 189 +++++++++++++++
+ .../BlackBoxTest/SecureBootBBTestMain.h       |  65 ++++++
+ .../BlackBoxTest/SecureBootBBTestSupport.c    | 217 ++++++++++++++++++
+ .../BlackBoxTest/SecureBootBBTestSupport.h    |  65 ++++++
+ uefi-sct/SctPkg/UEFI/UEFI_SCT.dsc             |   1 +
+ 8 files changed, 661 insertions(+)
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.c
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.h
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTest.inf
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestMain.c
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestMain.h
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestSupport.c
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestSupport.h
+
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.c
+new file mode 100644
+index 00000000..0c58a5b8
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.c
+@@ -0,0 +1,33 @@
++/** @file
++
++  Copyright 2006 - 2016 Unified EFI, Inc.<BR>
++  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
++  Copyright 2021, Arm LTD.
++
++  This program and the accompanying materials
++  are licensed and made available under the terms and conditions of the BSD License
++  which accompanies this distribution.  The full text of the license may be found at 
++  http://opensource.org/licenses/bsd-license.php
++ 
++  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++ 
++**/
++/*++
++
++Module Name:
++
++  Guid.c
++
++Abstract:
++
++  GUIDs auto-generated for EFI test assertion.
++
++--*/
++
++#include "Efi.h"
++#include "Guid.h"
++
++// defined in the UEFI spec
++EFI_GUID gEfiImageSecurityDatabaseGuid = EFI_IMAGE_SECURITY_DATABASE_GUID;
++
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.h b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.h
+new file mode 100644
+index 00000000..df0923f4
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.h
+@@ -0,0 +1,36 @@
++/** @file
++
++  Copyright 2006 - 2016 Unified EFI, Inc.<BR>
++  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
++  Copyright 2021, Arm LTD.
++
++  This program and the accompanying materials
++  are licensed and made available under the terms and conditions of the BSD License
++  which accompanies this distribution.  The full text of the license may be found at 
++  http://opensource.org/licenses/bsd-license.php
++ 
++  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++ 
++**/
++/*++
++
++Module Name:
++
++  guid.h
++
++Abstract:
++
++  GUIDs auto-generated for EFI test assertion.
++
++--*/
++
++// defined in the UEFI spec
++#define EFI_IMAGE_SECURITY_DATABASE_GUID \
++{ 0xd719b2cb, 0x3d3a, 0x4596, \
++{ 0xa3, 0xbc, 0xda, 0xd0, 0x0e, 0x67, 0x65, 0x6f }}
++
++extern EFI_GUID gEfiImageSecurityDatabaseGuid;
++
++extern EFI_GUID gEfiGlobalVariableGuid;
++
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTest.inf b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTest.inf
+new file mode 100644
+index 00000000..01f5a5c9
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTest.inf
+@@ -0,0 +1,55 @@
++## @file
++#
++#  Copyright 2006 - 2012 Unified EFI, Inc.<BR>
++#  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
++#  Copyright 2021, Arm LTD.
++#
++#  This program and the accompanying materials
++#  are licensed and made available under the terms and conditions of the BSD License
++#  which accompanies this distribution.  The full text of the license may be found at 
++#  http://opensource.org/licenses/bsd-license.php
++# 
++#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++# 
++##
++#/*++
++#
++# Module Name:
++#
++#   SecureBootBBTest.inf
++#
++# Abstract:
++#
++#   Component description file for Secure Boot Black-Box Test.
++#
++#--*/
++
++[Defines]
++  INF_VERSION          = 0x00010005
++  BASE_NAME            = SecureBootBBTest
++  FILE_GUID            = 6d74244a-802a-475f-bdcc-cd315110b512
++  MODULE_TYPE          = UEFI_DRIVER
++  VERSION_STRING       = 1.0
++  ENTRY_POINT          = InitializeSecureBootBbTest
++
++[Sources.common]
++  SecureBootBBTestMain.h
++  SecureBootBBTestMain.c
++  SecureBootBBTestSupport.c
++  Guid.h
++  Guid.c
++
++[Packages]
++  MdePkg/MdePkg.dec
++  SctPkg/SctPkg.dec
++  SctPkg/UEFI/UEFI.dec
++
++[LibraryClasses]
++  UefiDriverEntryPoint
++  SctLib
++  EfiTestLib
++
++[Protocols]
++  gEfiTestLoggingLibraryGuid
++  gEfiTestProfileLibraryGuid
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestMain.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestMain.c
+new file mode 100644
+index 00000000..de616d41
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestMain.c
+@@ -0,0 +1,189 @@
++/** @file
++
++  Copyright 2006 - 2017 Unified EFI, Inc.<BR>
++  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
++  Copyright 2021, Arm LTD.
++
++  This program and the accompanying materials
++  are licensed and made available under the terms and conditions of the BSD License
++  which accompanies this distribution.  The full text of the license may be found at 
++  http://opensource.org/licenses/bsd-license.php
++ 
++  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++ 
++**/
++/*++
++
++Module Name:
++  SecureBootBBTestMain.c
++
++Abstract:
++  The main source file for SecureBoot Black-Box Test.
++
++--*/
++
++//
++// Includes
++//
++
++#include "SctLib.h"
++#include "SecureBootBBTestMain.h"
++#include "SecureBootBBTestSupport.h"
++
++//
++// Declarations
++//
++
++EFI_BB_TEST_PROTOCOL_FIELD gBBTestProtocolField = {
++  SECURE_BOOT_BB_TEST_REVISION,
++  SECURE_BOOT_BB_TEST_GUID,
++  L"Secure Boot Test",
++  L"UEFI Secure Boot Black-Box Test"
++};
++
++EFI_GUID gSupportProtocolGuid[] = {
++  EFI_STANDARD_TEST_LIBRARY_GUID,
++  EFI_TEST_RECOVERY_LIBRARY_GUID,
++  EFI_NULL_GUID
++};
++
++EFI_BB_TEST_ENTRY_FIELD gBBTestEntryField[] = {
++  0
++};
++
++EFI_BB_TEST_PROTOCOL *gBBTestProtocolInterface;
++
++//
++// Prototypes
++//
++
++EFI_STATUS
++EFIAPI
++InitializeSecureBootBbTest (
++  IN EFI_HANDLE           ImageHandle,
++  IN EFI_SYSTEM_TABLE     *SystemTable
++  );
++
++EFI_STATUS
++EFIAPI
++UnloadSecureBootBbTest (
++  IN EFI_HANDLE       ImageHandle
++  );
++
++//
++// Functions
++//
++
++
++/**
++ *  Creates/installs the BlackBox Interface and the Entry Point list.
++ *  @param ImageHandle    The image handle.
++ *  @param SystemTable    The system table.
++ *  @return EFI_SUCCESS   The interface was installed successfully.
++ *  @return EFI_OUT_OF_RESOURCES    Failed due to the lack of resources.
++ *  @return EFI_INVALID_PARAMETER   One of parameters is invalid.
++ */
++EFI_STATUS
++EFIAPI
++InitializeSecureBootBbTest (
++  IN EFI_HANDLE           ImageHandle,
++  IN EFI_SYSTEM_TABLE     *SystemTable
++  )
++{
++  SctInitializeLib (ImageHandle, SystemTable);
++  EfiInitializeTestLib (ImageHandle, SystemTable);
++
++  GetSystemDevicePathAndFilePath (ImageHandle);
++
++  return EfiInitAndInstallBBTestInterface (
++           &ImageHandle,
++           &gBBTestProtocolField,
++           gBBTestEntryField,
++           UnloadSecureBootBbTest,
++           &gBBTestProtocolInterface
++           );
++}
++
++
++/**
++ *  Unloads the BlackBox Interface and the Entry Point list.
++ *  @param ImageHandle    The image handle.
++ *  @return EFI_SUCCESS   The interface was uninstalled successfully.
++ */
++EFI_STATUS
++EFIAPI
++UnloadSecureBootBbTest (
++  IN EFI_HANDLE       ImageHandle
++  )
++{
++  return EfiUninstallAndFreeBBTestInterface (
++           ImageHandle,
++           gBBTestProtocolInterface
++           );
++}
++
++
++/**
++ *  Support function - Get test support protocol library.
++ *  @param SupportHandle  A handle containing support protocols.
++ *  @param StandardLib    A pointer to Standard Test Support Protocol.
++ *  @param RecoveryLib    A pointer to Test Recovery Support Protocol.
++ *  @param LoggingLib     A pointer to Test Logging Support Protocol.
++ *  @return EFI_SUCCESS   Successfully.
++ *  @return Other value   Something failed.
++ */
++EFI_STATUS
++GetTestSupportLibrary (
++  IN EFI_HANDLE                           SupportHandle,
++  OUT EFI_STANDARD_TEST_LIBRARY_PROTOCOL  **StandardLib,
++  OUT EFI_TEST_PROFILE_LIBRARY_PROTOCOL   **ProfileLib,
++  OUT EFI_TEST_LOGGING_LIBRARY_PROTOCOL   **LoggingLib
++  )
++{
++  EFI_STATUS            Status;
++
++  //
++  // Get the standard test support library interface
++  //
++  *StandardLib = NULL;
++  Status = gtBS->HandleProtocol (
++                   SupportHandle,
++                   &gEfiStandardTestLibraryGuid,
++                   (VOID **) StandardLib
++                   );
++  if (EFI_ERROR(Status)) {
++    return Status;
++  }
++
++  //
++  // Get the test profile support library interface
++  //
++  if (ProfileLib != NULL) {
++    *ProfileLib = NULL;
++    Status = gtBS->HandleProtocol (
++                     SupportHandle,
++                     &gEfiTestProfileLibraryGuid,
++                     (VOID **) ProfileLib
++                     );
++    if (EFI_ERROR(Status)) {
++      return Status;
++    }
++  }
++
++  //
++  // Get the test logging support library interface
++  //
++  *LoggingLib = NULL;
++  Status = gtBS->HandleProtocol (
++                   SupportHandle,
++                   &gEfiTestLoggingLibraryGuid,
++                   (VOID **) LoggingLib
++                   );
++  // Test logging support library is optional
++
++  //
++  // Done
++  //
++  return EFI_SUCCESS;
++}
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestMain.h b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestMain.h
+new file mode 100644
+index 00000000..3dc34908
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestMain.h
+@@ -0,0 +1,65 @@
++/** @file
++
++  Copyright 2006 - 2016 Unified EFI, Inc.<BR>
++  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
++
++  This program and the accompanying materials
++  are licensed and made available under the terms and conditions of the BSD License
++  which accompanies this distribution.  The full text of the license may be found at 
++  http://opensource.org/licenses/bsd-license.php
++ 
++  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++ 
++**/
++/*++
++
++Module Name:
++  SecureBootBBTestMain.h
++
++Abstract:
++  Header file for Secure Boot Black-Box Test.
++
++--*/
++
++#ifndef _SECURE_BOOT_BB_TEST_MAIN_H
++#define _SECURE_BOOT_BB_TEST_MAIN_H
++
++//
++// Includes
++//
++#include "Efi.h"
++#include "Guid.h"
++#include <Library/EfiTestLib.h>
++
++#include EFI_TEST_PROTOCOL_DEFINITION(TestRecoveryLibrary)
++#include EFI_TEST_PROTOCOL_DEFINITION(TestLoggingLibrary)
++#include EFI_TEST_PROTOCOL_DEFINITION(TestProfileLibrary)
++
++//
++// Definitions
++//
++
++#define SECURE_BOOT_BB_TEST_REVISION    0x00010000
++
++#define SECURE_BOOT_BB_TEST_GUID        \
++  { 0xCBADA58E, 0xA1AA, 0x45DF, {0xBD, 0xDF, 0xF9, 0xBA, 0x12, 0x92, 0xF8, 0x87 }}
++
++#define MAX_BUFFER_SIZE                       256
++
++//
++// Prototypes
++//
++
++//
++// Support functions
++//
++EFI_STATUS
++GetTestSupportLibrary (
++  IN EFI_HANDLE                           SupportHandle,
++  OUT EFI_STANDARD_TEST_LIBRARY_PROTOCOL  **StandardLib,
++  OUT EFI_TEST_PROFILE_LIBRARY_PROTOCOL   **ProfileLib,
++  OUT EFI_TEST_LOGGING_LIBRARY_PROTOCOL   **LoggingLib
++  );
++
++#endif
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestSupport.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestSupport.c
+new file mode 100644
+index 00000000..7e88e858
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestSupport.c
+@@ -0,0 +1,217 @@
++/** @file
++
++  Copyright 2006 - 2016 Unified EFI, Inc.<BR>
++  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
++
++  This program and the accompanying materials
++  are licensed and made available under the terms and conditions of the BSD License
++  which accompanies this distribution.  The full text of the license may be found at 
++  http://opensource.org/licenses/bsd-license.php
++ 
++  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++ 
++**/
++/*++
++
++Module Name:
++
++  SecureBootBBTestSupport.c
++
++Abstract:
++
++  BB test support source file for Secure Boot
++
++--*/
++
++#include "SctLib.h"
++#include "SecureBootBBTestMain.h"
++#include "SecureBootBBTestSupport.h"
++
++//
++// globals variables
++//
++
++EFI_DEVICE_PATH_PROTOCOL        *gDevicePath     = NULL;
++CHAR16                          *gFilePath       = NULL;
++EFI_HANDLE                      gDeviceHandle;
++
++//
++// internal helper function.
++//
++
++/*
++ *  get the system device path and file path.
++ *  @param ProfileLib the Profile Library Protocol instance.
++ *  @return EFI_SUCCESS the system device path and file path were gotten successfully.
++ */
++EFI_STATUS
++GetSystemData (
++  IN EFI_TEST_PROFILE_LIBRARY_PROTOCOL  *ProfileLib
++  )
++{
++  EFI_DEVICE_PATH_PROTOCOL    *TempDevicePath;
++  CHAR16                      *TempFilePath;
++  EFI_STATUS                  Status;
++
++  //
++  // If gFilePath and gDevicePath has been assigned, return directly.
++  //
++  if ((gFilePath != NULL) && (gDevicePath != NULL)) {
++    return EFI_SUCCESS;
++  }
++
++  //
++  // Free gFilePath or gDevicePath
++  //
++  if (gFilePath != NULL) {
++    gtBS->FreePool (gFilePath);
++    gFilePath = NULL;
++  }
++  if (gDevicePath != NULL) {
++    gtBS->FreePool (gDevicePath);
++    gDevicePath = NULL;
++  }
++
++  //
++  //Get system device path and file path
++  //
++  Status = ProfileLib->EfiGetSystemDevicePath (
++                         ProfileLib,
++                         &TempDevicePath,
++                         &TempFilePath
++                         );
++  if (EFI_ERROR(Status)) {
++    return Status;
++  }
++
++  //
++  //make up the file path.
++  //
++  gFilePath = NULL;
++  gFilePath = SctPoolPrint (L"%s\\%s", TempFilePath, DEPENDECY_DIR_NAME);
++
++  gtBS->FreePool (TempFilePath);
++
++  if (gFilePath == NULL) {
++    gtBS->FreePool (TempDevicePath);
++    return EFI_OUT_OF_RESOURCES;
++  }
++
++  gDevicePath = TempDevicePath;
++
++  //
++  // Done, return status code EFI_SUCCESS
++  //
++  return EFI_SUCCESS;
++}
++
++
++/*
++ *  get the device handle.
++ *  @param ImageHandle the Image Handle instance.
++ *  @return EFI_SUCCESS the device handle was gotten successfully.
++ */
++EFI_STATUS
++GetSystemDevicePathAndFilePath (
++  IN EFI_HANDLE           ImageHandle
++  )
++{
++  EFI_STATUS                  Status;
++  EFI_LOADED_IMAGE_PROTOCOL   *Image;
++
++  //
++  // Get the image instance from the image handle
++  //
++  Status = gtBS->HandleProtocol (
++                   ImageHandle,
++                   &gEfiLoadedImageProtocolGuid,
++                   (VOID **) &Image
++                   );
++  if (EFI_ERROR(Status)) {
++    return Status;
++  }
++
++  gDeviceHandle = Image->DeviceHandle;
++
++  //
++  // Done, return status code EFI_SUCCESS
++  //
++  return EFI_SUCCESS;
++}
++
++/**
++ *  Open the file and get the file size.
++ *  @param FileName the file name to be opened.
++ *  @param FileHandle the opened file handle.
++ *  @param FileSize the opened file size.
++ *  @return EFI_SUCCESS the file was opened successfully.
++ */
++EFI_STATUS
++OpenFileAndGetSize (
++  IN  CHAR16          *FileName,
++  OUT EFI_FILE_HANDLE *FileHandle,
++  OUT UINT32          *FileSize
++  )
++{
++  EFI_FILE_HANDLE     RootDir;
++  EFI_FILE_HANDLE     FHandle;
++  CHAR16              *FileNameBuffer;
++  EFI_STATUS          Status;
++  EFI_FILE_INFO       *FileInfo;
++
++  if (FileName == NULL || FileHandle == NULL) {
++    return EFI_INVALID_PARAMETER;
++  }
++
++  RootDir = NULL;
++  //
++  //Open the root directory.
++  //
++  RootDir = SctOpenRoot (gDeviceHandle);
++  if (RootDir == NULL) {
++    return EFI_NOT_FOUND;
++  }
++  //
++  //make up the file name.
++  //
++  FileNameBuffer = SctPoolPrint (L"%s\\%s", gFilePath, FileName);
++  if (FileNameBuffer == NULL) {
++    RootDir->Close (RootDir);
++    return EFI_OUT_OF_RESOURCES;
++  }
++
++  Status = RootDir->Open (
++                      RootDir,
++                      &FHandle,
++                      FileNameBuffer,
++                      EFI_FILE_MODE_READ,
++                      0
++                      );
++  RootDir->Close (RootDir);
++  gtBS->FreePool (FileNameBuffer);
++
++  if (EFI_ERROR(Status)) {
++    return Status;
++  }
++
++  //
++  //get the file size.
++  //
++  if (FileSize != NULL) {
++    FileInfo = NULL;
++    Status = SctGetFileInfo (FHandle, &FileInfo);
++
++    if (EFI_ERROR (Status)) {
++      return Status;
++    }
++    *FileSize = (UINT32)FileInfo->FileSize;
++    gtBS->FreePool (FileInfo);
++  }
++
++  *FileHandle = FHandle;
++  //
++  //done successfully return EFI_SUCCESS.
++  //
++  return EFI_SUCCESS;
++}
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestSupport.h b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestSupport.h
+new file mode 100644
+index 00000000..8f4f5482
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestSupport.h
+@@ -0,0 +1,65 @@
++/** @file
++
++  Copyright 2006 - 2010 Unified EFI, Inc.<BR>
++  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
++
++  This program and the accompanying materials
++  are licensed and made available under the terms and conditions of the BSD License
++  which accompanies this distribution.  The full text of the license may be found at 
++  http://opensource.org/licenses/bsd-license.php
++ 
++  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++ 
++**/
++/*++
++
++Module Name:
++
++  SecureBootBBTestSupport.h
++
++Abstract:
++
++  BB test support header file for Secure Boot
++
++--*/
++
++#ifndef _SECUREBOOT_BBTEST_SUPPORT_H
++#define _SECUREBOOT_BBTEST_SUPPORT_H
++
++#include "SctLib.h"
++
++//
++// global variables
++//
++
++#define MAX_STRING_LEN                 256
++
++#define DEPENDECY_DIR_NAME             L"Dependency\\SecureBootBBTest"
++
++extern EFI_DEVICE_PATH_PROTOCOL        *gDevicePath;
++extern CHAR16                          *gFilePath;
++extern EFI_HANDLE                      gDeviceHandle;
++
++//
++// support function protype
++//
++
++EFI_STATUS
++GetSystemData (
++  IN EFI_TEST_PROFILE_LIBRARY_PROTOCOL  *ProfileLib
++  );
++
++EFI_STATUS
++GetSystemDevicePathAndFilePath (
++  IN EFI_HANDLE           ImageHandle
++  );
++
++EFI_STATUS
++OpenFileAndGetSize (
++  IN  CHAR16          *FileName,
++  OUT EFI_FILE_HANDLE *FileHandle,
++  OUT UINT32          *FileSize
++  );
++
++#endif
+diff --git a/uefi-sct/SctPkg/UEFI/UEFI_SCT.dsc b/uefi-sct/SctPkg/UEFI/UEFI_SCT.dsc
+index 8974dc3c..aa54b6dc 100644
+--- a/uefi-sct/SctPkg/UEFI/UEFI_SCT.dsc
++++ b/uefi-sct/SctPkg/UEFI/UEFI_SCT.dsc
+@@ -208,6 +208,7 @@ SctPkg/TestCase/UEFI/EFI/BootServices/ProtocolHandlerServices/BlackBoxTest/Proto
+ SctPkg/TestCase/UEFI/EFI/RuntimeServices/MiscRuntimeServices/BlackBoxTest/MiscRuntimeServicesBBTest.inf
+ SctPkg/TestCase/UEFI/EFI/RuntimeServices/TimeServices/BlackBoxTest/TimeServicesBBTest.inf
+ SctPkg/TestCase/UEFI/EFI/RuntimeServices/VariableServices/BlackBoxTest/VariableServicesBBTest.inf
++SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTest.inf
+ 
+ SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTest.inf
+ SctPkg/TestCase/UEFI/EFI/Protocol/GraphicsOutput/BlackBoxTest/GraphicsOutputBBTest.inf
+-- 
+2.17.1
+

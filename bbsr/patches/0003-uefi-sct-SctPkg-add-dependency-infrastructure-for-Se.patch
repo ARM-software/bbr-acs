@@ -1,0 +1,123 @@
+From 9d203dfda85807eb0a49a3fcf5ca7f60c82a7d55 Mon Sep 17 00:00:00 2001
+From: Stuart Yoder <stuart.yoder@arm.com>
+Date: Mon, 24 May 2021 15:50:22 -0500
+Subject: [PATCH 03/22] uefi-sct/SctPkg: add dependency infrastructure for
+ Secure Boot
+
+-add a GNUMakefile that generates private/public key pairs
+ dependencies for SecureBoot-- a PK, KEK, db, and dbx
+
+-update test package script to copy the keys to the test
+ package
+
+Signed-off-by: Stuart Yoder <stuart.yoder@arm.com>
+---
+ .../BlackBoxTest/Dependency/Keys/GNUmakefile  | 51 +++++++++++++++++++
+ .../BlackBoxTest/Dependency/Keys/Keys.inf     | 37 ++++++++++++++
+ 2 files changed, 88 insertions(+)
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Keys/GNUmakefile
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Keys/Keys.inf
+
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Keys/GNUmakefile b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Keys/GNUmakefile
+new file mode 100644
+index 00000000..9362579e
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Keys/GNUmakefile
+@@ -0,0 +1,51 @@
++## @file
++#
++#  Copyright 2006 - 2012 Unified EFI, Inc.<BR>
++#  Copyright (c) 2011 - 2012, ARM Ltd. All rights reserved.<BR>
++#
++#  This program and the accompanying materials
++#  are licensed and made available under the terms and conditions of the BSD License
++#  which accompanies this distribution.  The full text of the license may be found at 
++#  http://opensource.org/licenses/bsd-license.php
++# 
++#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++# 
++##
++#/*++
++#
++# Module Name:
++#
++#   makefile
++#
++# Abstract:
++#
++#   This is the makefile for creating a private/public keypair for Secure Boot testing.
++#
++#--*/
++
++BASE_NAME=SecureBoot
++TARGET=$(BIN_DIR)/$(BASE_NAME)
++
++all: TestPK1 TestKEK1 TestDB1 TestDBX1
++
++TestPK1:
++	openssl req -x509 -sha256 -newkey rsa:2048 -subj /CN=ACS_TEST_PK/ -keyout $(TARGET)_$(@).key -out $(TARGET)_$(@).crt -nodes -days 4000
++	openssl x509 -outform der -in $(TARGET)_$(@).crt -out $(TARGET)_$(@).der
++
++TestKEK1:
++	openssl req -x509 -sha256 -newkey rsa:2048 -subj /CN=ACS_TEST_PK/ -keyout $(TARGET)_$(@).key -out $(TARGET)_$(@).crt -nodes -days 4000
++	openssl x509 -outform der -in $(TARGET)_$(@).crt -out $(TARGET)_$(@).der
++
++TestDB1:
++	openssl req -x509 -sha256 -newkey rsa:2048 -subj /CN=ACS_TEST_DB/ -keyout $(TARGET)_$(@).key -out $(TARGET)_$(@).crt -nodes -days 4000
++	openssl x509 -outform der -in $(TARGET)_$(@).crt -out $(TARGET)_$(@).der
++
++TestDBX1:
++	openssl req -x509 -sha256 -newkey rsa:2048 -subj /CN=ACS_TEST_DB/ -keyout $(TARGET)_$(@).key -out $(TARGET)_$(@).crt -nodes -days 4000
++	openssl x509 -outform der -in $(TARGET)_$(@).crt -out $(TARGET)_$(@).der
++
++clean:
++	$(RM) $(BIN_DIR)/$(TARGET)_*.key
++	$(RM) $(BIN_DIR)/$(TARGET)_*.crt
++	$(RM) $(BIN_DIR)/$(TARGET)_*.der
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Keys/Keys.inf b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Keys/Keys.inf
+new file mode 100644
+index 00000000..2914320d
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Keys/Keys.inf
+@@ -0,0 +1,37 @@
++## @file
++#
++#  Copyright (c) 2021, ARM Ltd. All rights reserved.<BR>
++#
++#  This program and the accompanying materials
++#  are licensed and made available under the terms and conditions of the BSD License
++#  which accompanies this distribution.  The full text of the license may be found at 
++#  http://opensource.org/licenses/bsd-license.php
++# 
++#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++# 
++##
++#/*++
++#
++# Module Name:
++#
++#   Keys.inf
++#
++# Abstract:
++#
++#   Component description file for creating the Secure Boot test keys.
++#
++#--*/
++
++[defines]
++BASE_NAME            = TestPK1
++FILE_GUID            = 0B1412C0-1AB8-49AB-BC65-F81E368A0AC2
++MODULE_TYPE          = UEFI_DRIVER
++CUSTOM_MAKEFILE      = MSFT| makefile
++CUSTOM_MAKEFILE      = GCC | GNUmakefile
++
++[sources.common]
++
++[nmake.common]
++
++[includes.common]
+-- 
+2.17.1
+

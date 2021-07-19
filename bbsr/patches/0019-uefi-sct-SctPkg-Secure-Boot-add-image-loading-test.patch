@@ -1,0 +1,841 @@
+From 57ded7e71d5260b278eba3a9b5fbd00da461052b Mon Sep 17 00:00:00 2001
+From: Stuart Yoder <stuart.yoder@arm.com>
+Date: Thu, 8 Jul 2021 18:04:53 -0500
+Subject: [PATCH 19/22] uefi-sct/SctPkg: Secure Boot: add image loading test
+
+-add infrastructure for the image loading test
+  -define a global ImageHandle in TestSupport for use in
+   LoadImage()
+  -generate needed signature lists
+  -define test GUIDs
+  -initialize KEK, db, dbx
+
+-add initial test assertion to test loading an image that
+ is not signed
+
+Signed-off-by: Stuart Yoder <stuart.yoder@arm.com>
+---
+ .../Dependency/Keys/Application2.efi          | Bin 0 -> 12288 bytes
+ .../BlackBoxTest/Dependency/Keys/GNUmakefile  |  25 +-
+ .../SecureBoot/BlackBoxTest/Guid.c            |  20 +
+ .../SecureBoot/BlackBoxTest/Guid.h            |  50 ++
+ .../BlackBoxTest/ImageLoadingBBTest.c         | 522 ++++++++++++++++++
+ .../BlackBoxTest/SecureBootBBTest.inf         |   1 +
+ .../BlackBoxTest/SecureBootBBTestMain.c       |   9 +
+ .../BlackBoxTest/SecureBootBBTestMain.h       |  11 +
+ .../BlackBoxTest/SecureBootBBTestSupport.c    |   6 +-
+ .../BlackBoxTest/SecureBootBBTestSupport.h    |   1 +
+ 10 files changed, 641 insertions(+), 4 deletions(-)
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Keys/Application2.efi
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/ImageLoadingBBTest.c
+
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Keys/Application2.efi b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Keys/Application2.efi
+new file mode 100644
+index 0000000000000000000000000000000000000000..55456c913985d02f9e1fea5a9b46d0d1d890b44d
+GIT binary patch
+literal 12288
+zcmeI0&ubGw6vy9YdyopEL}?)fV-yjgnWR{uc*thc^ar#O@`H*B$!2%0A!#;bx6)FC
+z>K`Bklp<bIPbQ}xL_rEx>cwjg^;#_ANwAa@_YmSt(!kV9Ayx!=18?7tdEYlPpW{y7
+zhOXDGQ(a3@hy;)T5<mh-00|%gB!C2v01`j~{|SLe7(lB!4!!0Fc;O@~ojx$?d|cdW
+z{ylFMStB*JM^|s#9r-<IKeCT+xa$TO;0u2kdo6vzVlz7L>UeIh8zAM?6iey!(L$@A
+zd2UGn8(exUp#ZSvNd-q70t|a#IqFFXBdq4W0=D3jY<kF=a0#eiu5F0Pt;W)NWk-bS
+zwkT9tUqgh_UQDPsX<T=LeQ|*5XzZX`x4Rv`cY*Ec2m5QYxstjpwf0}`K<NTNsb@;E
+zw?(nK41uk(`15V~JUw%OYDIW0fMlPev(8dux<C)?3L?aNB*|Wtp(N5fIq03sn^0nU
+z)<g4JYi~lb%Pz@IarH-!sfMewH|@oOmAX^18%rNwvG)Z|!0v}eGv1laH0-=@&1T=R
+z0LLLn00|%gB!C2v01`j~NB{{S0VIF~{sDnizw1u=S?$b|0F*yviZ|Xok45WayWtmw
+zzNM9?(_c1?>Q?{E)roh#pC3HjU;p0i71?hef&Lg+aJTKI?Dz4r$bDl@C#E&OXlOn^
+znK6o4l1`h&q@tS1v~DRxmSa(3s>MvfGKsEbhXyU(w8*@EFEePW7Ln&OIgKP}8l%~0
+zSWb*5$3vlE5)4K|6W6a1T8?CANt~)eim8)Ccx;j|ixdsZP>md!G89eMCg+q{oya*w
+z&C13CYbT?6LC<S?UR@-?LLrw?6)R)phYlyLBl#IgZXPf5YPlT$c8rk#5<mh-00|%g
+TB!C2v01`j~NB{}^Z34dl$2RAt
+
+literal 0
+HcmV?d00001
+
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Keys/GNUmakefile b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Keys/GNUmakefile
+index 11f821dc..ded66458 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Keys/GNUmakefile
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Keys/GNUmakefile
+@@ -26,6 +26,7 @@
+ 
+ BASE_NAME=SecureBoot
+ TARGET=$(BIN_DIR)/$(BASE_NAME)
++SOURCE_DIR=$(WORKSPACE)/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Keys
+ FUTURE_DATE=$(shell date --rfc-3339=date -d "+1 year")
+ FUTURE_DATE2=$(shell date --rfc-3339=date -d "+1 day")
+ FUTURE_DATE3=$(shell date --rfc-3339=date -d "+2 day")
+@@ -34,6 +35,7 @@ PAST_DATE=$(shell date --rfc-3339=date -d "-1 year")
+ ifdef KEYS_DIR
+ TEST_KEK1_CRT=$(KEYS_DIR)/TestKEK1.crt
+ TEST_DB1_CRT=$(KEYS_DIR)/TestDB1.crt
++TEST_DB1_KEY=$(KEYS_DIR)/TestDB1.key
+ TEST_DBX1_CRT=$(KEYS_DIR)/TestDBX1.crt
+ TEST_KEK1_KEY=$(KEYS_DIR)/TestKEK1.key
+ TEST_PK1_CRT=$(KEYS_DIR)/TestPK1.crt
+@@ -46,11 +48,19 @@ TEST_PK1_CRT=$(BIN_DIR)/SecureBoot_TestPK1.crt
+ TEST_PK1_KEY=$(BIN_DIR)/SecureBoot_TestPK1.key
+ endif
+ 
+-all: $(TEST_KEYS) TestKEK2 KEKSigList1.auth TestImage1.bin NullKEK.auth NullDB.auth NullDBX.auth TestKEK1.auth TestDB1.auth TestDBX1.auth SignCert1 dbSigList1.auth SignCert2 SignCert3 RevokedCert1 RevokedCert2 RevokedCert3 RevokedCert4 dbSigList2.auth dbSigList3.auth dbSigList4.auth
++all: $(TEST_KEYS) TestKEK2 KEKSigList1.auth TestImage1.bin TestImage2.bin TestImage3.bin NullKEK.auth NullDB.auth NullDBX.auth TestKEK1.auth TestDB1.auth TestDBX1.auth SignCert1 dbSigList1.auth SignCert2 SignCert3 RevokedCert1 RevokedCert2 RevokedCert3 RevokedCert4 dbSigList2.auth dbSigList3.auth dbSigList4.auth DBXRevokedList1.auth
+ 
+ TestImage1.bin:
+-	head -c 16K </dev/urandom > $(TARGET)_$(@)
+-
++	cp $(SOURCE_DIR)/Application2.efi $(TARGET)_$(@)
++
++TestImage2.bin: SignCert1
++	cp $(SOURCE_DIR)/Application2.efi $(TARGET)_$(@)
++	sbsign --key $(TARGET)_SignCert1.key --cert $(TARGET)_SignCert1.crt $(TARGET)_$(@) --output $(TARGET)_$(@)
++
++TestImage3.bin: SignCert2
++	cp $(SOURCE_DIR)/Application2.efi $(TARGET)_$(@)
++	sbsign --key $(TARGET)_SignCert2.key --cert $(TARGET)_SignCert2.crt $(TARGET)_$(@) --output $(TARGET)_$(@)
++
+ TestImage5.bin:
+ 	cp $(BIN_DIR)/Ebc_EbcDriver.efi $(TARGET)_$(@)
+ 
+@@ -155,6 +165,15 @@ dbSigList4.auth: Sign_Cert4
+ 	cert-to-efi-sig-list $(BIN_DIR)/SecureBoot_Sign_Cert4.crt $(BIN_DIR)/SecureBoot_TestDB9.esl
+ 	sign-efi-sig-list -c $(BIN_DIR)/SecureBoot_TestKEK2.crt -k $(BIN_DIR)/SecureBoot_TestKEK2.key -t "$(FUTURE_DATE3)" db $(BIN_DIR)/SecureBoot_TestDB9.esl $(BIN_DIR)/SecureBoot_DBSigList4.auth
+ 
++DBXRevokedList1.auth: RevokedCert1 RevokedCert2 RevokedCert3 RevokedCert4 TestImage5.bin
++	cert-to-efi-sig-list $(BIN_DIR)/SecureBoot_RevokedCert1.crt $(BIN_DIR)/SecureBoot_RevokedCert1.esl
++	cert-to-efi-sig-list $(BIN_DIR)/SecureBoot_RevokedCert2.crt $(BIN_DIR)/SecureBoot_RevokedCert2.esl
++	cert-to-efi-sig-list $(BIN_DIR)/SecureBoot_RevokedCert3.crt $(BIN_DIR)/SecureBoot_RevokedCert3.esl
++	cert-to-efi-sig-list $(BIN_DIR)/SecureBoot_RevokedCert4.crt $(BIN_DIR)/SecureBoot_RevokedCert4.esl
++	hash-to-efi-sig-list $(BIN_DIR)/SecureBoot_TestImage5.bin $(BIN_DIR)/SecureBoot_TestImage5Hash.esl
++	cat $(BIN_DIR)/SecureBoot_RevokedCert1.esl $(BIN_DIR)/SecureBoot_RevokedCert2.esl $(BIN_DIR)/SecureBoot_RevokedCert3.esl  $(BIN_DIR)/SecureBoot_RevokedCert4.esl $(BIN_DIR)/SecureBoot_TestImage5Hash.esl  > $(BIN_DIR)/SecureBoot_DBXRevokedList1.esl
++	sign-efi-sig-list -c $(TEST_KEK1_CRT) -k $(TEST_KEK1_KEY) -t "$(FUTURE_DATE2)" dbx $(BIN_DIR)/SecureBoot_DBXRevokedList1.esl $(BIN_DIR)/SecureBoot_DBXRevokedList1.auth
++
+ clean:
+ 	$(RM) $(BIN_DIR)/$(TARGET)_*.key
+ 	$(RM) $(BIN_DIR)/$(TARGET)_*.crt
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.c
+index f2656daa..dea89d60 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.c
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.c
+@@ -64,3 +64,23 @@ EFI_GUID gSecureBootVariableUpdatesBbTestAssertionGuid006 = EFI_TEST_SECUREBOOTV
+ EFI_GUID gSecureBootVariableUpdatesBbTestAssertionGuid007 = EFI_TEST_SECUREBOOTVARIABLEUPDATES_ASSERTION_007_GUID;
+ 
+ EFI_GUID gSecureBootVariableUpdatesBbTestAssertionGuid008 = EFI_TEST_SECUREBOOTVARIABLEUPDATES_ASSERTION_008_GUID;
++
++EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid001 = EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_001_GUID;
++
++EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid002 = EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_002_GUID;
++
++EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid003 = EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_003_GUID;
++
++EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid004 = EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_004_GUID;
++
++EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid005 = EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_005_GUID;
++
++EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid006 = EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_006_GUID;
++
++EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid007 = EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_007_GUID;
++
++EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid008 = EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_008_GUID;
++
++EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid009 = EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_009_GUID;
++
++EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid010 = EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_010_GUID;
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.h b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.h
+index d0630187..994ab8f4 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.h
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.h
+@@ -109,3 +109,53 @@ extern EFI_GUID gSecureBootVariableUpdatesBbTestAssertionGuid007;
+ { 0xead975e5, 0x0a13, 0x45a6, {0xac, 0xdd, 0xb3, 0xee, 0x23, 0x64, 0x30, 0x57 }}
+ 
+ extern EFI_GUID gSecureBootVariableUpdatesBbTestAssertionGuid008;
++
++#define EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_001_GUID \
++{ 0x6c605b08, 0x2ab7, 0x4681, {0x9f, 0x2f, 0x74, 0xd0, 0x8d, 0x96, 0x4e, 0x35 }}
++
++extern EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid001;
++
++#define EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_002_GUID \
++{ 0x34daa12d, 0x302b, 0x4afd, {0x9f, 0x1f, 0xcb, 0x55, 0x2e, 0x59, 0x48, 0xbe }}
++
++extern EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid002;
++
++#define EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_003_GUID \
++{ 0x5e1c06cb, 0xf84a, 0x4b38, {0x80, 0x96, 0x2f, 0x7b, 0x95, 0x91, 0xbb, 0x3a }}
++
++extern EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid003;
++
++#define EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_004_GUID \
++{ 0x85f7e35e, 0xe333, 0x4d44, {0x83, 0xf8, 0x03, 0x39, 0x41, 0x89, 0xf3, 0xb2 }}
++
++extern EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid004;
++
++#define EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_005_GUID \
++{ 0xaa8167ae, 0xf03a, 0x4074, {0xb2, 0x78, 0xd6, 0xf1, 0x29, 0x0a, 0x86, 0xa7 }}
++
++extern EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid005;
++
++#define EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_006_GUID \
++{ 0xb62a25f4, 0xc24e, 0x4853, {0x9a, 0xd1, 0x8b, 0x3f, 0xc5, 0x9b, 0x29, 0xd7 }}
++
++extern EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid006;
++
++#define EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_007_GUID \
++{ 0x54e33072, 0x43d2, 0x4fbf, {0xb4, 0x4e, 0x1d, 0x1c, 0xe7, 0xf7, 0x1a, 0xd2 }}
++
++extern EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid007;
++
++#define EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_008_GUID \
++{ 0x20a23f21, 0x31f1, 0x4264, {0xa6, 0xcb, 0x7d, 0xc7, 0xe6, 0x96, 0x3c, 0x63 }}
++
++extern EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid008;
++
++#define EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_009_GUID \
++{ 0x4bb36713, 0xd8e2, 0x405b, {0x8b, 0xda, 0x86, 0x12, 0xc7, 0x92, 0x91, 0xa9 }}
++
++extern EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid009;
++
++#define EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_010_GUID \
++{ 0x3b48371b, 0xc27e, 0x4c19, {0xb9, 0x99, 0x54, 0x53, 0x7e, 0xa4, 0xbf, 0xed }}
++
++extern EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid010;
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/ImageLoadingBBTest.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/ImageLoadingBBTest.c
+new file mode 100644
+index 00000000..44589fcd
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/ImageLoadingBBTest.c
+@@ -0,0 +1,522 @@
++/** @file
++
++  Copyright 2006 - 2012 Unified EFI, Inc.<BR>
++  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
++  Copyright 2021, Arm LTD.
++
++  This program and the accompanying materials
++  are licensed and made available under the terms and conditions of the BSD License
++  which accompanies this distribution.  The full text of the license may be found at 
++  http://opensource.org/licenses/bsd-license.php
++ 
++  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++ 
++**/
++/*++
++
++Module Name:
++  ImageLoadingBBTest.c
++
++Abstract:
++  Source file for Secure Boot Image Loading Black-Box Test - Conformance Test.
++
++--*/
++
++#include "SctLib.h"
++#include "SecureBootBBTestMain.h"
++#include "SecureBootBBTestSupport.h"
++
++#define KEK_ATTRIBUTES (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | \
++                       EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS)
++
++//
++// Prototypes (external)
++//
++
++EFI_STATUS
++ImageLoadingTest (
++  IN EFI_BB_TEST_PROTOCOL       *This,
++  IN VOID                       *ClientInterface,
++  IN EFI_TEST_LEVEL             TestLevel,
++  IN EFI_HANDLE                 SupportHandle
++  );
++
++
++//
++// Prototypes (internal)
++//
++
++EFI_STATUS
++ImageLoadingVariableInit  (
++  IN EFI_RUNTIME_SERVICES                 *RT,
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL   *StandardLib,
++  IN EFI_TEST_LOGGING_LIBRARY_PROTOCOL    *LoggingLib,
++  EFI_TEST_PROFILE_LIBRARY_PROTOCOL   *ProfileLib
++  );
++
++EFI_STATUS
++ImageLoadingTestCheckpoint1 (
++  IN EFI_RUNTIME_SERVICES                 *RT,
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL   *StandardLib,
++  IN EFI_TEST_LOGGING_LIBRARY_PROTOCOL    *LoggingLib,
++  EFI_TEST_PROFILE_LIBRARY_PROTOCOL   *ProfileLib
++  );
++
++//
++// Functions
++//
++
++/**
++ *  Entry point for Secure Boot Image Loading Test.
++ *  @param This             A pointer to the EFI_BB_TEST_PROTOCOL instance.
++ *  @param ClientInterface  A pointer to the interface to be tested.
++ *  @param TestLevel        Test "thoroughness" control.
++ *  @param SupportHandle    A handle containing support protocols.
++ *  @return EFI_SUCCESS     Successfully.
++ *  @return Other value     Something failed.
++ */
++EFI_STATUS
++ImageLoadingTest(
++  IN EFI_BB_TEST_PROTOCOL       *This,
++  IN VOID                       *ClientInterface,
++  IN EFI_TEST_LEVEL             TestLevel,
++  IN EFI_HANDLE                 SupportHandle
++  )
++{
++  EFI_STATUS                          Status;
++  EFI_RUNTIME_SERVICES                *RT;
++  EFI_STANDARD_TEST_LIBRARY_PROTOCOL  *StandardLib;
++  EFI_TEST_PROFILE_LIBRARY_PROTOCOL   *ProfileLib;
++  EFI_TEST_LOGGING_LIBRARY_PROTOCOL   *LoggingLib;
++
++  //
++  // Get test support library interfaces
++  //
++  Status = GetTestSupportLibrary (
++             SupportHandle,
++             &StandardLib,
++             &ProfileLib,
++             &LoggingLib
++             );
++
++  if (EFI_ERROR(Status)) {
++    return Status;
++  }
++
++  RT = (EFI_RUNTIME_SERVICES *)ClientInterface;
++
++  //
++  // Get the system device path and file path
++  //
++  Status = GetSystemData (ProfileLib);
++  if (EFI_ERROR(Status)) {
++    return Status;
++  }
++
++  // Initialize KEK, db, dbx
++  Status = ImageLoadingVariableInit (RT, StandardLib, LoggingLib, ProfileLib);
++  if (EFI_ERROR(Status)) {
++    SecureBootVariableCleanup (RT, StandardLib, LoggingLib, ProfileLib);
++    return Status;
++  }
++
++  Status = ImageLoadingTestCheckpoint1 (RT, StandardLib, LoggingLib, ProfileLib);
++  if (EFI_ERROR(Status)) {
++    SecureBootVariableCleanup (RT, StandardLib, LoggingLib, ProfileLib);
++    return Status;
++  }
++
++  // Restore KEK, db, dbx
++  Status = SecureBootVariableCleanup (RT, StandardLib, LoggingLib, ProfileLib);
++  if (EFI_ERROR(Status)) {
++    return Status;
++  }
++
++  //
++  // Done
++  //
++  return EFI_SUCCESS;
++
++}
++
++/**
++ *  Initialize Secure Boot variables for this test
++ *
++ *  @param StandardLib    A pointer to EFI_STANDARD_TEST_LIBRARY_PROTOCOL
++ *                        instance.
++ *  @param LoggingLib     A pointer to EFI_TEST_LOGGING_LIBRARY_PROTOCOL
++ *                        instance.
++ *  @param ProfileLib     A pointer to EFI_TEST_PROFILE_LIBRARY_PROTOCOL
++ *                        instance.
++ *  @return EFI_SUCCESS   Successfully.
++ *  @return Other value   Something failed.
++ */
++EFI_STATUS
++ImageLoadingVariableInit  (
++  IN EFI_RUNTIME_SERVICES                 *RT,
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL   *StandardLib,
++  IN EFI_TEST_LOGGING_LIBRARY_PROTOCOL    *LoggingLib,
++  EFI_TEST_PROFILE_LIBRARY_PROTOCOL   *ProfileLib
++  )
++{
++  EFI_STATUS            Status;
++  EFI_TEST_ASSERTION    Result;
++  UINTN                 DataSize;
++  UINT8                 Data[MAX_BUFFER_SIZE];
++  UINT32                Attributes;
++  EFI_FILE_HANDLE       KeyFHandle;
++  UINT32                KeyFileSize;
++  CHAR16                *FileName;
++  VOID                  *Buffer;
++  UINTN                 BufferSize;
++  UINT32                DBAttributes;
++  UINT32                DBXAttributes;
++
++  DataSize = MAX_BUFFER_SIZE;
++  Status = RT->GetVariable (
++                 L"SecureBoot",               // VariableName
++                 &gEfiGlobalVariableGuid,     // VendorGuid
++                 &Attributes,                 // Attributes
++                 &DataSize,                   // DataSize
++                 Data                         // Data
++                 );
++
++  // if SecureBoot is not enabled, exit
++  if (EFI_ERROR(Status) || Data[0] != 1) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"Secure Boot ImageLoadingTest: SecureBoot not enabled\n"
++                     );
++    return EFI_NOT_FOUND;
++  }
++
++  //
++  // Initialize KEK
++  //
++
++  FileName = L"KEKSigList1.auth";
++
++  //
++  //read the key file into memory.
++  //
++  Status = OpenFileAndGetSize (
++             FileName,
++             &KeyFHandle,
++             &KeyFileSize
++             );
++
++  if (EFI_ERROR(Status)) {
++    return EFI_NOT_FOUND;
++  }
++
++  Buffer = SctAllocatePool (KeyFileSize);
++
++  if (Buffer == NULL) {
++    KeyFHandle->Close (KeyFHandle);
++    return EFI_OUT_OF_RESOURCES;
++  }
++
++  BufferSize = KeyFileSize;
++
++  Status = KeyFHandle->Read (
++                      KeyFHandle,
++                      &BufferSize,
++                      Buffer
++                      );
++
++  if (EFI_ERROR(Status)) {
++    KeyFHandle->Close (KeyFHandle);
++    gtBS->FreePool (Buffer);
++    return EFI_LOAD_ERROR;
++  }
++
++  Status = RT->SetVariable (
++                     L"KEK",                    // VariableName
++                     &gEfiGlobalVariableGuid,   // VendorGuid
++                     KEK_ATTRIBUTES,            // Attributes
++                     BufferSize,                // DataSize
++                     Buffer                     // Data
++                     );
++
++  gtBS->FreePool (Buffer);
++
++  if (EFI_ERROR(Status)) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"Secure Boot ImageLoadingTest: unable to set KEK. Status=%r.\n",
++                     Status
++                     );
++    return EFI_NOT_FOUND;
++  }
++
++
++  //
++  // Initialize db
++  //
++
++  // get db variable attributes
++  DataSize = 0;
++  Status = RT->GetVariable (
++                 L"db",                          // VariableName
++                 &gEfiImageSecurityDatabaseGuid, // VendorGuid
++                 &DBAttributes,                  // Attributes
++                 &DataSize,                      // DataSize
++                 NULL                            // Data
++                 );
++
++  FileName = L"dbSigList2.auth";
++
++  //
++  //read the key file into memory.
++  //
++  Status = OpenFileAndGetSize (
++             FileName,
++             &KeyFHandle,
++             &KeyFileSize
++             );
++
++  if (EFI_ERROR(Status)) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"Secure Boot ImageLoadingTest: couldn't load dbSigList2.auth\n"
++                     );
++    return EFI_NOT_FOUND;
++  }
++
++  Buffer = SctAllocatePool (KeyFileSize);
++
++  if (Buffer == NULL) {
++    KeyFHandle->Close (KeyFHandle);
++    return EFI_OUT_OF_RESOURCES;
++  }
++
++  BufferSize = KeyFileSize;
++
++  Status = KeyFHandle->Read (
++                      KeyFHandle,
++                      &BufferSize,
++                      Buffer
++                      );
++
++  if (EFI_ERROR(Status)) {
++    KeyFHandle->Close (KeyFHandle);
++    gtBS->FreePool (Buffer);
++    return EFI_LOAD_ERROR;
++  }
++
++  Status = RT->SetVariable (
++                     L"db",                    // VariableName
++                     &gEfiImageSecurityDatabaseGuid,  // Vendor GUID
++                     DBAttributes,            // Attributes
++                     BufferSize,                // DataSize
++                     Buffer                     // Data
++                     );
++
++  gtBS->FreePool (Buffer);
++
++  if (EFI_ERROR(Status)) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"Secure Boot ImageLoadingTest: unable to set db\n"
++                     );
++    return EFI_NOT_FOUND;
++  }
++
++
++  //
++  // Initialize dbx
++  //
++
++  // get dbx variable attributes
++  DataSize = 0;
++  Status = RT->GetVariable (
++                 L"dbx",                          // VariableName
++                 &gEfiImageSecurityDatabaseGuid, // VendorGuid
++                 &DBXAttributes,                    // Attributes
++                 &DataSize,                      // DataSize
++                 NULL                            // Data
++                 );
++
++  FileName = L"DBXRevokedList1.auth";
++
++  //
++  //read the key file into memory.
++  //
++  Status = OpenFileAndGetSize (
++             FileName,
++             &KeyFHandle,
++             &KeyFileSize
++             );
++
++  if (EFI_ERROR(Status)) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"Secure Boot ImageLoadingTest: unable to load DBXRevokedList1.auth\n"
++                     );
++    return EFI_NOT_FOUND;
++  }
++
++  Buffer = SctAllocatePool (KeyFileSize);
++
++  if (Buffer == NULL) {
++    KeyFHandle->Close (KeyFHandle);
++    return EFI_OUT_OF_RESOURCES;
++  }
++
++  BufferSize = KeyFileSize;
++
++  Status = KeyFHandle->Read (
++                      KeyFHandle,
++                      &BufferSize,
++                      Buffer
++                      );
++
++  if (EFI_ERROR(Status)) {
++    KeyFHandle->Close (KeyFHandle);
++    gtBS->FreePool (Buffer);
++    return EFI_LOAD_ERROR;
++  }
++
++  Status = RT->SetVariable (
++                     L"dbx",                    // VariableName
++                     &gEfiImageSecurityDatabaseGuid,  // Vendor GUID
++                     DBXAttributes,            // Attributes
++                     BufferSize,                // DataSize
++                     Buffer                     // Data
++                     );
++
++  gtBS->FreePool (Buffer);
++
++  if (EFI_ERROR(Status)) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"Secure Boot ImageLoadingTest: unable to set dbx. Status=%r.\n",
++                     Status
++                     );
++    return EFI_NOT_FOUND;
++  }
++
++
++  //
++  // Done
++  //
++  return EFI_SUCCESS;
++}
++
++/**
++ *  Verify that updates to KEK are signed (by PK) FIXME
++ *
++ *  @param StandardLib    A pointer to EFI_STANDARD_TEST_LIBRARY_PROTOCOL
++ *                        instance.
++ *  @param LoggingLib     A pointer to EFI_TEST_LOGGING_LIBRARY_PROTOCOL
++ *                        instance.
++ *  @param ProfileLib     A pointer to EFI_TEST_PROFILE_LIBRARY_PROTOCOL
++ *                        instance.
++ *  @return EFI_SUCCESS   Successfully.
++ *  @return Other value   Something failed.
++ */
++EFI_STATUS
++ImageLoadingTestCheckpoint1 (
++  IN EFI_RUNTIME_SERVICES                 *RT,
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL   *StandardLib,
++  IN EFI_TEST_LOGGING_LIBRARY_PROTOCOL    *LoggingLib,
++  EFI_TEST_PROFILE_LIBRARY_PROTOCOL   *ProfileLib
++  )
++{
++  EFI_STATUS               Status;
++  EFI_TEST_ASSERTION       Result;
++  EFI_DEVICE_PATH_PROTOCOL *FilePath;
++  CHAR16                   *EntireFileName;
++  CHAR16                   *FileName;
++  EFI_HANDLE               ImageHandle;
++#if 0
++  UINTN                 DataSize;
++  UINT8                 Data[MAX_BUFFER_SIZE];
++  UINT32                Attributes;
++  EFI_FILE_HANDLE       KeyFHandle;
++  UINT32                KeyFileSize;
++  CHAR16                *FileName;
++  VOID                  *Buffer;
++  UINTN                 BufferSize;
++  UINT32                DBAttributes;
++  UINT32                DBXAttributes;
++#endif
++
++  //
++  // Trace ...
++  //
++  if (LoggingLib != NULL) {
++    LoggingLib->EnterFunction (
++                  LoggingLib,
++                  L"ImageLoadingTestCheckpoint1",
++                  L"UEFI spec, 32.4, 32.4.1"
++                  );
++  }
++
++  //
++  //  Test assertion 1: Verify loading image with no signature.  Load image (TestImage1)
++  //   with no signature.  Expect result: SECURITY_VIOLATION or ACCESS_DENIED.
++  //
++
++  FileName = L"TestImage1.bin";
++  EntireFileName = SctPoolPrint (L"%s\\%s", gFilePath, FileName);
++  FilePath = SctFileDevicePath (gDeviceHandle, EntireFileName);
++  SctFreePool (EntireFileName);
++
++  ImageHandle = NULL;
++  Status = gtBS->LoadImage (
++                     FALSE,
++                     gImageHandle,
++                     FilePath,
++                     NULL,
++                     0,
++                     &ImageHandle
++                     );
++
++  SctPrint(L"status = %x\n", Status);
++
++  // As per UEFI spec, valid return codes for EFI_BOOT_SERVICES.LoadImage()
++  // for signature check failures are security violation or access denied.
++  if (Status == EFI_SECURITY_VIOLATION) {
++    Result = EFI_TEST_ASSERTION_PASSED;
++  } else if (Status == EFI_ACCESS_DENIED && ImageHandle == NULL) {
++    Result = EFI_TEST_ASSERTION_PASSED;
++  } else {
++    Result = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 Result,
++                 gSecureBootImageLoadingBbTestAssertionGuid001,
++                 L"SecureBoot - Verify load of unsigned image.",
++                 L"%a:%d:Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
++  //
++  // Trace ...
++  //
++  if (LoggingLib != NULL) {
++    LoggingLib->ExitFunction (
++                  LoggingLib,
++                  L"ImageLoadingTestCheckpoint1",
++                  L"UEFI spec, 32.5, 32.4.1"
++                  );
++  }
++
++  //
++  // Done
++  //
++  return EFI_SUCCESS;
++
++}
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTest.inf b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTest.inf
+index a93959af..97a39dfa 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTest.inf
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTest.inf
+@@ -39,6 +39,7 @@
+   SecureBootBBTestSupport.c
+   VariableAttributesBBTest.c
+   VariableUpdatesBBTest.c
++  ImageLoadingBBTest.c
+   Guid.h
+   Guid.c
+ 
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestMain.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestMain.c
+index 78df34e6..3c424507 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestMain.c
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestMain.c
+@@ -67,6 +67,15 @@ EFI_BB_TEST_ENTRY_FIELD gBBTestEntryField[] = {
+     EFI_TEST_CASE_AUTO,
+     VariableUpdatesTest
+   },
++  {
++    IMAGE_LOADING_TEST_GUID,
++    L"ImageLoading",
++    L"Verifies Secure Boot image loading.",
++    EFI_TEST_LEVEL_MINIMAL,
++    gSupportProtocolGuid,
++    EFI_TEST_CASE_AUTO,
++    ImageLoadingTest
++  },
+ 
+   0
+ };
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestMain.h b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestMain.h
+index d89bbbd5..8b7cbf6f 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestMain.h
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestMain.h
+@@ -53,6 +53,9 @@ Abstract:
+ #define VARIABLE_UPDATES_TEST_GUID \
+   { 0x495CB6D7, 0x0817, 0x4015, {0xA4, 0x79, 0x0D, 0xB4, 0xC2, 0x30, 0x86, 0x26 }}
+ 
++#define IMAGE_LOADING_TEST_GUID \
++  { 0xBA4A8DD9, 0x2D6A, 0x43A6, {0x96, 0xCF, 0x79, 0x47, 0x89, 0x2B, 0x73, 0x59 }}
++
+ //
+ // Prototypes
+ //
+@@ -72,6 +75,14 @@ VariableUpdatesTest(
+   IN EFI_HANDLE                 SupportHandle
+   );
+ 
++EFI_STATUS
++ImageLoadingTest(
++  IN EFI_BB_TEST_PROTOCOL       *This,
++  IN VOID                       *ClientInterface,
++  IN EFI_TEST_LEVEL             TestLevel,
++  IN EFI_HANDLE                 SupportHandle
++  );
++
+ //
+ // Support functions
+ //
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestSupport.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestSupport.c
+index 2cdd2226..52320e2d 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestSupport.c
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestSupport.c
+@@ -39,6 +39,7 @@ Abstract:
+ EFI_DEVICE_PATH_PROTOCOL        *gDevicePath     = NULL;
+ CHAR16                          *gFilePath       = NULL;
+ EFI_HANDLE                      gDeviceHandle;
++EFI_HANDLE                      mImageHandle;
+ 
+ //
+ // internal helper function.
+@@ -124,6 +125,8 @@ GetSystemDevicePathAndFilePath (
+   EFI_STATUS                  Status;
+   EFI_LOADED_IMAGE_PROTOCOL   *Image;
+ 
++  gImageHandle = ImageHandle;
++
+   //
+   // Get the image instance from the image handle
+   //
+@@ -137,6 +140,7 @@ GetSystemDevicePathAndFilePath (
+   }
+ 
+   gDeviceHandle = Image->DeviceHandle;
++
+ 
+   //
+   // Done, return status code EFI_SUCCESS
+@@ -612,7 +616,7 @@ SecureBootVariableCleanup (
+   Status = RT->SetVariable (
+                      L"dbx",                     // VariableName
+                      &gEfiImageSecurityDatabaseGuid,   // VendorGuid
+-                     BXAttributes,             // Attributes
++                     DBXAttributes,             // Attributes
+                      BufferSize,                // DataSize
+                      Buffer                     // Data
+                      );
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestSupport.h b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestSupport.h
+index e6a5ed6e..f4b7bcf5 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestSupport.h
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTestSupport.h
+@@ -40,6 +40,7 @@ Abstract:
+ extern EFI_DEVICE_PATH_PROTOCOL        *gDevicePath;
+ extern CHAR16                          *gFilePath;
+ extern EFI_HANDLE                      gDeviceHandle;
++extern EFI_HANDLE                      mImageHandle;
+ 
+ //
+ // support function protype
+-- 
+2.17.1
+

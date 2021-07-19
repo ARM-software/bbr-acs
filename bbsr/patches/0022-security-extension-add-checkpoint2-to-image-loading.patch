@@ -1,0 +1,338 @@
+From 91a3bda6a0530df8a4ef566ebfa6861c7a59266f Mon Sep 17 00:00:00 2001
+From: Stuart Yoder <stuart.yoder@arm.com>
+Date: Mon, 19 Jul 2021 11:12:16 -0500
+Subject: [PATCH 22/22] security-extension: add checkpoint2 to image loading
+
+add checkpoint2 which verifies revocation of signatures and images
+in dbx
+
+Signed-off-by: Stuart Yoder <stuart.yoder@arm.com>
+---
+ .../BlackBoxTest/ImageLoadingBBTest.c         | 276 +++++++++++++++++-
+ 1 file changed, 262 insertions(+), 14 deletions(-)
+
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/ImageLoadingBBTest.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/ImageLoadingBBTest.c
+index e0493f8a..2c53ecf8 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/ImageLoadingBBTest.c
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/ImageLoadingBBTest.c
+@@ -63,6 +63,14 @@ ImageLoadingTestCheckpoint1 (
+   EFI_TEST_PROFILE_LIBRARY_PROTOCOL   *ProfileLib
+   );
+ 
++EFI_STATUS
++ImageLoadingTestCheckpoint2 (
++  IN EFI_RUNTIME_SERVICES                 *RT,
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL   *StandardLib,
++  IN EFI_TEST_LOGGING_LIBRARY_PROTOCOL    *LoggingLib,
++  EFI_TEST_PROFILE_LIBRARY_PROTOCOL   *ProfileLib
++  );
++
+ //
+ // Functions
+ //
+@@ -127,6 +135,12 @@ ImageLoadingTest(
+     return Status;
+   }
+ 
++
++  Status = ImageLoadingTestCheckpoint2 (RT, StandardLib, LoggingLib, ProfileLib);
++  if (EFI_ERROR(Status)) {
++    SecureBootVariableCleanup (RT, StandardLib, LoggingLib, ProfileLib);
++    return Status;
++  }
+   // Restore KEK, db, dbx
+   Status = SecureBootVariableCleanup (RT, StandardLib, LoggingLib, ProfileLib);
+   if (EFI_ERROR(Status)) {
+@@ -411,7 +425,7 @@ ImageLoadingVariableInit  (
+ }
+ 
+ /**
+- *  Verify that updates to KEK are signed (by PK) FIXME
++ *  Verify image loading for images with certificates in db
+  *
+  *  @param StandardLib    A pointer to EFI_STANDARD_TEST_LIBRARY_PROTOCOL
+  *                        instance.
+@@ -436,18 +450,6 @@ ImageLoadingTestCheckpoint1 (
+   CHAR16                   *EntireFileName;
+   CHAR16                   *FileName;
+   EFI_HANDLE               ImageHandle;
+-#if 0
+-  UINTN                 DataSize;
+-  UINT8                 Data[MAX_BUFFER_SIZE];
+-  UINT32                Attributes;
+-  EFI_FILE_HANDLE       KeyFHandle;
+-  UINT32                KeyFileSize;
+-  CHAR16                *FileName;
+-  VOID                  *Buffer;
+-  UINTN                 BufferSize;
+-  UINT32                DBAttributes;
+-  UINT32                DBXAttributes;
+-#endif
+ 
+   //
+   // Trace ...
+@@ -651,6 +653,252 @@ ImageLoadingTestCheckpoint1 (
+                  (UINTN)__LINE__,
+                  Status
+                  );
++
++  //
++  // Done
++  //
++  return EFI_SUCCESS;
++
++}
++
++/**
++ *  Verify image loading when images are revoked in dbx
++ *
++ *  @param StandardLib    A pointer to EFI_STANDARD_TEST_LIBRARY_PROTOCOL
++ *                        instance.
++ *  @param LoggingLib     A pointer to EFI_TEST_LOGGING_LIBRARY_PROTOCOL
++ *                        instance.
++ *  @param ProfileLib     A pointer to EFI_TEST_PROFILE_LIBRARY_PROTOCOL
++ *                        instance.
++ *  @return EFI_SUCCESS   Successfully.
++ *  @return Other value   Something failed.
++ */
++EFI_STATUS
++ImageLoadingTestCheckpoint2 (
++  IN EFI_RUNTIME_SERVICES                 *RT,
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL   *StandardLib,
++  IN EFI_TEST_LOGGING_LIBRARY_PROTOCOL    *LoggingLib,
++  EFI_TEST_PROFILE_LIBRARY_PROTOCOL   *ProfileLib
++  )
++{
++  EFI_STATUS               Status;
++  EFI_TEST_ASSERTION       Result;
++  EFI_DEVICE_PATH_PROTOCOL *FilePath;
++  CHAR16                   *EntireFileName;
++  CHAR16                   *FileName;
++  EFI_HANDLE               ImageHandle;
++
++  //
++  // Trace ...
++  //
++  if (LoggingLib != NULL) {
++    LoggingLib->EnterFunction (
++                  LoggingLib,
++                  L"ImageLoadingTestCheckpoint2",
++                  L"UEFI spec, 32.4, 32.4.1"
++                  );
++  }
++
++  //
++  //  Test assertion 1: Verify revocation with signed image with signature in db 
++  //  but revoked in dbx with EFI_CERT_X509_SHA256_GUID.  Load image (TestImage6)
++  //  signed with RevokedCert1.  Expect result: SECURITY_VIOLATION.
++  //
++
++  FileName = L"TestImage6.bin";
++  EntireFileName = SctPoolPrint (L"%s\\%s", gFilePath, FileName);
++  FilePath = SctFileDevicePath (gDeviceHandle, EntireFileName);
++  SctFreePool (EntireFileName);
++
++  ImageHandle = NULL;
++  Status = gtBS->LoadImage (
++                     FALSE,
++                     gImageHandle,
++                     FilePath,
++                     NULL,
++                     0,
++                     &ImageHandle
++                     );
++
++  if (Status == EFI_SECURITY_VIOLATION) {
++    Result = EFI_TEST_ASSERTION_PASSED;
++  } else if (Status == EFI_ACCESS_DENIED && ImageHandle == NULL) {
++    Result = EFI_TEST_ASSERTION_PASSED;
++  } else {
++    Result = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 Result,
++                 gSecureBootImageLoadingBbTestAssertionGuid005,
++                 L"SecureBoot - Verify load of signed image with signature in db and revoked in dbx with SHA256 hash.",
++                 L"%a:%d:Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
++  //
++  //  Test assertion 2: Verify revocation with signed image with signature in db but
++  //  revoked in dbx with EFI_CERT_X509_SHA384_GUID.  Load image (TestImage7) signed
++  //  with RevokedCert2.  Expect result: SECURITY_VIOLATION.
++  //
++
++  FileName = L"TestImage7.bin";
++  EntireFileName = SctPoolPrint (L"%s\\%s", gFilePath, FileName);
++  FilePath = SctFileDevicePath (gDeviceHandle, EntireFileName);
++  SctFreePool (EntireFileName);
++
++  ImageHandle = NULL;
++  Status = gtBS->LoadImage (
++                     FALSE,
++                     gImageHandle,
++                     FilePath,
++                     NULL,
++                     0,
++                     &ImageHandle
++                     );
++
++  if (Status == EFI_SECURITY_VIOLATION) {
++    Result = EFI_TEST_ASSERTION_PASSED;
++  } else if (Status == EFI_ACCESS_DENIED && ImageHandle == NULL) {
++    Result = EFI_TEST_ASSERTION_PASSED;
++  } else {
++    Result = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 Result,
++                 gSecureBootImageLoadingBbTestAssertionGuid005,
++                 L"SecureBoot - Verify load of signed image with signature in db and revoked in dbx with SHA384 hash.",
++                 L"%a:%d:Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
++  //
++  //  Test assertion 3: Verify revocation with signed image (TestImage8) with signature in
++  //  db but revoked in dbx with EFI_CERT_X509_SHA512_GUID.  Load image signed with
++  //  RevokedCert3.  Expect result: SECURITY_VIOLATION.
++  //
++
++  FileName = L"TestImage8.bin";
++  EntireFileName = SctPoolPrint (L"%s\\%s", gFilePath, FileName);
++  FilePath = SctFileDevicePath (gDeviceHandle, EntireFileName);
++  SctFreePool (EntireFileName);
++
++  ImageHandle = NULL;
++  Status = gtBS->LoadImage (
++                     FALSE,
++                     gImageHandle,
++                     FilePath,
++                     NULL,
++                     0,
++                     &ImageHandle
++                     );
++
++  if (Status == EFI_SECURITY_VIOLATION) {
++    Result = EFI_TEST_ASSERTION_PASSED;
++  } else if (Status == EFI_ACCESS_DENIED && ImageHandle == NULL) {
++    Result = EFI_TEST_ASSERTION_PASSED;
++  } else {
++    Result = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 Result,
++                 gSecureBootImageLoadingBbTestAssertionGuid005,
++                 L"SecureBoot - Verify load of signed image with signature in db and revoked in dbx with SHA512 hash.",
++                 L"%a:%d:Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
++  //
++  //  Test assertion 4: Verify revocation with image (TestImage9) with signature in db,
++  //  but signature also in DBXRevokedList1.  Load image signed with RevokedCert4.
++  //  Expect result: SECURITY_VIOLATION.
++  //
++
++  FileName = L"TestImage9.bin";
++  EntireFileName = SctPoolPrint (L"%s\\%s", gFilePath, FileName);
++  FilePath = SctFileDevicePath (gDeviceHandle, EntireFileName);
++  SctFreePool (EntireFileName);
++
++  ImageHandle = NULL;
++  Status = gtBS->LoadImage (
++                     FALSE,
++                     gImageHandle,
++                     FilePath,
++                     NULL,
++                     0,
++                     &ImageHandle
++                     );
++
++  if (Status == EFI_SECURITY_VIOLATION) {
++    Result = EFI_TEST_ASSERTION_PASSED;
++  } else if (Status == EFI_ACCESS_DENIED && ImageHandle == NULL) {
++    Result = EFI_TEST_ASSERTION_PASSED;
++  } else {
++    Result = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 Result,
++                 gSecureBootImageLoadingBbTestAssertionGuid005,
++                 L"SecureBoot - Verify load of signed image with signature in db and revoked in dbx with certificate.",
++                 L"%a:%d:Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
++  //
++  //  Test assertion 5: Verify revocation with image with signature in db,
++  //  but revoked with SHA256 hash of image in DBXRevokedList1.  Load image
++  //  (TestImage10).  Expect result: SECURITY_VIOLATION.
++  //
++
++  FileName = L"TestImage10.bin";
++  EntireFileName = SctPoolPrint (L"%s\\%s", gFilePath, FileName);
++  FilePath = SctFileDevicePath (gDeviceHandle, EntireFileName);
++  SctFreePool (EntireFileName);
++
++  ImageHandle = NULL;
++  Status = gtBS->LoadImage (
++                     FALSE,
++                     gImageHandle,
++                     FilePath,
++                     NULL,
++                     0,
++                     &ImageHandle
++                     );
++
++  if (Status == EFI_SECURITY_VIOLATION) {
++    Result = EFI_TEST_ASSERTION_PASSED;
++  } else if (Status == EFI_ACCESS_DENIED && ImageHandle == NULL) {
++    Result = EFI_TEST_ASSERTION_PASSED;
++  } else {
++    Result = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 Result,
++                 gSecureBootImageLoadingBbTestAssertionGuid005,
++                 L"SecureBoot - Verify load of signed image with signature in db and revoked in dbx with hash of image.",
++                 L"%a:%d:Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
+ 
+   //
+   // Trace ...
+@@ -658,7 +906,7 @@ ImageLoadingTestCheckpoint1 (
+   if (LoggingLib != NULL) {
+     LoggingLib->ExitFunction (
+                   LoggingLib,
+-                  L"ImageLoadingTestCheckpoint1",
++                  L"ImageLoadingTestCheckpoint2",
+                   L"UEFI spec, 32.5, 32.4.1"
+                   );
+   }
+-- 
+2.17.1
+

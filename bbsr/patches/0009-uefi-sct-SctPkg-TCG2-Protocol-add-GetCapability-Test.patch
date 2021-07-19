@@ -1,0 +1,708 @@
+From b55c1e7b88f6707c6a6aa23c999663b187203e83 Mon Sep 17 00:00:00 2001
+From: Joseph Hemann <Joseph.hemann@arm.com>
+Date: Wed, 12 May 2021 10:02:18 -0500
+Subject: [PATCH 09/22] uefi-sct/SctPkg: TCG2 Protocol: add GetCapability Test
+
+-implement initial infrastructure for the TCG2 protocol test
+ including updates to .dsc file, inf file, GUID source files,
+ update to Category.ini.
+
+-add initial TCG2 protocol test for GetCapability()
+  -checkpoint for NULL pointer passed for buffer
+  -checkpoint for return of struct version numbers
+
+Signed-off-by: Joseph Hemann <Joseph.hemann@arm.com>
+Signed-off-by: Stuart Yoder <stuart.yoder@arm.com>
+---
+ uefi-sct/SctPkg/CommonGenFramework.sh         |   1 +
+ uefi-sct/SctPkg/Config/Data/Category.ini      |   7 +
+ .../Protocol/TCG2Protocol/BlackBoxTest/Guid.c |  35 +++
+ .../Protocol/TCG2Protocol/BlackBoxTest/Guid.h |  43 +++
+ .../BlackBoxTest/TCG2ProtocolBBTest.h         |  73 +++++
+ .../BlackBoxTest/TCG2ProtocolBBTest.inf       |  51 ++++
+ .../TCG2ProtocolBBTestConformance.c           | 289 ++++++++++++++++++
+ .../BlackBoxTest/TCG2ProtocolBBTestMain.c     | 106 +++++++
+ uefi-sct/SctPkg/UEFI/UEFI_SCT.dsc             |   1 +
+ 9 files changed, 606 insertions(+)
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.c
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.h
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.h
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.inf
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestConformance.c
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestMain.c
+
+diff --git a/uefi-sct/SctPkg/CommonGenFramework.sh b/uefi-sct/SctPkg/CommonGenFramework.sh
+index c4909c61..42f7d92b 100755
+--- a/uefi-sct/SctPkg/CommonGenFramework.sh
++++ b/uefi-sct/SctPkg/CommonGenFramework.sh
+@@ -257,6 +257,7 @@ then
+     cp $ProcessorType/DiskIo2BBTest.efi                        $Framework/Test/ > NUL
+     cp $ProcessorType/TimeStampBBTest.efi                      $Framework/Test/ > NUL
+     cp $ProcessorType/RandomNumberBBTest.efi                   $Framework/Test/ > NUL
++    cp $ProcessorType/TCG2ProtocolBBTest.efi                   $Framework/Test/ > NUL
+     cp $ProcessorType/Hash2BBTest.efi                          $Framework/Test/ > NUL
+     cp $ProcessorType/Pkcs7BBTest.efi                          $Framework/Test/ > NUL
+     cp $ProcessorType/ConfigKeywordHandlerBBTest.efi           $Framework/Test/ > NUL
+diff --git a/uefi-sct/SctPkg/Config/Data/Category.ini b/uefi-sct/SctPkg/Config/Data/Category.ini
+index 5f903368..91268f00 100644
+--- a/uefi-sct/SctPkg/Config/Data/Category.ini
++++ b/uefi-sct/SctPkg/Config/Data/Category.ini
+@@ -1040,3 +1040,10 @@ InterfaceGuid = 8D59D32B-C655-4AE9-9B15-F25904992A43
+ Name          = IHV\ConsoleSupportTest\AbsolutePointerProtocolTest
+ Description   = Absolute Pointer Protocol Test on IHV Drivers
+ 
++[Category Data]
++Revision      = 0x00010000
++CategoryGuid  = 607f766c-7455-42be-930b-e4d76db2720f
++InterfaceGuid = 607f766c-7455-42be-930b-e4d76db2720f
++Name          = TCG2ProtocolTest
++Description   =
++
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.c
+new file mode 100644
+index 00000000..206662ee
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.c
+@@ -0,0 +1,35 @@
++/** @file
++
++  Copyright 2006 - 2013 Unified EFI, Inc.<BR>
++  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
++  Copyright (c) 2021, Arm Inc. All rights reserved.<BR>
++
++  This program and the accompanying materials
++  are licensed and made available under the terms and conditions of the BSD License
++  which accompanies this distribution.  The full text of the license may be found at
++  http://opensource.org/licenses/bsd-license.php
++
++  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++
++**/
++/*++
++
++Module Name:
++
++  guid.c
++
++Abstract:
++
++  GUIDs auto-generated for EFI test assertion.
++
++--*/
++
++#include "Efi.h"
++#include "Guid.h"
++
++EFI_GUID gTcg2ConformanceTestAssertionGuid001 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_001_GUID;
++
++EFI_GUID gTcg2ConformanceTestAssertionGuid002 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_002_GUID;
++
++EFI_GUID gTcg2ConformanceTestAssertionGuid003 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_003_GUID;
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.h b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.h
+new file mode 100644
+index 00000000..b675756b
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.h
+@@ -0,0 +1,43 @@
++/** @file
++
++  Copyright 2006 - 2016 Unified EFI, Inc.<BR>
++  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
++  Copyright (c) 2021, Arm Inc. All rights reserved.<BR>
++
++  This program and the accompanying materials
++  are licensed and made available under the terms and conditions of the BSD License
++  which accompanies this distribution.  The full text of the license may be found at
++  http://opensource.org/licenses/bsd-license.php
++
++  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++
++**/
++/*++
++
++Module Name:
++
++  guid.h
++
++Abstract:
++
++  GUIDs auto-generated for EFI test assertion.
++
++--*/
++
++
++#define EFI_TEST_TCG2CONFORMANCE_ASSERTION_001_GUID \
++{ 0xca93b02a, 0xe897, 0x4400, {0x81, 0x38, 0xc8, 0xa8, 0xcb, 0x2f, 0xc1, 0xed }}
++
++extern EFI_GUID gTcg2ConformanceTestAssertionGuid001;
++
++#define EFI_TEST_TCG2CONFORMANCE_ASSERTION_002_GUID \
++{ 0xda8821d9, 0x3d2c, 0x4698, {0x8c, 0xd5, 0x0f, 0x0c, 0x82, 0x94, 0x1d, 0x0c }}
++
++extern EFI_GUID gTcg2ConformanceTestAssertionGuid002;
++
++#define EFI_TEST_TCG2CONFORMANCE_ASSERTION_003_GUID \
++{ 0xfdee7001, 0x7e28, 0x4e35, {0x99, 0x66, 0x98, 0x0b, 0xeb, 0xba, 0xf1, 0x57 }}
++
++extern EFI_GUID gTcg2ConformanceTestAssertionGuid003;
++
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.h b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.h
+new file mode 100644
+index 00000000..727a4c8e
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.h
+@@ -0,0 +1,73 @@
++/** @file
++
++  Copyright 2006 - 2017 Unified EFI, Inc.<BR>
++  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
++  Copyright (c) 2021, Arm Inc. All rights reserved.<BR>
++
++  This program and the accompanying materials
++  are licensed and made available under the terms and conditions of the BSD License
++  which accompanies this distribution.  The full text of the license may be found at
++  http://opensource.org/licenses/bsd-license.php
++
++  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++
++**/
++/*++
++
++Module Name:
++    TCG2ProtocolBBTest.h
++
++Abstract:
++    head file of test driver of EFI TCG2 Protocol Test
++
++--*/
++
++#include "SctLib.h"
++#include <Library/EfiTestLib.h>
++#include <UEFI/Protocol/TCG2.h>
++#include "Guid.h"
++
++#define EFI_TCG2_TEST_REVISION 0x00010000
++
++extern EFI_HANDLE   mImageHandle;
++
++//////////////////////////////////////////////////////////////////////////////
++//
++// Entry GUIDs for Function Test
++//
++#define EFI_TCG2_PROTOCOL_TEST_ENTRY_GUID0101 \
++ {0x39ff9c71, 0x4b41, 0x4e5b, {0xae, 0xd7, 0x87, 0xc7, 0x94, 0x18, 0x7d, 0x67} }
++
++EFI_STATUS
++EFIAPI
++BBTestTCG2ProtocolUnload (
++  IN EFI_HANDLE       ImageHandle
++  );
++
++EFI_STATUS
++BBTestGetCapabilityConformanceTestCheckpoint1 (
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
++  IN EFI_TCG2_PROTOCOL                     *TCG2
++  );
++
++EFI_STATUS
++BBTestGetCapabilityConformanceTestCheckpoint2 (
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
++  IN EFI_TCG2_PROTOCOL                     *TCG2
++  );
++
++EFI_STATUS
++BBTestGetCapabilityConformanceTestCheckpoint3 (
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
++  IN EFI_TCG2_PROTOCOL                     *TCG2
++  );
++
++EFI_STATUS
++BBTestGetCapabilityConformanceTest (
++  IN EFI_BB_TEST_PROTOCOL       *This,
++  IN VOID                       *ClientInterface,
++  IN EFI_TEST_LEVEL             TestLevel,
++  IN EFI_HANDLE                 SupportHandle
++  );
++
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.inf b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.inf
+new file mode 100644
+index 00000000..f41d84b3
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.inf
+@@ -0,0 +1,51 @@
++## @file
++#
++#  Copyright 2006 - 2015 Unified EFI, Inc.<BR>
++#  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
++#  Copyright (c) 2021, Arm Inc. All rights reserved.<BR>
++#
++#  This program and the accompanying materials
++#  are licensed and made available under the terms and conditions of the BSD License
++#  which accompanies this distribution.  The full text of the license may be found at
++#  http://opensource.org/licenses/bsd-license.php
++#
++#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++#
++##
++#/*++
++#
++# Module Name:
++#
++#   TCG2ProtocolBBTest.inf
++#
++# Abstract:
++#
++#   Component description file for TCG2 Protocol Black-Box Test.
++#
++#--*/
++
++[defines]
++  INF_VERSION          = 0x00010005
++  BASE_NAME            = TCG2ProtocolBBTest
++  FILE_GUID            = BD8CB762-3935-434C-AC3F-462244910A2D
++  MODULE_TYPE          = UEFI_DRIVER
++  VERSION_STRING       = 1.0
++  ENTRY_POINT          = InitializeBBTestTCG2Protocol
++
++[sources.common]
++  Guid.c
++  TCG2ProtocolBBTestMain.c
++  TCG2ProtocolBBTestConformance.c
++
++[Packages]
++  MdePkg/MdePkg.dec
++  SctPkg/SctPkg.dec
++  SctPkg/UEFI/UEFI.dec
++
++[LibraryClasses]
++  UefiDriverEntryPoint
++  SctLib
++  EfiTestLib
++
++[Protocols]
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestConformance.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestConformance.c
+new file mode 100644
+index 00000000..ee9830d6
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestConformance.c
+@@ -0,0 +1,289 @@
++/** @file
++
++  Copyright 2006 - 2016 Unified EFI, Inc.<BR>
++  Copyright (c) 2021, Arm Inc. All rights reserved.<BR>
++
++  This program and the accompanying materials
++  are licensed and made available under the terms and conditions of the BSD License
++  which accompanies this distribution.  The full text of the license may be found at
++  http://opensource.org/licenses/bsd-license.php
++
++  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++
++**/
++/*++
++
++Module Name:
++
++    TCG2BBTestConformance.c
++
++Abstract:
++
++    for EFI Driver TCG2 Protocol's Basic Test
++
++--*/
++
++#include "TCG2ProtocolBBTest.h"
++
++/**
++ *  @brief Entrypoint for GetCapability() Function Test.
++ *         3 checkpoints will be tested.
++ *  @param This a pointer of EFI_BB_TEST_PROTOCOL
++ *  @param ClientInterface A pointer to the interface array under test
++ *  @param TestLevel Test "thoroughness" control
++ *  @param SupportHandle A handle containing protocols required
++ *  @return EFI_SUCCESS
++ *  @return EFI_NOT_FOUND
++ */
++
++EFI_STATUS
++BBTestGetCapabilityConformanceTest (
++  IN EFI_BB_TEST_PROTOCOL       *This,
++  IN VOID                       *ClientInterface,
++  IN EFI_TEST_LEVEL             TestLevel,
++  IN EFI_HANDLE                 SupportHandle
++  )
++{
++  EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib;
++  EFI_STATUS                            Status;
++  EFI_TCG2_PROTOCOL                     *TCG2;
++  //
++  // init
++  //
++  TCG2 = (EFI_TCG2_PROTOCOL*)ClientInterface;
++
++  //
++
++  // Get the Standard Library Interface
++  //
++  Status = gtBS->HandleProtocol (
++                   SupportHandle,
++                   &gEfiStandardTestLibraryGuid,
++                   (VOID **) &StandardLib
++                   );
++  if (EFI_ERROR(Status)) {
++    return Status;
++  }
++
++  // Test Using NULL BootCapablity Pointer
++  BBTestGetCapabilityConformanceTestCheckpoint1 (StandardLib, TCG2);
++
++  // Test Using Capability struct with struct size less than full size
++  BBTestGetCapabilityConformanceTestCheckpoint2 (StandardLib, TCG2);
++
++  // Test with full size field
++  BBTestGetCapabilityConformanceTestCheckpoint3 (StandardLib, TCG2);
++
++  return EFI_SUCCESS;
++}
++
++
++EFI_STATUS
++BBTestGetCapabilityConformanceTestCheckpoint1 (
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
++  IN EFI_TCG2_PROTOCOL                     *TCG2
++  )
++{
++  EFI_TEST_ASSERTION                    AssertionType;
++  EFI_STATUS                            Status;
++
++  EFI_TCG2_BOOT_SERVICE_CAPABILITY *BootServiceCapPtr = NULL;
++  Status = TCG2->GetCapability (
++                           TCG2,
++                           BootServiceCapPtr);
++
++  // Ensure GetCapablity returns Invalid Parameter when passing in NULL pointer
++  if (EFI_INVALID_PARAMETER == Status) {
++    AssertionType = EFI_TEST_ASSERTION_PASSED;
++  } else {
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 AssertionType,
++                 gTcg2ConformanceTestAssertionGuid001,
++                 L"TCG2_PROTOCOL.GetCapability - GetCapability() returns EFI_INVALID_PARAMETER with NULL pointer Capability Struct Passed in",
++                 L"%a:%d: Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
++
++}
++
++EFI_STATUS
++BBTestGetCapabilityConformanceTestCheckpoint2 (
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
++  IN EFI_TCG2_PROTOCOL                     *TCG2
++  )
++{
++  EFI_TEST_ASSERTION                    AssertionType;
++  EFI_STATUS                            Status;
++  char StructureVersionMajor;
++  char StructureVersionMinor;
++  char ProtocolVersionMajor;
++  char ProtocolVersionMinor;
++
++  EFI_TCG2_BOOT_SERVICE_CAPABILITY      BootServiceCap;
++  BootServiceCap.Size = sizeof(UINT8) + (sizeof(EFI_TCG2_VERSION) * 2);
++
++  Status = TCG2->GetCapability (
++                           TCG2,
++                           &BootServiceCap);
++
++  AssertionType = EFI_TEST_ASSERTION_PASSED;
++
++  StructureVersionMajor = BootServiceCap.StructureVersion.Major;
++  StructureVersionMinor = BootServiceCap.StructureVersion.Minor;
++
++  // If the input ProtocolCapability.Size < sizeof(EFI_TCG2_BOOT_SERVICE_CAPABILITY)
++  // the function will initialize the fields included in ProtocolCapability.Size.
++
++  if ((StructureVersionMajor != 1) | (StructureVersionMinor != 1)) {
++     StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol GetCapablity Test: Unexpected struct version numbers returned"
++                     );
++
++     AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  ProtocolVersionMajor = BootServiceCap.ProtocolVersion.Major;
++  ProtocolVersionMinor = BootServiceCap.ProtocolVersion.Minor;
++
++  if ((ProtocolVersionMajor != 1) | (ProtocolVersionMinor != 1)) {
++     StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol GetCapablity Test: Unexpected protocol version numbers returned."
++                     );
++
++     AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 AssertionType,
++                 gTcg2ConformanceTestAssertionGuid002,
++                 L"TCG2_PROTOCOL.GetCapability protocol version check failed.",
++                 L"%a:%d: Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
++  return EFI_SUCCESS;
++}
++
++EFI_STATUS
++BBTestGetCapabilityConformanceTestCheckpoint3 (
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
++  IN EFI_TCG2_PROTOCOL                     *TCG2
++  )
++{
++  EFI_TEST_ASSERTION                    AssertionType;
++  EFI_STATUS                            Status;
++  char StructureVersionMajor;
++  char StructureVersionMinor;
++  char ProtocolVersionMajor;
++  char ProtocolVersionMinor;
++
++  EFI_TCG2_BOOT_SERVICE_CAPABILITY      BootServiceCap;
++  BootServiceCap.Size = sizeof(EFI_TCG2_BOOT_SERVICE_CAPABILITY);
++
++  Status = TCG2->GetCapability (
++                           TCG2,
++                           &BootServiceCap);
++
++  AssertionType = EFI_TEST_ASSERTION_PASSED;
++
++  StructureVersionMajor = BootServiceCap.StructureVersion.Major;
++  StructureVersionMinor = BootServiceCap.StructureVersion.Minor;
++
++  // TCG EFI Protocol spec 6.4.4 #4
++  if ((StructureVersionMajor != 1) | (StructureVersionMinor != 1)) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol GetCapablity Test: GetCapabilty should have StructureVersion 1.1"
++                     );
++
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  // TCG EFI Protocol spec 6.4.4 #4
++  ProtocolVersionMajor = BootServiceCap.ProtocolVersion.Major;
++  ProtocolVersionMinor = BootServiceCap.ProtocolVersion.Minor;
++
++  if ((ProtocolVersionMajor != 1) | (ProtocolVersionMinor != 1)) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol GetCapablity Test: protocol version must be 1.1"
++                     );
++
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  if (!(BootServiceCap.SupportedEventLogs &  EFI_TCG2_EVENT_LOG_FORMAT_TCG_2)) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol GetCapablity Test: GetCapabilty must support TCG2 event log format"
++                     );
++
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  if (BootServiceCap.NumberOfPcrBanks < 1 ) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol GetCapablity Test: expect at least 1 PCR bank"
++                     );
++
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  EFI_TCG2_EVENT_ALGORITHM_BITMAP HashBitMapAlgos =  EFI_TCG2_BOOT_HASH_ALG_SHA256 | EFI_TCG2_BOOT_HASH_ALG_SHA384 | EFI_TCG2_BOOT_HASH_ALG_SHA512;
++
++  if (!(BootServiceCap.HashAlgorithmBitmap & HashBitMapAlgos)) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol GetCapablity Test: unexpected hash algorithms reported = %x",
++                     BootServiceCap.HashAlgorithmBitmap
++                     );
++
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  if (!(BootServiceCap.ActivePcrBanks & HashBitMapAlgos)) {
++    StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nTCG2 Protocol GetCapablity Test: unexpected active PCR banks reported = %x",
++                     BootServiceCap.ActivePcrBanks
++                     );
++
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 AssertionType,
++                 gTcg2ConformanceTestAssertionGuid003,
++                 L"TCG2_PROTOCOL.GetCapability - GetCapability checks failed",
++                 L"%a:%d: Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
++  return EFI_SUCCESS;
++}
++
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestMain.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestMain.c
+new file mode 100644
+index 00000000..146d2ae8
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestMain.c
+@@ -0,0 +1,106 @@
++/** @file
++
++  Copyright 2006 - 2017 Unified EFI, Inc.<BR>
++  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
++  Copyright (c) 2021, Arm Inc. All rights reserved.<BR>
++
++  This program and the accompanying materials
++  are licensed and made available under the terms and conditions of the BSD License
++  which accompanies this distribution.  The full text of the license may be found at
++  http://opensource.org/licenses/bsd-license.php
++
++  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++
++**/
++/*++
++
++Module Name:
++    TCG2ProtocolBBTestMain.c
++
++Abstract:
++    for EFI TCG2 Protocol Test
++
++--*/
++
++#include "TCG2ProtocolBBTest.h"
++
++EFI_HANDLE      mImageHandle;
++
++EFI_BB_TEST_PROTOCOL_FIELD gBBTestProtocolField = {
++  EFI_TCG2_TEST_REVISION,
++  EFI_TCG2_PROTOCOL_GUID,
++  L"Testing For EFI TCG2 Protocol",
++  L"Total # test cases for the EFI TCG2 Protocol"
++};
++
++EFI_GUID gSupportProtocolGuid1[2] = {
++  EFI_STANDARD_TEST_LIBRARY_GUID,
++  EFI_NULL_GUID
++};
++
++EFI_BB_TEST_ENTRY_FIELD gBBTestEntryField[] = {
++  {
++    EFI_TCG2_PROTOCOL_TEST_ENTRY_GUID0101,
++    L"GetCapability_Conf",
++    L"Test the GetCapablity API",
++    EFI_TEST_LEVEL_DEFAULT,
++    gSupportProtocolGuid1,
++    EFI_TEST_CASE_AUTO,
++    BBTestGetCapabilityConformanceTest
++  },
++  0
++};
++
++EFI_BB_TEST_PROTOCOL *gBBTestProtocolInterface;
++
++/**
++ *  Creates/installs the BlackBox Interface and eminating Entry Point
++ *  node list.
++ *  @param  ImageHandle The test driver image handle
++ *  @param  SystemTable Pointer to System Table
++ *  @return EFI_SUCCESS Indicates the interface was installed
++ *  @return EFI_OUT_OF_RESOURCES Indicates space for the new handle could not be allocated
++ *  @return EFI_INVALID_PARAMETER: One of the parameters has an invalid value.
++ */
++EFI_STATUS
++EFIAPI
++InitializeBBTestTCG2Protocol (
++  IN EFI_HANDLE           ImageHandle,
++  IN EFI_SYSTEM_TABLE     *SystemTable
++  )
++{
++  EfiInitializeTestLib (ImageHandle, SystemTable);
++
++  //
++  // initialize test utility lib
++  //
++  SctInitializeLib (ImageHandle, SystemTable);
++
++  mImageHandle = ImageHandle;
++
++  return EfiInitAndInstallBBTestInterface (
++           &ImageHandle,
++           &gBBTestProtocolField,
++           gBBTestEntryField,
++           BBTestTCG2ProtocolUnload,
++           &gBBTestProtocolInterface
++           );
++}
++
++/**
++ *  The driver's Unload function
++ *  @param  ImageHandle The test driver image handle
++ *  @return EFI_SUCCESS Indicates the interface was Uninstalled
++*/
++EFI_STATUS
++EFIAPI
++BBTestTCG2ProtocolUnload (
++  IN EFI_HANDLE       ImageHandle
++  )
++{
++  return EfiUninstallAndFreeBBTestInterface (
++           ImageHandle,
++           gBBTestProtocolInterface
++           );
++}
+diff --git a/uefi-sct/SctPkg/UEFI/UEFI_SCT.dsc b/uefi-sct/SctPkg/UEFI/UEFI_SCT.dsc
+index 5513ce21..1153b4cd 100644
+--- a/uefi-sct/SctPkg/UEFI/UEFI_SCT.dsc
++++ b/uefi-sct/SctPkg/UEFI/UEFI_SCT.dsc
+@@ -276,6 +276,7 @@ SctPkg/TestCase/UEFI/EFI/Protocol/StorageSecurityCommand/BlackBoxTest/StorageSec
+ SctPkg/TestCase/UEFI/EFI/Protocol/AdapterInfo/BlackBoxTest/AdapterInfoProtocolBBTest.inf
+ SctPkg/TestCase/UEFI/EFI/Protocol/TimeStamp/BlackBoxTest/TimeStampProtocolBBTest.inf
+ SctPkg/TestCase/UEFI/EFI/Protocol/RandomNumber/BlackBoxTest/RandomNumberBBTest.inf
++SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.inf
+ 
+ SctPkg/TestCase/UEFI/EFI/Protocol/Hash2/BlackBoxTest/Hash2BBTest.inf
+ SctPkg/TestCase/UEFI/EFI/Protocol/PKCS7Verify/BlackBoxTest/Pkcs7BBTest.inf
+-- 
+2.17.1
+

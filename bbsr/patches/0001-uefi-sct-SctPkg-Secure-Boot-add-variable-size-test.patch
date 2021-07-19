@@ -1,0 +1,704 @@
+From a30a6643ba4bee66b4d56f32868ff206d77caef0 Mon Sep 17 00:00:00 2001
+From: Joseph Hemann <Joseph.hemann@arm.com>
+Date: Fri, 12 Mar 2021 13:33:47 -0600
+Subject: [PATCH 01/22] uefi-sct/SctPkg: Secure Boot add variable size test
+
+Test for variable size requirements in the BBSR spec--
+a minimum of 128KB of NV storage for UEFI variables and
+the max supported variable size must be at least 64KB.
+
+Signed-off-by: Joseph Hemann <Joseph.hemann@arm.com>
+Signed-off-by: Stuart Yoder <stuart.yoder@arm.com>
+---
+ uefi-sct/SctPkg/CommonGenFramework.sh         |   1 +
+ uefi-sct/SctPkg/Config/Data/Category.ini      |   7 +
+ .../BlackBoxTest/BBSRVariableSizeBBTest.inf   |  54 +++++
+ .../BBSRVariableSizeBBTestFunction.c          | 208 ++++++++++++++++++
+ .../BlackBoxTest/BBSRVariableSizeBBTestMain.c | 192 ++++++++++++++++
+ .../BlackBoxTest/BBSRVariableSizeBBTestMain.h |  62 ++++++
+ .../BBSRVariableSizeTest/BlackBoxTest/Guid.c  |  33 +++
+ .../BBSRVariableSizeTest/BlackBoxTest/Guid.h  |  38 ++++
+ uefi-sct/SctPkg/UEFI/UEFI_SCT.dsc             |   3 +-
+ 9 files changed, 597 insertions(+), 1 deletion(-)
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTest.inf
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTestFunction.c
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTestMain.c
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTestMain.h
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/Guid.c
+ create mode 100644 uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/Guid.h
+
+diff --git a/uefi-sct/SctPkg/CommonGenFramework.sh b/uefi-sct/SctPkg/CommonGenFramework.sh
+index 779a6a44..8d58bed9 100755
+--- a/uefi-sct/SctPkg/CommonGenFramework.sh
++++ b/uefi-sct/SctPkg/CommonGenFramework.sh
+@@ -132,6 +132,7 @@ then
+     cp $ProcessorType/MiscBootServicesBBTest.efi               $Framework/Test/ > NUL
+     
+     cp $ProcessorType/VariableServicesBBTest.efi               $Framework/Test/ > NUL
++    cp $ProcessorType/BBSRVariableSizeTest.efi                 $Framework/Test/ > NUL
+     cp $ProcessorType/TimeServicesBBTest.efi                   $Framework/Test/ > NUL
+     cp $ProcessorType/MiscRuntimeServicesBBTest.efi            $Framework/Test/ > NUL
+ 
+diff --git a/uefi-sct/SctPkg/Config/Data/Category.ini b/uefi-sct/SctPkg/Config/Data/Category.ini
+index af27e362..534114c3 100644
+--- a/uefi-sct/SctPkg/Config/Data/Category.ini
++++ b/uefi-sct/SctPkg/Config/Data/Category.ini
+@@ -144,6 +144,13 @@ InterfaceGuid = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
+ Name          = RuntimeServicesTest\VariableServicesTest
+ Description   =
+ 
++[Category Data]
++Revision      = 0x00010000
++CategoryGuid  = d250c2ca-0fe7-4edf-9319-6eef4f6b0d12
++InterfaceGuid = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
++Name          = RuntimeServicesTest\BBSRVariableSizeTest
++Description   =
++
+ [Category Data]
+ Revision      = 0x00010000
+ CategoryGuid  = 0C1D662C-EA60-48F5-9D77-22F853499C4A
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTest.inf b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTest.inf
+new file mode 100644
+index 00000000..30807768
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTest.inf
+@@ -0,0 +1,54 @@
++## @file
++#
++#  Copyright 2006 - 2012 Unified EFI, Inc.<BR>
++#  Copyright (c) 2021, Arm Inc. All rights reserved.<BR>
++#
++#  This program and the accompanying materials
++#  are licensed and made available under the terms and conditions of the BSD License
++#  which accompanies this distribution.  The full text of the license may be found at
++#  http://opensource.org/licenses/bsd-license.php
++#
++#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++# 
++##
++#/*++
++#
++# Module Name:
++#
++#   BBSRVariableSizeBbTest.inf
++#
++# Abstract:
++#
++#   Component description file for BBSR Variable Size Test Black-Box Test.
++#
++#--*/
++
++[Defines]
++  INF_VERSION          = 0x00010005
++  BASE_NAME            = BBSRVariableSizeTest
++  FILE_GUID            = bdcc5953-b80c-4c47-80b2-85222e4dca0d
++  MODULE_TYPE          = UEFI_DRIVER
++  VERSION_STRING       = 1.0
++  ENTRY_POINT          = InitializeBBSRVariableSizeBbTest
++
++[Sources.common]
++  BBSRVariableSizeBBTestMain.h
++  BBSRVariableSizeBBTestMain.c
++  BBSRVariableSizeBBTestFunction.c
++  Guid.h
++  Guid.c
++
++[Packages]
++  MdePkg/MdePkg.dec
++  SctPkg/SctPkg.dec
++  SctPkg/UEFI/UEFI.dec
++
++[LibraryClasses]
++  UefiDriverEntryPoint
++  SctLib
++  EfiTestLib
++
++[Protocols]
++  gEfiTestRecoveryLibraryGuid
++  gEfiTestLoggingLibraryGuid
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTestFunction.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTestFunction.c
+new file mode 100644
+index 00000000..bc822b47
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTestFunction.c
+@@ -0,0 +1,208 @@
++/** @file
++
++  Copyright 2006 - 2012 Unified EFI, Inc.<BR>
++  Copyright (c) 2021, Arm Inc. All rights reserved.<BR>
++  This program and the accompanying materials
++  are licensed and made available under the terms and conditions of the BSD License
++  which accompanies this distribution.  The full text of the license may be found at 
++  http://opensource.org/licenses/bsd-license.php
++ 
++  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++ 
++**/
++/*++
++
++Module Name:
++ BBSRVariableSizeBbTestFunction.c
++
++Abstract:
++  Source file for BBSR Variable Size Function Black-Box Test - Function Test.
++
++--*/
++
++#include "SctLib.h"
++#include "BBSRVariableSizeBBTestMain.h"
++
++//
++// Prototypes (external)
++//
++
++EFI_STATUS
++BBSRVariableSizeTest (
++  IN EFI_BB_TEST_PROTOCOL       *This,
++  IN VOID                       *ClientInterface,
++  IN EFI_TEST_LEVEL             TestLevel,
++  IN EFI_HANDLE                 SupportHandle
++  );
++
++//
++// Prototypes (internal)
++//
++
++EFI_STATUS
++BBSRVariableSizeTestSub1 (
++  IN EFI_RUNTIME_SERVICES                 *RT,
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL   *StandardLib,
++  IN EFI_TEST_LOGGING_LIBRARY_PROTOCOL    *LoggingLib
++  );
++
++ /*  BBSR R040/050 - Entry point for BBSRVariableSize Function Test.
++ *  @param This             A pointer to the EFI_BB_TEST_PROTOCOL instance.
++ *  @param ClientInterface  A pointer to the interface to be tested.
++ *  @param TestLevel        Test "thoroughness" control.
++ *  @param SupportHandle    A handle containing support protocols.
++ *  @return EFI_SUCCESS     Successfully.
++ *  @return Other value     Something failed.
++ */
++EFI_STATUS
++BBSRVariableSizeTest (
++  IN EFI_BB_TEST_PROTOCOL       *This,
++  IN VOID                       *ClientInterface,
++  IN EFI_TEST_LEVEL             TestLevel,
++  IN EFI_HANDLE                 SupportHandle
++  )
++{
++  EFI_STATUS                          Status;
++  EFI_RUNTIME_SERVICES                *RT;
++  EFI_STANDARD_TEST_LIBRARY_PROTOCOL  *StandardLib;
++  EFI_TEST_RECOVERY_LIBRARY_PROTOCOL  *RecoveryLib;
++  EFI_TEST_LOGGING_LIBRARY_PROTOCOL   *LoggingLib;
++
++  //
++  // Get test support library interfaces
++  //
++  Status = GetTestSupportLibrary (
++             SupportHandle,
++             &StandardLib,
++             &RecoveryLib,
++             &LoggingLib
++             );
++  if (EFI_ERROR(Status)) {
++    return Status;
++  }
++
++  if (FALSE == CheckBBTestCanRunAndRecordAssertion(
++                  StandardLib, 
++                  L"BBSR VariableSize_Func - BBSR Variable Size Test not supporte in EFI",
++                  __FILE__,
++                  (UINTN)__LINE__
++                  )) {
++    return EFI_SUCCESS;
++  }
++
++  RT = (EFI_RUNTIME_SERVICES *)ClientInterface;
++
++  Status = BBSRVariableSizeTestSub1 (RT, StandardLib, LoggingLib);
++
++  return EFI_SUCCESS;
++}
++
++//
++// BBSR Variable Size Test
++//
++EFI_STATUS
++BBSRVariableSizeTestSub1 (
++  IN EFI_RUNTIME_SERVICES                 *RT,
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL   *StandardLib,
++  IN EFI_TEST_LOGGING_LIBRARY_PROTOCOL    *LoggingLib
++  )
++{
++  EFI_STATUS            QueryVarStatus;
++  UINT32                ValidAttributes = EFI_VARIABLE_NON_VOLATILE|EFI_VARIABLE_BOOTSERVICE_ACCESS|EFI_VARIABLE_RUNTIME_ACCESS;
++  UINT64                MaximumVariableStorageSize;
++  UINT64                RemainingVariableStorageSize;
++  UINT64                MaximumVariableSize;
++  EFI_TEST_ASSERTION Result = EFI_TEST_ASSERTION_PASSED;
++  
++  //
++  // Trace ...
++  //
++  if (LoggingLib != NULL) {
++    LoggingLib->EnterFunction (
++                  LoggingLib,
++                  L"VariableSizeFuncTestSub1",
++                  L"BBSR R040/R050"
++                  );
++  }
++    QueryVarStatus = RT->QueryVariableInfo (
++                              ValidAttributes,
++                              &MaximumVariableStorageSize,
++                              &RemainingVariableStorageSize,
++                              &MaximumVariableSize
++                              );
++
++     StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nQueryVariable MaxStorageSize is %d MaxVariableSize is %d",
++                     MaximumVariableStorageSize,
++                     MaximumVariableSize
++                     );
++
++   //Check MaxVariableStorageSize is larger than 128kb as per R040
++    if ( MaximumVariableStorageSize < 131072) {
++                     StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\nQueryVariable MaxStorageSize is %d, but must be at least 128KB",
++                     MaximumVariableStorageSize
++                     );
++
++          Result = EFI_TEST_ASSERTION_FAILED;
++    }
++    //
++    // Record assertion
++    //
++    StandardLib->RecordAssertion (
++                   StandardLib,
++                   Result,
++                   gBBSRVariableSizeTestBbTestVarSizeAssertionGuid001,
++                   L"RT.SecurityVariableSizeTest - BBSR Variable Size test",
++                   L"%a:%d:",
++                   __FILE__,
++                   (UINTN)__LINE__
++                   );
++
++   //Check MaxVariableSize is larger than 64kb as per R050
++    if ( MaximumVariableSize < 65536) {
++                     StandardLib->RecordMessage (
++                     StandardLib,
++                     EFI_VERBOSE_LEVEL_DEFAULT,
++                     L"\r\QueryVariable MaxVariableSize is %d, but must be at least 64KB",
++                     MaximumVariableSize
++                     );
++
++          Result = EFI_TEST_ASSERTION_FAILED;
++   }
++   //
++    // Record assertion
++    //
++    StandardLib->RecordAssertion (
++                   StandardLib,
++                   Result,
++                   gBBSRVariableSizeTestBbTestVarSizeAssertionGuid002,
++                   L"RT.SecurityVariableSizeTest - BBSR Variable Size test",
++                   L"%a:%d:",
++                   __FILE__,
++                   (UINTN)__LINE__
++                   );
++
++
++  //
++  // Trace ...
++  //
++  if (LoggingLib != NULL) {
++    LoggingLib->ExitFunction (
++                  LoggingLib,
++                  L"BBSRVariableSizeFuncTestSub1",
++                  L"BBSR R040/050"
++                  );
++  }
++
++  //
++  // Done
++  //
++  return EFI_SUCCESS;
++}
++
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTestMain.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTestMain.c
+new file mode 100644
+index 00000000..6287aa81
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTestMain.c
+@@ -0,0 +1,192 @@
++/** @file
++
++  Copyright 2006 - 2017 Unified EFI, Inc.<BR>
++  Copyright (c) 2021, Arm Inc. All rights reserved.<BR>
++
++  This program and the accompanying materials
++  are licensed and made available under the terms and conditions of the BSD License
++  which accompanies this distribution.  The full text of the license may be found at 
++  http://opensource.org/licenses/bsd-license.php
++ 
++  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++ 
++**/
++/*++
++
++Module Name:
++  BBSRVariableSizeBbTestMain.c
++
++Abstract:
++  The main source file for BBSR Variable Size Black-Box Test.
++
++--*/
++
++//
++// Includes
++//
++
++#include "SctLib.h"
++#include "BBSRVariableSizeBBTestMain.h"
++
++//
++// Declarations
++//
++
++EFI_BB_TEST_PROTOCOL_FIELD gBBTestProtocolField = {
++  BBSR_VARIABLE_SIZE_BB_TEST_REVISION,
++  BBSR_VARIABLE_SIZE_BB_TEST_GUID,
++  L"BBSR Variable Size Test",
++  L"BBSR Variable Size Black-Box Test"
++};
++
++EFI_GUID gSupportProtocolGuid[] = {
++  EFI_STANDARD_TEST_LIBRARY_GUID,
++  EFI_TEST_RECOVERY_LIBRARY_GUID,
++  EFI_NULL_GUID
++};
++
++EFI_BB_TEST_ENTRY_FIELD gBBTestEntryField[] = {
++  {
++    BBSR_VAR_SIZE_TEST_GUID,
++    L"BBSRVariableSizeTest_func",
++    L"Test that UEFI variable size requirements of BBSR are met.",
++    EFI_TEST_LEVEL_DEFAULT,
++    gSupportProtocolGuid,
++    EFI_TEST_CASE_AUTO,
++    BBSRVariableSizeTest
++  },
++    0
++};
++
++EFI_BB_TEST_PROTOCOL *gBBTestProtocolInterface;
++
++//
++// Prototypes
++//
++
++EFI_STATUS
++EFIAPI
++InitializeBBSRVariableSizeBbTest (
++  IN EFI_HANDLE           ImageHandle,
++  IN EFI_SYSTEM_TABLE     *SystemTable
++  );
++
++EFI_STATUS
++EFIAPI
++UnloadBBSRVariableSizeBbTest (
++  IN EFI_HANDLE       ImageHandle
++  );
++
++//
++// Functions
++//
++
++
++/**
++ *  Creates/installs the BlackBox Interface and the Entry Point list.
++ *  @param ImageHandle    The image handle.
++ *  @param SystemTable    The system table.
++ *  @return EFI_SUCCESS   The interface was installed successfully.
++ *  @return EFI_OUT_OF_RESOURCES    Failed due to the lack of resources.
++ *  @return EFI_INVALID_PARAMETER   One of parameters is invalid.
++ */
++EFI_STATUS
++EFIAPI
++InitializeBBSRVariableSizeBbTest (
++  IN EFI_HANDLE           ImageHandle,
++  IN EFI_SYSTEM_TABLE     *SystemTable
++  )
++{
++  SctInitializeLib (ImageHandle, SystemTable);
++  EfiInitializeTestLib (ImageHandle, SystemTable);
++
++  return EfiInitAndInstallBBTestInterface (
++           &ImageHandle,
++           &gBBTestProtocolField,
++           gBBTestEntryField,
++           UnloadBBSRVariableSizeBbTest,
++           &gBBTestProtocolInterface
++           );
++}
++
++
++/**
++ *  Unloads the BlackBox Interface and the Entry Point list.
++ *  @param ImageHandle    The image handle.
++ *  @return EFI_SUCCESS   The interface was uninstalled successfully.
++ */
++EFI_STATUS
++EFIAPI
++UnloadBBSRVariableSizeBbTest (
++  IN EFI_HANDLE       ImageHandle
++  )
++{
++  return EfiUninstallAndFreeBBTestInterface (
++           ImageHandle,
++           gBBTestProtocolInterface
++           );
++}
++
++
++/**
++ *  Support function - Get test support protocol library.
++ *  @param SupportHandle  A handle containing support protocols.
++ *  @param StandardLib    A pointer to Standard Test Support Protocol.
++ *  @param RecoveryLib    A pointer to Test Recovery Support Protocol.
++ *  @param LoggingLib     A pointer to Test Logging Support Protocol.
++ *  @return EFI_SUCCESS   Successfully.
++ *  @return Other value   Something failed.
++ */
++EFI_STATUS
++GetTestSupportLibrary (
++  IN EFI_HANDLE                           SupportHandle,
++  OUT EFI_STANDARD_TEST_LIBRARY_PROTOCOL  **StandardLib,
++  OUT EFI_TEST_RECOVERY_LIBRARY_PROTOCOL  **RecoveryLib,
++  OUT EFI_TEST_LOGGING_LIBRARY_PROTOCOL   **LoggingLib
++  )
++{
++  EFI_STATUS            Status;
++
++  //
++  // Get the standard test support library interface
++  //
++  *StandardLib = NULL;
++  Status = gtBS->HandleProtocol (
++                   SupportHandle,
++                   &gEfiStandardTestLibraryGuid,
++                   (VOID **) StandardLib
++                   );
++  if (EFI_ERROR(Status)) {
++    return Status;
++  }
++
++  //
++  // Get the test recovery support library interface
++  //
++  *RecoveryLib = NULL;
++  Status = gtBS->HandleProtocol (
++                   SupportHandle,
++                   &gEfiTestRecoveryLibraryGuid,
++                   (VOID **) RecoveryLib
++                   );
++  if (EFI_ERROR(Status)) {
++    return Status;
++  }
++
++  //
++  // Get the test logging support library interface
++  //
++  *LoggingLib = NULL;
++  Status = gtBS->HandleProtocol (
++                   SupportHandle,
++                   &gEfiTestLoggingLibraryGuid,
++                   (VOID **) LoggingLib
++                   );
++  // Test logging support library is optional
++
++  //
++  // Done
++  //
++  return EFI_SUCCESS;
++}
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTestMain.h b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTestMain.h
+new file mode 100644
+index 00000000..5d3c29cf
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTestMain.h
+@@ -0,0 +1,62 @@
++/** @file
++
++  Copyright 2006 - 2016 Unified EFI, Inc.<BR>
++  Copyright (c) 2021, Arm Inc. All rights reserved.<BR>
++
++  This program and the accompanying materials
++  are licensed and made available under the terms and conditions of the BSD License
++  which accompanies this distribution.  The full text of the license may be found at 
++  http://opensource.org/licenses/bsd-license.php
++ 
++  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++ 
++**/
++/*++
++
++Module Name:
++  BBSRVariableSizeBbTestMain.h
++
++Abstract:
++  Header file for BBSR Variable Size Test Black-Box Test.
++
++--*/
++
++//
++// Includes
++//
++#include "Efi.h"
++#include "Guid.h"
++#include <Library/EfiTestLib.h>
++
++#include EFI_TEST_PROTOCOL_DEFINITION(TestRecoveryLibrary)
++#include EFI_TEST_PROTOCOL_DEFINITION(TestLoggingLibrary)
++
++//
++// Definitions
++//
++
++#define BBSR_VARIABLE_SIZE_BB_TEST_REVISION    0x00010000
++
++#define BBSR_VARIABLE_SIZE_BB_TEST_GUID        \
++  { 0xD250C2CA, 0x0FE7, 0x4EDF, {0x93, 0x19, 0x6E, 0xEF, 0x4F, 0x6B, 0x0D, 0x12 }}
++
++
++EFI_STATUS
++BBSRVariableSizeTest (
++  IN EFI_BB_TEST_PROTOCOL       *This,
++  IN VOID                       *ClientInterface,
++  IN EFI_TEST_LEVEL             TestLevel,
++  IN EFI_HANDLE                 SupportHandle
++  );
++
++//
++// Support functions
++//
++EFI_STATUS
++GetTestSupportLibrary (
++  IN EFI_HANDLE                           SupportHandle,
++  OUT EFI_STANDARD_TEST_LIBRARY_PROTOCOL  **StandardLib,
++  OUT EFI_TEST_RECOVERY_LIBRARY_PROTOCOL  **RecoveryLib,
++  OUT EFI_TEST_LOGGING_LIBRARY_PROTOCOL   **LoggingLib
++  );
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/Guid.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/Guid.c
+new file mode 100644
+index 00000000..0aa91079
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/Guid.c
+@@ -0,0 +1,33 @@
++/** @file
++
++  Copyright 2006 - 2016 Unified EFI, Inc.<BR>
++  Copyright (c) 2021, Arm Inc. All rights reserved.<BR>
++
++  This program and the accompanying materials
++  are licensed and made available under the terms and conditions of the BSD License
++  which accompanies this distribution.  The full text of the license may be found at 
++  http://opensource.org/licenses/bsd-license.php
++ 
++  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++ 
++**/
++/*++
++
++Module Name:
++
++  guid.c
++
++Abstract:
++
++  GUIDs auto-generated for EFI test assertion.
++
++--*/
++
++#include "Efi.h"
++#include "Guid.h"
++
++
++EFI_GUID gBBSRVariableSizeTestBbTestVarSizeAssertionGuid001 = EFI_TEST_BBSRVARIABLESIZEBBTEST_VARSIZETEST_ASSERTION_001_GUID;
++
++EFI_GUID gBBSRVariableSizeTestBbTestVarSizeAssertionGuid002 = EFI_TEST_BBSRVARIABLESIZEBBTEST_VARSIZETEST_ASSERTION_002_GUID;
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/Guid.h b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/Guid.h
+new file mode 100644
+index 00000000..0a1360b1
+--- /dev/null
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/Guid.h
+@@ -0,0 +1,38 @@
++/** @file
++
++  Copyright 2006 - 2016 Unified EFI, Inc.<BR>
++  Copyright (c) 2021, Arm Inc. All rights reserved.<BR>
++
++  This program and the accompanying materials
++  are licensed and made available under the terms and conditions of the BSD License
++  which accompanies this distribution.  The full text of the license may be found at 
++  http://opensource.org/licenses/bsd-license.php
++ 
++  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
++  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++ 
++**/
++/*++
++
++Module Name:
++
++  guid.h
++
++Abstract:
++
++  GUIDs auto-generated for EFI test assertion.
++
++--*/
++
++#define BBSR_VAR_SIZE_TEST_GUID\
++{ 0x19a9edcf, 0xeeb9, 0x43e4, {0x86, 0xa0, 0xf2, 0x87, 0x34, 0xfe, 0xd4, 0x29 }}
++
++#define EFI_TEST_BBSRVARIABLESIZEBBTEST_VARSIZETEST_ASSERTION_001_GUID \
++{ 0xb6dc17ca, 0x71e1, 0x4bd5, {0x9e, 0x76, 0xf9, 0xa0, 0x84, 0x7d, 0x9a, 0xe4 }}
++
++extern EFI_GUID gBBSRVariableSizeTestBbTestVarSizeAssertionGuid001;
++
++#define EFI_TEST_BBSRVARIABLESIZEBBTEST_VARSIZETEST_ASSERTION_002_GUID \
++{ 0x9b37033f, 0x53af, 0x4097, {0xaa, 0xe3, 0x73, 0xfd, 0x28, 0xd2, 0x67, 0xd5 }}
++
++extern EFI_GUID gBBSRVariableSizeTestBbTestVarSizeAssertionGuid002;
+diff --git a/uefi-sct/SctPkg/UEFI/UEFI_SCT.dsc b/uefi-sct/SctPkg/UEFI/UEFI_SCT.dsc
+index 2e97687b..8974dc3c 100644
+--- a/uefi-sct/SctPkg/UEFI/UEFI_SCT.dsc
++++ b/uefi-sct/SctPkg/UEFI/UEFI_SCT.dsc
+@@ -209,6 +209,7 @@ SctPkg/TestCase/UEFI/EFI/RuntimeServices/MiscRuntimeServices/BlackBoxTest/MiscRu
+ SctPkg/TestCase/UEFI/EFI/RuntimeServices/TimeServices/BlackBoxTest/TimeServicesBBTest.inf
+ SctPkg/TestCase/UEFI/EFI/RuntimeServices/VariableServices/BlackBoxTest/VariableServicesBBTest.inf
+ 
++SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTest.inf
+ SctPkg/TestCase/UEFI/EFI/Protocol/GraphicsOutput/BlackBoxTest/GraphicsOutputBBTest.inf
+ SctPkg/TestCase/UEFI/EFI/Protocol/Bis/BlackBoxTest/BisBBTest.inf
+ SctPkg/TestCase/UEFI/EFI/Protocol/BlockIo/BlackBoxTest/BlockIoBBTest.inf
+@@ -483,4 +484,4 @@ SctPkg/TestCase/RIVL/Protocol/Http/Http/HttpENTSTest.inf
+ SctPkg/TestCase/RIVL/Protocol/Http/HttpServiceBinding/HttpServiceBindingENTSTest.inf
+ 
+ [Components.IA32, Components.X64]
+-SctPkg/TestCase/UEFI/EFI/Generic/ExeMode/BlackBoxTest/ExeModeBBTest.inf
+\ No newline at end of file
++SctPkg/TestCase/UEFI/EFI/Generic/ExeMode/BlackBoxTest/ExeModeBBTest.inf
+-- 
+2.17.1
+

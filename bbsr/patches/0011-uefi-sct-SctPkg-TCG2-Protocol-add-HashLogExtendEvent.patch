@@ -1,0 +1,458 @@
+From 9b64655f5a3d5ebf45b9004f7d8b595fff05b7b6 Mon Sep 17 00:00:00 2001
+From: Joseph Hemann <Joseph.hemann@arm.com>
+Date: Wed, 2 Jun 2021 18:30:42 -0500
+Subject: [PATCH 11/22] uefi-sct/SctPkg: TCG2 Protocol: add HashLogExtendEvent
+ test
+
+Signed-off-by: Joseph Hemann <Joseph.hemann@arm.com>
+Signed-off-by: Stuart Yoder <stuart.yoder@arm.com>
+---
+ .../Protocol/TCG2Protocol/BlackBoxTest/Guid.c |  12 +-
+ .../Protocol/TCG2Protocol/BlackBoxTest/Guid.h |  25 ++
+ .../BlackBoxTest/TCG2ProtocolBBTest.h         |  29 ++
+ .../TCG2ProtocolBBTestConformance.c           | 278 ++++++++++++++++++
+ .../BlackBoxTest/TCG2ProtocolBBTestMain.c     |   9 +
+ uefi-sct/SctPkg/UEFI/Protocol/TCG2.h          |   2 +
+ 6 files changed, 353 insertions(+), 2 deletions(-)
+
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.c
+index 53809330..32438f96 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.c
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.c
+@@ -34,6 +34,14 @@ EFI_GUID gTcg2ConformanceTestAssertionGuid002 = EFI_TEST_TCG2CONFORMANCE_ASSERTI
+ 
+ EFI_GUID gTcg2ConformanceTestAssertionGuid003 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_003_GUID;
+ 
+-EFI_GUID gTcg2ConformanceTestAssertionGuid004 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_004_GUID;
++EFI_GUID gTcg2ConformanceTestAssertionGuid004 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_004_GUID;
+ 
+-EFI_GUID gTcg2ConformanceTestAssertionGuid005 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_005_GUID;
++EFI_GUID gTcg2ConformanceTestAssertionGuid005 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_005_GUID;
++
++EFI_GUID gTcg2ConformanceTestAssertionGuid006 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_006_GUID;
++
++EFI_GUID gTcg2ConformanceTestAssertionGuid007 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_007_GUID;
++
++EFI_GUID gTcg2ConformanceTestAssertionGuid008 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_008_GUID;
++
++EFI_GUID gTcg2ConformanceTestAssertionGuid009 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_009_GUID;
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.h b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.h
+index f470255c..a740f7a3 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.h
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/Guid.h
+@@ -51,3 +51,28 @@ extern EFI_GUID gTcg2ConformanceTestAssertionGuid004;
+ 
+ extern EFI_GUID gTcg2ConformanceTestAssertionGuid005;
+ 
++#define EFI_TEST_TCG2CONFORMANCE_ASSERTION_005_GUID \
++{ 0xb0e717c4, 0xb1e2, 0x49f7, {0xb2, 0xd7, 0x60, 0x58, 0x97, 0x7d, 0x09, 0x2c }}
++
++extern EFI_GUID gTcg2ConformanceTestAssertionGuid005;
++
++#define EFI_TEST_TCG2CONFORMANCE_ASSERTION_006_GUID \
++{ 0xa8e1b5e6, 0xfc09, 0x461c, {0xb0, 0xe9, 0x2a, 0x49, 0xcd, 0x25, 0xc1, 0x24 }}
++
++extern EFI_GUID gTcg2ConformanceTestAssertionGuid006;
++
++#define EFI_TEST_TCG2CONFORMANCE_ASSERTION_007_GUID \
++{ 0x26f04a9b, 0x7b7a, 0x4f47, {0xbe, 0xa8, 0xb1, 0xa6, 0x02, 0x65, 0x19, 0x8a }}
++
++extern EFI_GUID gTcg2ConformanceTestAssertionGuid007;
++
++#define EFI_TEST_TCG2CONFORMANCE_ASSERTION_008_GUID \
++{ 0x4d1d9985, 0x91e2, 0x4948, {0x89, 0x16, 0xbb, 0x98, 0x13, 0x62, 0x39, 0x1d }}
++
++extern EFI_GUID gTcg2ConformanceTestAssertionGuid008;
++
++#define EFI_TEST_TCG2CONFORMANCE_ASSERTION_009_GUID \
++{ 0xfb59cab7, 0x4f8c, 0x4ded, {0xa4, 0x1c, 0xc8, 0x41, 0x20, 0x1c, 0x37, 0x22 }}
++
++extern EFI_GUID gTcg2ConformanceTestAssertionGuid009;
++
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.h b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.h
+index 67723f30..44ff6641 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.h
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.h
+@@ -42,6 +42,15 @@ extern EFI_HANDLE   mImageHandle;
+ #define EFI_TCG2_PROTOCOL_TEST_ENTRY_GUID0102 \
+  {0x847f1ae0, 0xb429, 0x49f1, {0x9e, 0x0c, 0x8f, 0x43, 0xfb, 0x55, 0x34, 0x54} }
+ 
++#define EFI_TCG2_PROTOCOL_TEST_ENTRY_GUID0103 \
++ {0x907a7878, 0xb294, 0xf147, {0xe9, 0x0a, 0x65, 0x43, 0xab, 0x55, 0x76, 0x46} }
++
++#define EV_POST_CODE 0x01
++
++#define EFI_TCG2_EXTEND_ONLY 0x0000000000000001
++
++#define PE_COFF_IMAGE 0x0000000000000010
++
+ EFI_STATUS
+ EFIAPI
+ BBTestTCG2ProtocolUnload (
+@@ -78,6 +87,18 @@ BBTestGetActivePcrBanksConformanceTestCheckpoint2 (
+   IN EFI_TCG2_PROTOCOL                     *TCG2
+   );
+ 
++EFI_STATUS
++BBTestHashLogExtendEventConformanceTestCheckpoint1 (
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
++  IN EFI_TCG2_PROTOCOL                     *TCG2
++  );
++
++EFI_STATUS
++BBTestHashLogExtendEventConformanceTestCheckpoint2 (
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
++  IN EFI_TCG2_PROTOCOL                     *TCG2
++  );
++
+ EFI_STATUS
+ BBTestGetCapabilityConformanceTest (
+   IN EFI_BB_TEST_PROTOCOL       *This,
+@@ -94,3 +115,11 @@ BBTestGetActivePcrBanksConformanceTest (
+   IN EFI_HANDLE                 SupportHandle
+   );
+ 
++EFI_STATUS
++BBTestHashLogExtendEventConformanceTest (
++  IN EFI_BB_TEST_PROTOCOL       *This,
++  IN VOID                       *ClientInterface,
++  IN EFI_TEST_LEVEL             TestLevel,
++  IN EFI_HANDLE                 SupportHandle
++  );
++
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestConformance.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestConformance.c
+index 3e307095..a99a3e6b 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestConformance.c
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestConformance.c
+@@ -125,6 +125,53 @@ BBTestGetActivePcrBanksConformanceTest (
+   return EFI_SUCCESS;
+ }
+ 
++/**
++ *  @brief Entrypoint for HashLogExtendEvent() Function Test.
++ *         2 checkpoints will be tested.
++ *  @param This a pointer of EFI_BB_TEST_PROTOCOL
++ *  @param ClientInterface A pointer to the interface array under test
++ *  @param TestLevel Test "thoroughness" control
++ *  @param SupportHandle A handle containing protocols required
++ *  @return EFI_SUCCESS
++ *  @return EFI_NOT_FOUND
++ */
++
++EFI_STATUS
++BBTestHashLogExtendEventConformanceTest (
++  IN EFI_BB_TEST_PROTOCOL       *This,
++  IN VOID                       *ClientInterface,
++  IN EFI_TEST_LEVEL             TestLevel,
++  IN EFI_HANDLE                 SupportHandle
++  )
++{
++  EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib;
++  EFI_STATUS                            Status;
++  EFI_TCG2_PROTOCOL                     *TCG2;
++  //
++  // init
++  //
++  TCG2 = (EFI_TCG2_PROTOCOL*)ClientInterface;
++
++  // Get the Standard Library Interface
++  //
++  Status = gtBS->HandleProtocol (
++                   SupportHandle,
++                   &gEfiStandardTestLibraryGuid,
++                   (VOID **) &StandardLib
++                   );
++  if (EFI_ERROR(Status)) {
++    return Status;
++  }
++
++  //Test Using NULL Pointer
++  BBTestHashLogExtendEventConformanceTestCheckpoint1 (StandardLib, TCG2);
++
++  //Test with correct size field
++  BBTestHashLogExtendEventConformanceTestCheckpoint2 (StandardLib, TCG2);
++
++  return EFI_SUCCESS;
++}
++
+ EFI_STATUS
+ BBTestGetCapabilityConformanceTestCheckpoint1 (
+   IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
+@@ -423,3 +470,234 @@ BBTestGetActivePcrBanksConformanceTestCheckpoint2 (
+ 
+   return EFI_SUCCESS;
+ }
++
++EFI_STATUS
++BBTestHashLogExtendEventConformanceTestCheckpoint1 (
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
++  IN EFI_TCG2_PROTOCOL                     *TCG2
++  )
++{
++  EFI_TEST_ASSERTION                    AssertionType;
++  EFI_STATUS                            Status;
++  UINT64                                Flags = 0;
++  EFI_PHYSICAL_ADDRESS                  DataToHash;
++  UINT64                                DataToHashLen;
++  EFI_TCG2_EVENT                        *EfiTcgEvent;
++  const CHAR16                          *EventData = L"TCG2 Protocol Test";
++  const CHAR16                          *Str = L"The quick brown fox jumps over the lazy dog";
++  UINT32                                EfiTcgEventSize = sizeof(EFI_TCG2_EVENT) + SctStrSize(EventData);
++  
++  DataToHash =  Str;
++  DataToHashLen = SctStrLen(Str);
++
++  Status = gtBS->AllocatePool (
++                   EfiBootServicesData,
++                   EfiTcgEventSize,
++                   (VOID **)&EfiTcgEvent
++                   );
++
++  EfiTcgEvent->Header.HeaderSize = sizeof(EFI_TCG2_EVENT_HEADER);
++  EfiTcgEvent->Header.EventType = EV_POST_CODE;
++  EfiTcgEvent->Header.PCRIndex = 16;
++  EfiTcgEvent->Size = EfiTcgEvent->Header.HeaderSize + SctStrSize(EventData);
++
++  // Ensure HashLogExtendEvent returns Invalid Parameter when passing in NULL DataToHash pointer
++  // EFI Protocol Spec Section 6.6.5 #1
++  Status = TCG2->HashLogExtendEvent (
++                           TCG2,
++                           Flags,
++                           NULL,
++                           0,
++                           EfiTcgEvent);
++
++  if (EFI_INVALID_PARAMETER != Status) {
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  } else {
++    AssertionType = EFI_TEST_ASSERTION_PASSED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 AssertionType,
++                 gTcg2ConformanceTestAssertionGuid004,
++                 L"TCG2_PROTOCOL.HashLogExtendEvent - Test with NULL DataToHash Pointer should return EFI_INVALID_PARAMETER",
++                 L"%a:%d: Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++ 
++  // Ensure HashLogExtendEvent returns Invalid Parameter when passing in NULL EfiTcgEvent pointer
++  // EFI Protocol Spec Section 6.6.5 #1
++  Status = TCG2->HashLogExtendEvent (
++                           TCG2,
++                           Flags,
++                           DataToHash,
++                           DataToHashLen,
++                           NULL);
++
++  if (EFI_INVALID_PARAMETER != Status) {
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++   } else {
++    AssertionType = EFI_TEST_ASSERTION_PASSED;
++   }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 AssertionType,
++                 gTcg2ConformanceTestAssertionGuid005,
++                 L"TCG2_PROTOCOL.HashLogExtendEvent - Test with NULL EfiTcgEvent Pointer should return EFI_INVALID_PARAMETER",
++                 L"%a:%d: Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++  
++  // Ensure HashLogExtendEvent returns Invalid Parameter when passed in EventSize < HeaderSize + sizeof(UINT32)
++  // EFI Protocol Spec Section 6.6.5 #2
++  EfiTcgEvent->Size = EfiTcgEvent->Header.HeaderSize + sizeof(UINT32) - 1;
++  
++  Status = TCG2->HashLogExtendEvent (
++                           TCG2,
++                           Flags,
++                           DataToHash,
++                           DataToHashLen,
++                           EfiTcgEvent);
++
++  if (EFI_INVALID_PARAMETER != Status) {
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  } else {
++    AssertionType = EFI_TEST_ASSERTION_PASSED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 AssertionType,
++                 gTcg2ConformanceTestAssertionGuid006,
++                 L"TCG2_PROTOCOL.HashLogExtendEvent - Test with Event.Size < Event.Header.HeaderSize + sizeof(UINT32) should return EFI_INVALID_PARAMETER",
++                 L"%a:%d: Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++ 
++  // Ensure HashLogExtendEvent returns Invalid Parameter when passing in PCR Index > 23
++  // EFI Protocol Spec Section 6.6.5 #3
++  EfiTcgEvent->Header.PCRIndex = 24;
++  EfiTcgEvent->Size = EfiTcgEvent->Header.HeaderSize + SctStrSize(EventData);
++  
++  Status = TCG2->HashLogExtendEvent (
++                           TCG2,
++                           Flags,
++                           DataToHash,
++                           DataToHashLen,
++                           EfiTcgEvent);
++
++  if (EFI_INVALID_PARAMETER != Status) {
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  } else {
++    AssertionType = EFI_TEST_ASSERTION_PASSED;
++  }
++ 
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 AssertionType,
++                 gTcg2ConformanceTestAssertionGuid007,
++                 L"TCG2_PROTOCOL.HashLogExtendEvent - Test with PCRIndex > 23 should return  EFI_INVALID_PARAMETER",
++                 L"%a:%d: Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
++  return EFI_SUCCESS;
++}
++
++EFI_STATUS
++BBTestHashLogExtendEventConformanceTestCheckpoint2 (
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
++  IN EFI_TCG2_PROTOCOL                     *TCG2
++  )
++{
++
++  EFI_TCG2_EVENT                        *EfiTcgEvent;
++  EFI_TEST_ASSERTION                    AssertionType;
++  EFI_STATUS                            Status;
++  UINT64                                Flags;
++  EFI_PHYSICAL_ADDRESS                  DataToHash;
++  UINT64                                DataToHashLen;
++  const CHAR16 *Str = L"The quick brown fox jumps over the lazy dog";
++  const CHAR16 *EventData = L"TCG2 Protocol Test";
++  UINT32 EfiTcgEventSize = sizeof(EFI_TCG2_EVENT) + SctStrSize(EventData);
++
++  DataToHash = Str;
++  DataToHashLen = SctStrLen(Str);
++
++  Status = gtBS->AllocatePool (
++                   EfiBootServicesData,
++                   EfiTcgEventSize,
++                   (VOID **)&EfiTcgEvent
++                   );
++
++  EfiTcgEvent->Header.HeaderSize = sizeof(EFI_TCG2_EVENT_HEADER);
++  EfiTcgEvent->Header.EventType = EV_POST_CODE;
++  EfiTcgEvent->Header.PCRIndex = 16;
++  EfiTcgEvent->Size = EfiTcgEvent->Header.HeaderSize + SctStrSize(EventData);
++
++  // Ensure HashLogExtendEvent returns EFI_SUCCESS with valid parameters
++  Status = TCG2->HashLogExtendEvent (
++                           TCG2,
++                           Flags,
++                           DataToHash,
++                           DataToHashLen,
++                           EfiTcgEvent);
++
++  if (Status != EFI_SUCCESS) {
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  } else {
++    AssertionType = EFI_TEST_ASSERTION_PASSED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 AssertionType,
++                 gTcg2ConformanceTestAssertionGuid008,
++                 L"TCG2_PROTOCOL.HashLogExtendEvent - HashLogExtendEvent() Test: HashLogExtendEvent should return EFI_SUCCESS",
++                 L"%a:%d: Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
++  // Test with valid Parameters but with Flags = PE_COFF_IMAGE
++  // EFI Protocol Spec Section 6.6.5 #4
++  Flags = PE_COFF_IMAGE;
++
++  Status = TCG2->HashLogExtendEvent (
++                           TCG2,
++                           Flags,
++                           DataToHash,
++                           DataToHashLen,
++                           EfiTcgEvent);
++
++  if (Status != EFI_UNSUPPORTED) {
++    AssertionType = EFI_TEST_ASSERTION_FAILED;
++  } else {
++    AssertionType = EFI_TEST_ASSERTION_PASSED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 AssertionType,
++                 gTcg2ConformanceTestAssertionGuid009,
++                 L"TCG2_PROTOCOL.HashLogExtendEvent - HashLogExtendEvent() Test Handling of PE_COFF_IMAGE flag",
++                 L"%a:%d: Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
++  gtBS->FreePool (EfiTcgEvent);
++  
++  return EFI_SUCCESS;
++}
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestMain.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestMain.c
+index c9f47379..89f110dd 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestMain.c
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTestMain.c
+@@ -58,6 +58,15 @@ EFI_BB_TEST_ENTRY_FIELD gBBTestEntryField[] = {
+     EFI_TEST_CASE_AUTO,
+     BBTestGetActivePcrBanksConformanceTest
+   },
++  {
++    EFI_TCG2_PROTOCOL_TEST_ENTRY_GUID0103,
++    L"HashLogExtendEvent_Conf",
++    L"Test the HashLogExtendEvent API",
++    EFI_TEST_LEVEL_DEFAULT,
++    gSupportProtocolGuid1,
++    EFI_TEST_CASE_AUTO,
++    BBTestHashLogExtendEventConformanceTest
++  },
+   0
+ };
+ 
+diff --git a/uefi-sct/SctPkg/UEFI/Protocol/TCG2.h b/uefi-sct/SctPkg/UEFI/Protocol/TCG2.h
+index 94631bf2..643ce672 100644
+--- a/uefi-sct/SctPkg/UEFI/Protocol/TCG2.h
++++ b/uefi-sct/SctPkg/UEFI/Protocol/TCG2.h
+@@ -94,6 +94,7 @@ typedef UINT32 TCG_PCRINDEX;
+ 
+ typedef UINT32 TCG_EVENTTYPE;
+ 
++#pragma pack(1)
+ typedef struct tdEFI_TCG2_EVENT_HEADER {
+   UINT32 HeaderSize;
+   UINT16 HeaderVersion;
+@@ -106,6 +107,7 @@ typedef struct tdEFI_TCG2_EVENT {
+   EFI_TCG2_EVENT_HEADER Header;
+   UINT8 Event[];
+ } EFI_TCG2_EVENT;
++#pragma pack()
+ 
+ typedef
+ EFI_STATUS
+-- 
+2.17.1
+

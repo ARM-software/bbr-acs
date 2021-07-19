@@ -1,0 +1,336 @@
+From 6af4d479f90b6dc1bace3b2688181b9f4250bec8 Mon Sep 17 00:00:00 2001
+From: Joseph Hemann <Joseph.hemann@arm.com>
+Date: Tue, 6 Jul 2021 14:03:38 -0500
+Subject: [PATCH 16/22] uefi-sct/SctPkg: Secure Boot: verify update of dbx
+ variable
+
+-generate dbSigList3
+-verify that unsigned update gives security violation
+-verify that dbx update (dbSigList3) signed by KEK succeeds
+
+Signed-off-by: Joseph Hemann <Joseph.hemann@arm.com>
+---
+ .../BlackBoxTest/Dependency/Keys/GNUmakefile  |  17 +-
+ .../SecureBoot/BlackBoxTest/Guid.c            |   4 +
+ .../SecureBoot/BlackBoxTest/Guid.h            |  10 +
+ .../BlackBoxTest/VariableUpdatesBBTest.c      | 218 ++++++++++++++++++
+ 4 files changed, 245 insertions(+), 4 deletions(-)
+
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Keys/GNUmakefile b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Keys/GNUmakefile
+index 43c9e974..c559ada7 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Keys/GNUmakefile
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Keys/GNUmakefile
+@@ -45,7 +45,7 @@ TEST_PK1_CRT=$(BIN_DIR)/SecureBoot_TestPK1.crt
+ TEST_PK1_KEY=$(BIN_DIR)/SecureBoot_TestPK1.key
+ endif
+ 
+-all: $(TEST_KEYS) TestKEK2 KEKSigList1.auth TestImage1.bin NullKEK.auth NullDB.auth NullDBX.auth TestKEK1.auth TestDB1.auth TestDBX1.auth SignCert1 dbSigList1.auth SignCert2 SignCert3 RevokedCert1 RevokedCert2 RevokedCert3 RevokedCert4 dbSigList2.auth
++all: $(TEST_KEYS) TestKEK2 KEKSigList1.auth TestImage1.bin NullKEK.auth NullDB.auth NullDBX.auth TestKEK1.auth TestDB1.auth TestDBX1.auth SignCert1 dbSigList1.auth SignCert2 SignCert3 RevokedCert1 RevokedCert2 RevokedCert3 RevokedCert4 dbSigList2.auth dbSigList3.auth
+ 
+ TestImage1.bin:
+ 	head -c 16K </dev/urandom > $(TARGET)_$(@)
+@@ -127,7 +127,11 @@ dbSigList1.auth: SignCert1
+ 	cert-to-efi-sig-list $(BIN_DIR)/SecureBoot_SignCert1.crt $(BIN_DIR)/SecureBoot_TestDB1.esl
+ 	sign-efi-sig-list -c $(TEST_PK1_CRT) -k $(TEST_PK1_KEY) db $(BIN_DIR)/SecureBoot_TestDB1.esl $(BIN_DIR)/SecureBoot_DBSigList1.auth
+ 
+-dbSigList2.auth: SignCert2 SignCert3 RevokedCert1 RevokedCert2 RevokedCert3 RevokedCert4 TestImage5.bin
++KEKSigList3.auth: TestKEK3
++	cert-to-efi-sig-list $(BIN_DIR)/SecureBoot_TestKEK3.crt $(BIN_DIR)/SecureBoot_TestKEK3.esl
++	sign-efi-sig-list -c $(TEST_PK1_CRT) -k $(TEST_PK1_KEY) KEK $(BIN_DIR)/SecureBoot_KEKSigList1.esl $(BIN_DIR)/SecureBoot_KEKSigList1.auth
++
++dbSigListLong: SignCert2 SignCert3 RevokedCert1 RevokedCert2 RevokedCert3 RevokedCert4 TestImage5.bin
+ 	cert-to-efi-sig-list $(BIN_DIR)/SecureBoot_SignCert2.crt $(BIN_DIR)/SecureBoot_TestDB2.esl
+ 	cert-to-efi-sig-list $(BIN_DIR)/SecureBoot_SignCert3.crt $(BIN_DIR)/SecureBoot_TestDB3.esl
+ 	cert-to-efi-sig-list $(BIN_DIR)/SecureBoot_RevokedCert1.crt $(BIN_DIR)/SecureBoot_TestDB4.esl
+@@ -135,8 +139,13 @@ dbSigList2.auth: SignCert2 SignCert3 RevokedCert1 RevokedCert2 RevokedCert3 Revo
+ 	cert-to-efi-sig-list $(BIN_DIR)/SecureBoot_RevokedCert3.crt $(BIN_DIR)/SecureBoot_TestDB6.esl
+ 	cert-to-efi-sig-list $(BIN_DIR)/SecureBoot_RevokedCert4.crt $(BIN_DIR)/SecureBoot_TestDB7.esl
+ 	hash-to-efi-sig-list $(BIN_DIR)/SecureBoot_TestImage5.bin $(BIN_DIR)/SecureBoot_TestDB8.esl
+-	cat $(BIN_DIR)/SecureBoot_TestDB2.esl $(BIN_DIR)/SecureBoot_TestDB3.esl $(BIN_DIR)/SecureBoot_TestDB4.esl $(BIN_DIR)/SecureBoot_TestDB5.esl $(BIN_DIR)/SecureBoot_TestDB6.esl  $(BIN_DIR)/SecureBoot_TestDB7.esl $(BIN_DIR)/SecureBoot_TestDB8.esl  > $(BIN_DIR)/SecureBoot_DBSigList2.esl
+-	sign-efi-sig-list -c $(TEST_KEK1_CRT) -k $(TEST_KEK1_KEY) -t "$(FUTURE_DATE2)" db $(BIN_DIR)/SecureBoot_TestDB2.esl $(BIN_DIR)/SecureBoot_DBSigList2.auth
++	cat $(BIN_DIR)/SecureBoot_TestDB2.esl $(BIN_DIR)/SecureBoot_TestDB3.esl $(BIN_DIR)/SecureBoot_TestDB4.esl $(BIN_DIR)/SecureBoot_TestDB5.esl $(BIN_DIR)/SecureBoot_TestDB6.esl  $(BIN_DIR)/SecureBoot_TestDB7.esl $(BIN_DIR)/SecureBoot_TestDB8.esl  > $(BIN_DIR)/SecureBoot_DBSigListLong.esl
++
++dbSigList2.auth: dbSigListLong
++	sign-efi-sig-list -c $(TEST_KEK1_CRT) -k $(TEST_KEK1_KEY) -t "$(FUTURE_DATE2)" db $(BIN_DIR)/SecureBoot_DBSigListLong.esl $(BIN_DIR)/SecureBoot_DBSigList2.auth
++
++dbSigList3.auth: dbSigListLong
++	sign-efi-sig-list -c $(TEST_KEK1_CRT) -k $(TEST_KEK1_KEY) -t "$(FUTURE_DATE2)" dbx $(BIN_DIR)/SecureBoot_DBSigListLong.esl $(BIN_DIR)/SecureBoot_DBSigList3.auth
+ 
+ clean:
+ 	$(RM) $(BIN_DIR)/$(TARGET)_*.key
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.c
+index af4dea1f..f4f38cb8 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.c
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.c
+@@ -58,3 +58,7 @@ EFI_GUID gSecureBootVariableUpdatesBbTestAssertionGuid003 = EFI_TEST_SECUREBOOTV
+ EFI_GUID gSecureBootVariableUpdatesBbTestAssertionGuid004 = EFI_TEST_SECUREBOOTVARIABLEUPDATES_ASSERTION_004_GUID;
+ 
+ EFI_GUID gSecureBootVariableUpdatesBbTestAssertionGuid005 = EFI_TEST_SECUREBOOTVARIABLEUPDATES_ASSERTION_005_GUID;
++
++EFI_GUID gSecureBootVariableUpdatesBbTestAssertionGuid006 = EFI_TEST_SECUREBOOTVARIABLEUPDATES_ASSERTION_006_GUID;
++
++EFI_GUID gSecureBootVariableUpdatesBbTestAssertionGuid007 = EFI_TEST_SECUREBOOTVARIABLEUPDATES_ASSERTION_007_GUID;
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.h b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.h
+index b11c1ed7..49012de9 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.h
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Guid.h
+@@ -94,3 +94,13 @@ extern EFI_GUID gSecureBootVariableUpdatesBbTestAssertionGuid004;
+ { 0x021ef001, 0x0cb2, 0x45d4, {0x85, 0x29, 0xd4, 0xf0, 0xe8, 0x3a, 0xdd, 0x1f }}
+ 
+ extern EFI_GUID gSecureBootVariableUpdatesBbTestAssertionGuid005;
++
++#define EFI_TEST_SECUREBOOTVARIABLEUPDATES_ASSERTION_006_GUID \
++{ 0x70febf5b, 0x27d6, 0x44ae, {0xab, 0x43, 0x05, 0x9d, 0xdd, 0x8b, 0x29, 0x47 }}
++
++extern EFI_GUID gSecureBootVariableUpdatesBbTestAssertionGuid006;
++
++#define EFI_TEST_SECUREBOOTVARIABLEUPDATES_ASSERTION_007_GUID \
++{ 0xefe0e633, 0xfd4c, 0x4b20, {0xa6, 0x4d, 0xed, 0x4f, 0x2a, 0xfb, 0xa5, 0xce }}
++
++extern EFI_GUID gSecureBootVariableUpdatesBbTestAssertionGuid007;
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/VariableUpdatesBBTest.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/VariableUpdatesBBTest.c
+index 5e76b8b1..e1bef0b0 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/VariableUpdatesBBTest.c
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/VariableUpdatesBBTest.c
+@@ -67,6 +67,14 @@ VariableUpdatesTestCheckpoint2 (
+   EFI_TEST_PROFILE_LIBRARY_PROTOCOL   *ProfileLib
+   );
+ 
++EFI_STATUS
++VariableUpdatesTestCheckpoint3 (
++  IN EFI_RUNTIME_SERVICES                 *RT,
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL   *StandardLib,
++  IN EFI_TEST_LOGGING_LIBRARY_PROTOCOL    *LoggingLib,
++  EFI_TEST_PROFILE_LIBRARY_PROTOCOL   *ProfileLib
++  );
++
+ EFI_STATUS
+ VariableUpdatesCleanup (
+   IN EFI_RUNTIME_SERVICES                 *RT,
+@@ -134,6 +142,10 @@ VariableUpdatesTest(
+   if (EFI_ERROR(Status)) {
+     return Status;
+   }
++  Status = VariableUpdatesTestCheckpoint3 (RT, StandardLib, LoggingLib, ProfileLib);
++  if (EFI_ERROR(Status)) {
++    return Status;
++  }
+ 
+   Status = VariableUpdatesCleanup (RT, StandardLib, LoggingLib, ProfileLib);
+   if (EFI_ERROR(Status)) {
+@@ -623,6 +635,212 @@ VariableUpdatesTestCheckpoint2 (
+   return EFI_SUCCESS;
+ }
+ 
++/**
++ *  Verify that updates to dbx are signed
++ *
++ *  @param StandardLib    A pointer to EFI_STANDARD_TEST_LIBRARY_PROTOCOL
++ *                        instance.
++ *  @param LoggingLib     A pointer to EFI_TEST_LOGGING_LIBRARY_PROTOCOL
++ *                        instance.
++ *  @param ProfileLib     A pointer to EFI_TEST_PROFILE_LIBRARY_PROTOCOL
++ *                        instance.
++ *  @return EFI_SUCCESS   Successfully.
++ *  @return Other value   Something failed.
++ */
++EFI_STATUS
++VariableUpdatesTestCheckpoint3 (
++  IN EFI_RUNTIME_SERVICES                 *RT,
++  IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL   *StandardLib,
++  IN EFI_TEST_LOGGING_LIBRARY_PROTOCOL    *LoggingLib,
++  EFI_TEST_PROFILE_LIBRARY_PROTOCOL   *ProfileLib
++  )
++{
++  EFI_STATUS            Status;
++  EFI_TEST_ASSERTION    Result;
++  UINTN                 DataSize;
++  UINT8                 Data[MAX_BUFFER_SIZE];
++  UINT32                Attributes;
++  EFI_FILE_HANDLE       KeyFHandle;
++  UINT32                KeyFileSize;
++  CHAR16                *FileName;
++  VOID                  *Buffer;
++  UINTN                 BufferSize;
++  UINT32                DBXAttributes;
++
++  //
++  // Trace ...
++  //
++  if (LoggingLib != NULL) {
++    LoggingLib->EnterFunction (
++                  LoggingLib,
++                  L"VariableUpdatesTest",
++                  L"UEFI spec, 8.2, 32.3, 32.4.1"
++                  );
++  }
++
++  // get dbx variable attributes
++  DataSize = 0;
++  Attributes = 0;
++  Status = RT->GetVariable (
++                 L"dbx",                          // VariableName
++                 &gEfiImageSecurityDatabaseGuid, // VendorGuid
++                 &DBXAttributes,                    // Attributes
++                 &DataSize,                      // DataSize
++                 NULL                            // Data
++                 );
++
++
++  //
++  // Test dbx update with unsigned data
++  //
++
++  FileName = L"TestImage1.bin";
++
++  //
++  // read the key data into memory.
++  //
++  Status = OpenFileAndGetSize (
++             FileName,
++             &KeyFHandle,
++             &KeyFileSize
++             );
++
++  if (EFI_ERROR(Status)) {
++    return EFI_NOT_FOUND;
++  }
++
++  Buffer = SctAllocatePool (KeyFileSize);
++
++  if (Buffer == NULL) {
++    KeyFHandle->Close (KeyFHandle);
++    return EFI_OUT_OF_RESOURCES;
++  }
++
++  BufferSize = KeyFileSize;
++
++  Status = KeyFHandle->Read (
++                      KeyFHandle,
++                      &BufferSize,
++                      Buffer
++                      );
++
++  if (EFI_ERROR(Status)) {
++    KeyFHandle->Close (KeyFHandle);
++    gtBS->FreePool (Buffer);
++    return EFI_LOAD_ERROR;
++  }
++
++  Status = RT->SetVariable (
++                     L"dbx",                           // VariableName
++                     &gEfiImageSecurityDatabaseGuid,  // Vendor GUID
++                     DBXAttributes,                   // Attributes
++                     BufferSize,                      // DataSize
++                     Buffer                           // Data
++                     );
++
++  if (Status == EFI_SECURITY_VIOLATION) {
++    Result = EFI_TEST_ASSERTION_PASSED;
++  } else {
++    Result = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 Result,
++                 gSecureBootVariableUpdatesBbTestAssertionGuid006,
++                 L"SecureBoot - Verify unsigned dbx update",
++                 L"%a:%d:Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
++  gtBS->FreePool (Buffer);
++
++  //
++  // Test db update with properly signed data
++  //
++
++  FileName = L"dbSigList3.auth";
++
++  //
++  //read the key file into memory.
++  //
++  Status = OpenFileAndGetSize (
++             FileName,
++             &KeyFHandle,
++             &KeyFileSize
++             );
++
++  if (EFI_ERROR(Status)) {
++    return EFI_NOT_FOUND;
++  }
++
++  Buffer = SctAllocatePool (KeyFileSize);
++
++  if (Buffer == NULL) {
++    KeyFHandle->Close (KeyFHandle);
++    return EFI_OUT_OF_RESOURCES;
++  }
++
++  BufferSize = KeyFileSize;
++
++  Status = KeyFHandle->Read (
++                      KeyFHandle,
++                      &BufferSize,
++                      Buffer
++                      );
++
++  if (EFI_ERROR(Status)) {
++    KeyFHandle->Close (KeyFHandle);
++    gtBS->FreePool (Buffer);
++    return EFI_LOAD_ERROR;
++  }
++
++  Status = RT->SetVariable (
++                     L"dbx",                    // VariableName
++                     &gEfiImageSecurityDatabaseGuid,  // Vendor GUID
++                     DBXAttributes,            // Attributes
++                     BufferSize,                // DataSize
++                     Buffer                     // Data
++                     );
++
++  if (Status == EFI_SUCCESS) {
++    Result = EFI_TEST_ASSERTION_PASSED;
++  } else {
++    Result = EFI_TEST_ASSERTION_FAILED;
++  }
++
++  StandardLib->RecordAssertion (
++                 StandardLib,
++                 Result,
++                 gSecureBootVariableUpdatesBbTestAssertionGuid007,
++                 L"SecureBoot - Verify signed dbx update",
++                 L"%a:%d:Status - %r",
++                 __FILE__,
++                 (UINTN)__LINE__,
++                 Status
++                 );
++
++  gtBS->FreePool (Buffer);
++
++  //
++  // Trace ...
++  //
++  if (LoggingLib != NULL) {
++    LoggingLib->ExitFunction (
++                  LoggingLib,
++                  L"VariableUpdatesTest",
++                  L"UEFI spec, 8.2, 32.3, 32.4.1"
++                  );
++  }
++
++  //
++  // Done
++  //
++  return EFI_SUCCESS;
++}
++
+ /**
+  *  Clean up the secure boot variables
+  *
+-- 
+2.17.1
+
