@@ -37,12 +37,13 @@
 # PARALLELISM - number of cores to build across
 
 TOP_DIR=`pwd`
+# toolchain
+. $TOP_DIR/../../common/scripts/common_cross_toolchain.sh
+
 FWTS_PATH=fwts
 FWTS_BINARY=fwts_output
 RAMDISK_PATH=ramdisk
 FWTS_DEP=$RAMDISK_PATH/fwts_build_dep
-GCC=tools/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
-CROSS_COMPILE=$TOP_DIR/$GCC
 BUILD_PLAT=$1
 BUILD_TYPE=$2
 

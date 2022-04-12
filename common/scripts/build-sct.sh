@@ -53,8 +53,6 @@ SCT_PATH=edk2-test
 UEFI_TOOLCHAIN=GCC5
 UEFI_BUILD_MODE=DEBUG
 TARGET_ARCH=AARCH64
-GCC=tools/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
-CROSS_COMPILE=$TOP_DIR/$GCC
 
 BUILD_PLAT=$1
 BUILD_TYPE=$2
@@ -67,6 +65,24 @@ if ! [[ $BUILD_PLAT = IR ]] && ! [[ $BUILD_PLAT = ES ]] ; then
     echo "Please provide a target."
     echo "Usage build-sct.sh <IR/ES/SR> <BUILD_TYPE>"
     exit
+fi
+
+. $TOP_DIR/../../common/config/common_config.cfg
+# toolchain
+. $TOP_DIR/../../common/scripts/common_cross_toolchain.sh
+
+if [[ ! ${ARCH+x} ]]; then
+    # use AARCH64
+    TARGET_ARCH=AARCH64
+else
+    case $ARCH in
+    arm)
+        TARGET_ARCH=ARM
+        ;;
+    *)
+        TARGET_ARCH=AARCH64
+        ;;
+    esac
 fi
 
 if ! [[ $BUILD_TYPE = S ]] && ! [[  $BUILD_TYPE = F  ]] ; then
@@ -96,6 +112,7 @@ do_build()
 
     export EDK2_TOOLCHAIN=$UEFI_TOOLCHAIN
     export ${UEFI_TOOLCHAIN}_AARCH64_PREFIX=$CROSS_COMPILE
+    export ${UEFI_TOOLCHAIN}_ARM_PREFIX=$CROSS_COMPILE
     local vars=
     export PACKAGES_PATH=$TOP_DIR/$UEFI_PATH
     export PYTHON_COMMAND=/usr/bin/python3
@@ -111,9 +128,9 @@ do_build()
     cp -r $SBBR_TEST_DIR/SbbrBootServices uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/
     cp -r $SBBR_TEST_DIR/SbbrEfiSpecVerLvl $SBBR_TEST_DIR/SbbrRequiredUefiProtocols $SBBR_TEST_DIR/SbbrSmbios $SBBR_TEST_DIR/SbbrSysEnvConfig uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/
     cp -r $SBBR_TEST_DIR/SBBRRuntimeServices uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/
-    cp $SBBR_TEST_DIR/BBR_SCT.dsc uefi-sct/SctPkg/UEFI/
-    cp $SBBR_TEST_DIR/build_bbr.sh uefi-sct/SctPkg/
-    
+    cp $SBBR_TEST_DIR/BBR_SCT*.dsc uefi-sct/SctPkg/UEFI/
+    cp $SBBR_TEST_DIR/build_bbr*.sh uefi-sct/SctPkg/
+
     #Startup/runtime files.
     mkdir -p uefi-sct/SctPkg/BBR
     if [ $BUILD_PLAT = IR ]; then
@@ -144,8 +161,15 @@ do_build()
     fi
 
     pushd uefi-sct
-    ./SctPkg/build_bbr.sh $TARGET_ARCH GCC $UEFI_BUILD_MODE
-    
+    if [[ $ARCH = "arm" ]]; then
+        export CROSS_COMPILE_32=$CROSS_COMPILE
+        export HOST_ARCH=ARM
+        # patch on edk2
+        ./SctPkg/build_bbr_arm.sh $TARGET_ARCH GCC $UEFI_BUILD_MODE
+    else
+        ./SctPkg/build_bbr.sh $TARGET_ARCH GCC $UEFI_BUILD_MODE
+    fi
+
     popd
 }
 

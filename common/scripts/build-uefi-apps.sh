@@ -52,14 +52,29 @@ UEFI_PATH=edk2
 UEFI_TOOLCHAIN=GCC5
 UEFI_BUILD_MODE=DEBUG
 TARGET_ARCH=AARCH64
-GCC=tools/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
-CROSS_COMPILE=$TOP_DIR/$GCC
+
+# toolchain
+. $TOP_DIR/../../common/scripts/common_cross_toolchain.sh
 
 BUILD_PLAT=$1
 BUILD_TYPE=$2
 
 if [ $BUILD_PLAT = SR ]; then
    BUILD_PLAT=ES
+fi
+
+if [[ ! ${ARCH+x} ]]; then
+    # use AARCH64
+    TARGET_ARCH=AARCH64
+else
+    case $ARCH in
+    arm)
+        TARGET_ARCH=ARM
+        ;;
+    *)
+        TARGET_ARCH=AARCH64
+        ;;
+    esac
 fi
 
 #Currently the BUILD_PLAT flag is not used. For future use
@@ -95,7 +110,25 @@ do_build()
     PATH="$PATH:$CROSS_COMPILE_DIR"
 
     export EDK2_TOOLCHAIN=$UEFI_TOOLCHAIN
-    export ${UEFI_TOOLCHAIN}_AARCH64_PREFIX=$CROSS_COMPILE
+    if [[ ! ${ARCH+x} ]]; then
+            # use ARCH=arm64
+            CROSS_COMPILE_DIR=$(dirname $CROSS_COMPILE)
+            PATH="$PATH:$CROSS_COMPILE_DIR"
+            export ${UEFI_TOOLCHAIN}_AARCH64_PREFIX=$CROSS_COMPILE
+            ARCH_TARGET_FOR_UEFI=AARCH64
+        else
+            case $ARCH in
+            arm)
+                export ${UEFI_TOOLCHAIN}_ARM_PREFIX=$CROSS_COMPILE
+                ARCH_TARGET_FOR_UEFI=ARM
+                ;;
+            *)
+                export ${UEFI_TOOLCHAIN}_AARCH64_PREFIX=$CROSS_COMPILE
+                ARCH_TARGET_FOR_UEFI=AARCH64
+                ;;
+            esac
+        fi
+
     local vars=
     export PACKAGES_PATH=$TOP_DIR/$UEFI_PATH
     export PYTHON_COMMAND=/usr/bin/python3
@@ -105,7 +138,7 @@ do_build()
     source $TOP_DIR/$UEFI_PATH/edksetup.sh
     make -C $TOP_DIR/$UEFI_PATH/BaseTools
 
-    build -a AARCH64 -t GCC5 -p MdeModulePkg/MdeModulePkg.dsc
+    build -a $ARCH_TARGET_FOR_UEFI -t GCC5 -p MdeModulePkg/MdeModulePkg.dsc
     popd
 }
 
