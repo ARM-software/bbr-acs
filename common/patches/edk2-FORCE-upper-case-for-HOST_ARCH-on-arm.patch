@@ -1,0 +1,28 @@
+From 243a5a4ed954134d08426616683926a9e66cbc17 Mon Sep 17 00:00:00 2001
+From: Christophe Priouzeau <christophe.priouzeau@foss.st.com>
+Date: Tue, 14 Dec 2021 11:12:25 +0100
+Subject: [PATCH] FORCE upper-case for HOST_ARCH on arm
+
+Signed-off-by: Christophe Priouzeau <christophe.priouzeau@foss.st.com>
+---
+ BaseTools/Source/C/Makefiles/header.makefile | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/BaseTools/Source/C/Makefiles/header.makefile b/BaseTools/Source/C/Makefiles/header.makefile
+index 0df728f327..46953777a0 100644
+--- a/BaseTools/Source/C/Makefiles/header.makefile
++++ b/BaseTools/Source/C/Makefiles/header.makefile
+@@ -38,6 +38,10 @@ ifndef HOST_ARCH
+   $(info Detected HOST_ARCH of $(HOST_ARCH) using uname.)
+ endif
+ 
++ifneq (,$(findstring arm,$(HOST_ARCH)))
++	HOST_ARCH=ARM
++endif
++
+ CYGWIN:=$(findstring CYGWIN, $(shell uname -s))
+ LINUX:=$(findstring Linux, $(shell uname -s))
+ DARWIN:=$(findstring Darwin, $(shell uname -s))
+-- 
+2.25.1
+

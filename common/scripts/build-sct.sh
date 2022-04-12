@@ -134,6 +134,14 @@ do_build()
         echo "Applying SCT patch ..."
         patch  -p1  < $BBR_DIR/common/patches/edk2-test-bbr.patch
     fi
+    if [[ $ARCH = "arm" ]]; then
+        pushd $TOP_DIR/$SCT_PATH/../edk2
+        if ! patch -R -p1 -s -f --dry-run < $BBR_DIR/common/patches/edk2-FORCE-upper-case-for-HOST_ARCH-on-arm.patch; then
+            echo "Applying EDK2 for ARM patch ..."
+            patch  -p1  < $BBR_DIR/common/patches/edk2-FORCE-upper-case-for-HOST_ARCH-on-arm.patch
+        fi
+        popd
+    fi
 
     pushd uefi-sct
     ./SctPkg/build_bbr.sh $TARGET_ARCH GCC $UEFI_BUILD_MODE
