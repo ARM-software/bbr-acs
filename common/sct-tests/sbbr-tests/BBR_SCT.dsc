@@ -74,7 +74,7 @@
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/bbrSct
-  SUPPORTED_ARCHITECTURES        = AARCH64
+  SUPPORTED_ARCHITECTURES        = AARCH64|ARM
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -91,7 +91,7 @@
 [SkuIds]
   0|DEFAULT              # The entry: 0|DEFAULT is reserved and always required.
 
-[BuildOptions]
+[BuildOptions.AARCH64]
   *_*_AARCH64_CC_FLAGS         = -D EFIAARCH64 -I$(WORKSPACE)/MdePkg/Include/AArch64 $(GCC_VER_MACRO)
   GCC:*_*_AARCH64_CC_FLAGS     = -D EFIAARCH64 $(GCC_VER_MACRO) -ffreestanding -nostdinc -nostdlib -Wno-error=unused-function -Wno-error=unused-but-set-variable -Wno-error
   *_*_AARCH64_VFRPP_FLAGS      = -D EFIAARCH64 $(GCC_VER_MACRO)
@@ -99,6 +99,26 @@
   *_*_AARCH64_PP_FLAGS         = -D EFIAARCH64 $(GCC_VER_MACRO)
   RVCT:*_*_AARCH64_DLINK_FLAGS = --muldefweak
 
+[BuildOptions.ARM]
+  *_*_ARM_CC_FLAGS      = -D EFIARM -I$(WORKSPACE)/MdePkg/Include/Arm $(GCC_VER_MACRO)
+  GCC:*_*_ARM_CC_FLAGS  = -D EFIARM $(GCC_VER_MACRO) -fno-stack-protector -ffreestanding -nostdinc -nostdlib -Wno-error=unused-function -Wno-error=unused-but-set-variable -Wno-error=implicit-function-declaration -Wno-error
+  *_*_ARM_VFRPP_FLAGS   = -D EFIARM $(GCC_VER_MACRO)
+  *_*_ARM_APP_FLAGS     = -D EFIARM $(GCC_VER_MACRO)
+  *_*_ARM_PP_FLAGS      = -D EFIARM $(GCC_VER_MACRO)
+  RVCT:*_*_ARM_DLINK_FLAGS = --muldefweak
+  RVCT:*_*_ARM_CC_FLAGS    = --diag_remark=167 --diag_suppress=167,1295,188,550,1,68,111,177
+# 167:  "argument of type <type1> is incompatible with parameter of type # <type2>"
+#       (caused here by passing typed pointers to functions that take "void *" or "void **")
+# 1295: "provide arguments" (i.e. `UINTN Function ()` should be `UINTN Function (VOID)`)
+# 188:  "enumerated type mixed with another type"
+#       (i.e. passing an integer as an enum without a cast)
+# 550:  "variable <var> was set but never used"
+# 1:    "last line of file ends without a newline"
+# 68:   "integer conversion resulted in a change of sign" ("if (Status == -1)")
+# 111:  "statement is unreachable" (invariably "break;" after "return X;" in case statement)
+# 177:  "function <static function> was declared but never referenced"
+
+[BuildOptions]
   DEBUG_*_*_CC_FLAGS  = -DEFI_DEBUG -DACS_VERSION=\"v1.0\"
   RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG -DACS_VERSION=\"v1.0\"
 
@@ -111,10 +131,6 @@
 
   MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
 
-[Libraries.ARM]
-  ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
-
-[Libraries.AARCH64]
   ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
 [LibraryClasses.common]
@@ -141,6 +157,7 @@
 
 [LibraryClasses.ARM]
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
+  ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
 
 [LibraryClasses.AARCH64]
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
@@ -535,7 +552,11 @@ SctPkg/TestCase/RIVL/Protocol/Http/HttpServiceBinding/HttpServiceBindingENTSTest
 #
 # UEFI System Environment and Configuration Tests - SBBR v1.0 3.3
 #
-SctPkg/TestCase/UEFI/EFI/Generic/SbbrSysEnvConfig/BlackBoxTest/SysEnvConfigBBTest.inf
+# Embedded only on 64bit, ArmReadCurrentEL() is not available on ArmLib for 32bits
+!if AARCH64 in $(ARCH)
+  SctPkg/TestCase/UEFI/EFI/Generic/SbbrSysEnvConfig/BlackBoxTest/SysEnvConfigBBTest.inf
+!endif
+
 #End of UEFI System Environment and Configuration Tests - SBBR v1.0 3.3
 #
 # Check if EFI Specification Version is 2.7 or greater
