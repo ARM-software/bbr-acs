@@ -43,6 +43,9 @@
 # Copyright (c) 2011, 2015-2020 ARM Ltd. All rights reserved.<BR>
 #
 
+# Prevent confusuion with environment ARCH string identifiers
+unset ARCH
+
 SctpackageDependencyList=(SctPkg BaseTools)
 
 function get_build_arch
