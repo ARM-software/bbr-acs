@@ -72,6 +72,12 @@ function set_cross_compile
 	    else
 	        TEMP_CROSS_COMPILE=aarch64-linux-gnu-
 	    fi
+	elif [ "$SCT_TARGET_ARCH" == "ARM" ]; then
+	    if [ X"$CROSS_COMPILE_32" != X"" ]; then
+	        TEMP_CROSS_COMPILE="$CROSS_COMPILE_32"
+	    else
+	        TEMP_CROSS_COMPILE=arm-linux-gnueabihf-
+	    fi
 	else
 	    echo "Unsupported target architecture '$SCT_TARGET_ARCH'!" >&2
 	fi
