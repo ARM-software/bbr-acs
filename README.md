@@ -11,7 +11,7 @@ The BBR test suites check for compliance against the SBBR and EBBR specification
   - Firmware Test Suite (FWTS)
 
 ## Release details
-- Code Quality: v1.0.2
+- Code Quality: v1.0.3
 - The BBR tests are written for version 1.0 of the BBR specification.
 - The compliance suite is not a substitute for design verification.
 - To review the ACS logs, Arm licensees can contact Arm directly through their partner managers.
@@ -121,4 +121,4 @@ Arm BBR ACS is distributed under Apache v2.0 License.
 
 --------------
 
-*Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.*
+*Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.*

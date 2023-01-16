@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (c) 2021-2022, ARM Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2023, ARM Limited and Contributors. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -43,7 +43,6 @@ FWTS_BINARY=fwts_output
 RAMDISK_PATH=ramdisk
 FWTS_DEP=$RAMDISK_PATH/fwts_build_dep
 if [[ $arch != "aarch64" ]]; then
-    GCC=tools/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
     CROSS_COMPILE=$TOP_DIR/$GCC
 fi
 

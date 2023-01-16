@@ -1,4 +1,4 @@
-# Copyright (c) 2021, ARM Limited and Contributors. All rights reserved.
+# Copyright (c) 2021, 2023 ARM Limited and Contributors. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -46,7 +46,7 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
 
                 #Check if SCT run has already completed
                 if  exist FS%j:\acs_results\sct_results\Overall\Summary.log then
-                    echo SCT has completed run. Press any key to start SCT execution from the begining. WARNING: Ensure you have backed up the existing logs.
+                    echo SCT has completed run. Press any key to start SCT execution from the beginning. WARNING: Ensure you have backed up the existing logs.
                     stallforkey.efi 5
                     if %lasterror% == 0 then
                         #Backup the existing logs

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (c) 2021, ARM Limited and Contributors. All rights reserved.
+# Copyright (c) 2021, 2023 ARM Limited and Contributors. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -56,7 +56,6 @@ TARGET_ARCH=AARCH64
 KEYS_DIR=$TOP_DIR/security-interface-extension-keys
 
 if [[ $arch != "aarch64" ]]; then
-    GCC=tools/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
     CROSS_COMPILE=$TOP_DIR/$GCC
 fi
 
@@ -103,7 +102,6 @@ do_build()
     fi
 
     export EDK2_TOOLCHAIN=$UEFI_TOOLCHAIN
-    local vars=
     export PACKAGES_PATH=$TOP_DIR/$UEFI_PATH
     export PYTHON_COMMAND=/usr/bin/python3
     export WORKSPACE=$TOP_DIR/$UEFI_PATH
@@ -132,12 +130,8 @@ do_clean()
 
 do_package ()
 {
-    echo "Packaging...";
-
-    if [[ $BUILD_PLAT = SIE ]]
-    then
-        sbsign --key $KEYS_DIR/TestDB1.key --cert $KEYS_DIR/TestDB1.crt $TOP_DIR/$UEFI_PATH/Build/MdeModule/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/CapsuleApp.efi --output $TOP_DIR/$UEFI_PATH/Build/MdeModule/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/CapsuleApp.efi
-    fi
+    echo "Packaging CapsuleApp...";
+    sbsign --key $KEYS_DIR/TestDB1.key --cert $KEYS_DIR/TestDB1.crt $TOP_DIR/$UEFI_PATH/Build/MdeModule/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/CapsuleApp.efi --output $TOP_DIR/$UEFI_PATH/Build/MdeModule/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/CapsuleApp.efi
 
     if [ -f $TOP_DIR/$UEFI_PATH/Build/MdeModule/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/CapsuleApp.efi ]; then
      echo "CapsuleApp.efi successfully generated at $TOP_DIR/$UEFI_PATH/Build/MdeModule/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/CapsuleApp.efi"

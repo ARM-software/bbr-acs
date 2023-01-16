@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (c) 2021, ARM Limited and Contributors. All rights reserved.
+# Copyright (c) 2021, 2023 ARM Limited and Contributors. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -65,8 +65,6 @@ popd
 
 PLATDIR=${TOP_DIR}/output
 OUTDIR=${PLATDIR}
-LINUX_OUT_DIR=out
-LINUX_PATH=linux-5.10
 
 do_clean
 do_build

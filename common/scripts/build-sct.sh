@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (c) 2021-2022, ARM Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2023, ARM Limited and Contributors. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -54,8 +54,11 @@ SCT_PATH=edk2-test
 UEFI_TOOLCHAIN=GCC5
 UEFI_BUILD_MODE=DEBUG
 TARGET_ARCH=AARCH64
+KEYS_DIR=$TOP_DIR/security-interface-extension-keys
+TEST_DB1_KEY=$KEYS_DIR/TestDB1.key
+TEST_DB1_CRT=$KEYS_DIR/TestDB1.crt
+SCT_FRAMEWORK=$TOP_DIR/$SCT_PATH/uefi-sct/Build/bbrSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}/${TARGET_ARCH}
 if [[ $arch != "aarch64" ]]; then
-    GCC=tools/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
     CROSS_COMPILE=$TOP_DIR/$GCC
 fi
 
@@ -89,31 +92,31 @@ echo "Target: $BUILD_PLAT"
 echo "Build type: $BUILD_TYPE"
 
 SBBR_TEST_DIR=$BBR_DIR/common/sct-tests/sbbr-tests
+BBSR_TEST_DIR=$BBR_DIR/bbsr/sct-tests
 
 do_build()
 {
    
     pushd $TOP_DIR/$SCT_PATH
-    if [[ $arch != "aarch64" ]]; then
+    export KEYS_DIR=$TOP_DIR/security-interface-extension-keys
+    export EDK2_TOOLCHAIN=$UEFI_TOOLCHAIN
+    export KEYS_DIR=$TOP_DIR/security-interface-extension-keys
+    export EDK2_TOOLCHAIN=$UEFI_TOOLCHAIN
+    if [ $BUILD_PLAT = SIE ]; then
         CROSS_COMPILE_DIR=$(dirname $CROSS_COMPILE)
-        if [ $BUILD_PLAT = SIE ]; then
-            export PATH="$TOP_DIR/efitools:$PATH:$CROSS_COMPILE_DIR"
-            export KEYS_DIR=$TOP_DIR/security-interface-extension-keys
-        else
-            export PATH="$PATH:$CROSS_COMPILE_DIR"
-        fi
+        export PATH="$TOP_DIR/efitools:$PATH:$CROSS_COMPILE_DIR"
+        export ${UEFI_TOOLCHAIN}_AARCH64_PREFIX=$CROSS_COMPILE
     else
-        if [ $BUILD_PLAT = SIE ]; then
-            export PATH="$TOP_DIR/efitools:$PATH"
-            export KEYS_DIR=$TOP_DIR/security-interface-extension-keys
-        fi
+        export PATH="$TOP_DIR/efitools:$PATH"
     fi
+
 
     export EDK2_TOOLCHAIN=$UEFI_TOOLCHAIN
     if [[ $arch != "aarch64" ]]; then
         export ${UEFI_TOOLCHAIN}_AARCH64_PREFIX=$CROSS_COMPILE
     fi
-    local vars=
+    
+    # export EDK2 enviromnent variables
     export PACKAGES_PATH=$TOP_DIR/$UEFI_PATH
     export PYTHON_COMMAND=/usr/bin/python3
     export WORKSPACE=$TOP_DIR/$SCT_PATH/uefi-sct
@@ -131,6 +134,11 @@ do_build()
         cp -r $SBBR_TEST_DIR/SBBRRuntimeServices uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/
         cp $SBBR_TEST_DIR/BBR_SCT.dsc uefi-sct/SctPkg/UEFI/
         cp $SBBR_TEST_DIR/build_bbr.sh uefi-sct/SctPkg/
+        # copy SIE SCT tests to edk2-test
+        cp -r $BBSR_TEST_DIR/BBSRVariableSizeTest uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices
+        cp -r $BBSR_TEST_DIR/SecureBoot uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices
+        cp -r $BBSR_TEST_DIR/TCG2Protocol uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol
+        cp -r $BBSR_TEST_DIR/TCG2.h uefi-sct/SctPkg/UEFI/Protocol
     fi
     
     #Startup/runtime files.
@@ -152,10 +160,11 @@ do_build()
     fi
 
     if [[ $BUILD_PLAT != SIE ]] ; then
-        if ! patch -R -p1 -s -f --dry-run < $BBR_DIR/common/patches/edk2-test-bbr.patch; then
-            echo "Applying SCT patch ..."
-            patch  -p1  < $BBR_DIR/common/patches/edk2-test-bbr.patch
-        fi
+        echo "Applying edk2-test BBR patch..."
+        git apply --ignore-whitespace --ignore-space-change $BBR_DIR/common/patches/edk2-test-bbr.patch
+
+        echo "Applying SIE SCT patch..."
+        git apply --ignore-whitespace --ignore-space-change $BBR_DIR/bbsr/patches/0001-SIE-Patch-for-UEFI-SCT-Build.patch
     fi
 
     pushd uefi-sct
@@ -183,6 +192,27 @@ do_clean()
     popd
 
 }
+# sign SCT efi files
+SecureBootSign() {
+    echo "KEYS_DIR = $KEYS_DIR"
+
+    for f in $1/*.efi
+    do
+        echo "sbsign --key $TEST_DB1_KEY --cert $TEST_DB1_CRT $f --output $f"
+        sbsign --key $TEST_DB1_KEY --cert $TEST_DB1_CRT $f --output $f
+    done
+}
+
+# signing SCT test dependency files
+SecureBootSignDependency() {
+    echo "KEYS_DIR = $KEYS_DIR"
+
+    for f in $SCT_FRAMEWORK/Dependency/$1BBTest/*.efi
+    do
+        echo "sbsign --key $TEST_DB1_KEY --cert $TEST_DB1_CRT $f --output $f"
+        sbsign --key $TEST_DB1_KEY --cert $TEST_DB1_CRT $f --output $f
+    done
+}
 
 do_package ()
 {
@@ -200,12 +230,28 @@ do_package ()
         cp SctPkg/BBR/EBBR_manual.seq ${TARGET_ARCH}_SCT/SCT/Sequence/EBBR_manual.seq
 
     elif [ $BUILD_PLAT = ES ]; then
+        # Sign the SCT binaries
+        SecureBootSign $SCT_FRAMEWORK
+        SecureBootSign $SCT_FRAMEWORK/Support
+        SecureBootSign $TOP_DIR/$SCT_PATH/uefi-sct/Build/bbrSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}
+        SecureBootSign $SCT_FRAMEWORK/SCRT
+        SecureBootSign $SCT_FRAMEWORK/Test
+        SecureBootSign $SCT_FRAMEWORK/Ents/Support
+        SecureBootSign $SCT_FRAMEWORK/Ents/Test
+        SecureBootSignDependency LoadedImage
+        SecureBootSignDependency ImageServices
+        SecureBootSignDependency ProtocolHandlerServices
+        SecureBootSignDependency ConfigKeywordHandler
+        SecureBootSignDependency PciIo
         #SBBR
         cp -r Build/bbrSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}/${TARGET_ARCH}/* ${TARGET_ARCH}_SCT/SCT/
         cp Build/bbrSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}/SBBRStartup.nsh ${TARGET_ARCH}_SCT/SctStartup.nsh
         cp SctPkg/BBR/EfiCompliant_SBBR.ini ${TARGET_ARCH}_SCT/SCT/Dependency/EfiCompliantBBTest/EfiCompliant.ini
         cp SctPkg/BBR/SBBR_manual.seq ${TARGET_ARCH}_SCT/SCT/Sequence/SBBR_manual.seq
         cp SctPkg/BBR/SBBR_extd_run.seq ${TARGET_ARCH}_SCT/SCT/Sequence/SBBR_extd_run.seq
+        #BBSR
+        cp $BBR_DIR/bbsr/config/sie_SctStartup.nsh ${TARGET_ARCH}_SCT/sie_SctStartup.nsh
+        cp $BBR_DIR/bbsr/config/BBSR.seq  ${TARGET_ARCH}_SCT/SCT/Sequence
 
     elif [ $BUILD_PLAT = SIE ]; then
         cp -r Build/UefiSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}/${TARGET_ARCH}/* ${TARGET_ARCH}_SCT/SCT/
