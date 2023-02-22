@@ -93,6 +93,12 @@ echo "Build type: $BUILD_TYPE"
 
 SBBR_TEST_DIR=$BBR_DIR/common/sct-tests/sbbr-tests
 BBSR_TEST_DIR=$BBR_DIR/bbsr/sct-tests
+if [[ $BUILD_TYPE = S ]]; then
+    sed -i 's|SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTest.inf|#SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTest.inf|g' $BBR_DIR/common/sct-tests/sbbr-tests/BBR_SCT.dsc
+    sed -i 's|SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTest.inf|#SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTest.inf|g' $BBR_DIR/common/sct-tests/sbbr-tests/BBR_SCT.dsc
+    sed -i 's|SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.inf|#SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.inf|g' $BBR_DIR/common/sct-tests/sbbr-tests/BBR_SCT.dsc
+    sed -i 's|SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Images/Images.inf|#SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Images/Images.inf|g' $BBR_DIR/common/sct-tests/sbbr-tests/BBR_SCT.dsc
+fi
 
 do_build()
 {
@@ -160,11 +166,14 @@ do_build()
     fi
 
     if [[ $BUILD_PLAT != SIE ]] ; then
-        echo "Applying edk2-test BBR patch..."
-        git apply --ignore-whitespace --ignore-space-change $BBR_DIR/common/patches/edk2-test-bbr.patch
-
-        echo "Applying SIE SCT patch..."
-        git apply --ignore-whitespace --ignore-space-change $BBR_DIR/bbsr/patches/0001-SIE-Patch-for-UEFI-SCT-Build.patch
+        if git apply --check $BBR_DIR/common/patches/edk2-test-bbr.patch; then
+            echo "Applying edk2-test BBR patch..."
+            git apply --ignore-whitespace --ignore-space-change $BBR_DIR/common/patches/edk2-test-bbr.patch
+        fi
+        if git apply --check $BBR_DIR/bbsr/patches/0001-SIE-Patch-for-UEFI-SCT-Build.patch; then
+            echo "Applying SIE SCT patch..."
+            git apply --ignore-whitespace --ignore-space-change $BBR_DIR/bbsr/patches/0001-SIE-Patch-for-UEFI-SCT-Build.patch
+        fi
     fi
 
     pushd uefi-sct

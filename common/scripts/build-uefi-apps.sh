@@ -54,6 +54,7 @@ UEFI_TOOLCHAIN=GCC5
 UEFI_BUILD_MODE=DEBUG
 TARGET_ARCH=AARCH64
 KEYS_DIR=$TOP_DIR/security-interface-extension-keys
+GCC=tools/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
 
 if [[ $arch != "aarch64" ]]; then
     CROSS_COMPILE=$TOP_DIR/$GCC
@@ -109,7 +110,6 @@ do_build()
     #Build base tools
     source $TOP_DIR/$UEFI_PATH/edksetup.sh
     make -C $TOP_DIR/$UEFI_PATH/BaseTools
-
     build -a AARCH64 -t GCC5 -p MdeModulePkg/MdeModulePkg.dsc
     popd
 }
@@ -130,9 +130,9 @@ do_clean()
 
 do_package ()
 {
-    echo "Packaging CapsuleApp...";
-    sbsign --key $KEYS_DIR/TestDB1.key --cert $KEYS_DIR/TestDB1.crt $TOP_DIR/$UEFI_PATH/Build/MdeModule/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/CapsuleApp.efi --output $TOP_DIR/$UEFI_PATH/Build/MdeModule/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/CapsuleApp.efi
-
+    if [ $BUILD_TYPE = F ]; then
+        sbsign --key $KEYS_DIR/TestDB1.key --cert $KEYS_DIR/TestDB1.crt $TOP_DIR/$UEFI_PATH/Build/MdeModule/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/CapsuleApp.efi --output $TOP_DIR/$UEFI_PATH/Build/MdeModule/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/CapsuleApp.efi
+    fi
     if [ -f $TOP_DIR/$UEFI_PATH/Build/MdeModule/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/CapsuleApp.efi ]; then
      echo "CapsuleApp.efi successfully generated at $TOP_DIR/$UEFI_PATH/Build/MdeModule/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/CapsuleApp.efi"
     else
