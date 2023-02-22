@@ -54,8 +54,9 @@ UEFI_TOOLCHAIN=GCC5
 UEFI_BUILD_MODE=DEBUG
 TARGET_ARCH=AARCH64
 KEYS_DIR=$TOP_DIR/security-interface-extension-keys
-GCC=tools/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
-
+if [[ $BUILD_TYPE = S ]]; then
+    GCC=tools/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
+fi
 if [[ $arch != "aarch64" ]]; then
     CROSS_COMPILE=$TOP_DIR/$GCC
 fi
