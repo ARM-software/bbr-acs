@@ -52,7 +52,7 @@ get_fwts_src()
 {
     git clone --single-branch https://git.launchpad.net/fwts
     pushd $TOP_DIR/fwts
-    git checkout V21.08.00
+    git checkout V23.01.00
     git submodule update --init
     popd
 }
@@ -60,7 +60,7 @@ get_sct_src()
 {
     git clone --single-branch https://github.com/tianocore/edk2-test
     pushd $TOP_DIR/edk2-test
-    git checkout edk2-test-stable202108
+    git checkout 8713740892bdb857e970a2841de9800b2c6b5552
     popd
 }
 
