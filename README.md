@@ -4,15 +4,16 @@ required for out-of-box support of any BSA compatible operating system or hyperv
 to enable booting multi-core Arm platforms while remaining minimal enough to allow for OEM and ODM innovation, and
 market differentiation.
 
-For more information, see the [BBR specification](https://developer.arm.com/documentation/den0044/f/?lang=en).
+For more information, see the [BBR specification](https://developer.arm.com/documentation/den0044/g/?lang=en).
 
 The BBR test suites check for compliance against the SBBR and EBBR specifications. These tests are also delivered through two runtime executable environments:
   - UEFI Self Certification Tests (SCT)
   - Firmware Test Suite (FWTS)
 
 ## Release details
-- Code Quality: v1.0.3
-- The BBR tests are written for version 1.0 of the BBR specification.
+- Code Quality: v1.0.4
+- The SBBR tests are written for version 1.0 of the BBR specification.
+- The EBBR tests are written for version 2.0 of the BBR specification.
 - The compliance suite is not a substitute for design verification.
 - To review the ACS logs, Arm licensees can contact Arm directly through their partner managers.
 
