@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (c) 2021, ARM Limited and Contributors. All rights reserved.
+# Copyright (c) 2021, 2023, ARM Limited and Contributors. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -29,23 +29,28 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 TOP_DIR=`pwd`
-
+. $TOP_DIR/../../common/config/bbr_common_config.cfg
 get_cross_compiler()
 {
-    LINARO=https://releases.linaro.org/components/toolchain/binaries
-    VERSION=7.5-2019.12
-    GCC=aarch64-linux-gnu/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
-    TOOL_DIR=gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu
-    mkdir -p tools
-    pushd $TOP_DIR/tools
-    if [ ! -d "$TOOL_DIR" ]; then
-        echo "Getting compiler $TOOL_DIR"
-        wget $LINARO/$VERSION/$GCC
-        tar -xf gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
-        rm -rf gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
+    if [ $(uname -m) == "aarch64" ]; then
+        echo "=================================================================="
+        echo "aarch64 native build"
+        echo "WARNING: no cross compiler needed, GCC version recommended: ${GCC_TOOLS_VERSION}"
+        echo "=================================================================="
+    else
+        echo "Downloading cross compiler. Version : ${GCC_TOOLS_VERSION}"
+    if [ $TARGET_ARCH == "arm" ]; then
+        TAG=arm-linux-gnueabihf
+    else
+        TAG=aarch64-none-linux-gnu
     fi
-
-    popd
+        mkdir -p tools
+        pushd $TOP_DIR/tools
+        wget $CROSS_COMPILER_URL
+        tar -xf gcc-arm-${GCC_TOOLS_VERSION}-x86_64-${TAG}.tar.xz
+        rm gcc-arm-${GCC_TOOLS_VERSION}-x86_64-${TAG}.tar.xz
+        popd
+    fi
 }
 
 get_fwts_src()
