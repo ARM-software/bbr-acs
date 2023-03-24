@@ -81,12 +81,8 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
                         if  exist FS%i:\EFI\BOOT\bbr\SCT\Sequence then
                             cp -r FS%i:\EFI\BOOT\bbr\SCT\Sequence\BBSR.seq FS%j:\acs_results\SIE\sct_results\
                         endif
-
-                        #Restart to avoid an impact of running SCT tests on rest of the suites
-                        echo Reset the system ...
-                        reset
                     endif
-                    #goto Done
+                    goto Done
                 endif
             else
 :StartSCT
