@@ -58,12 +58,22 @@ KEYS_DIR=$TOP_DIR/security-interface-extension-keys
 TEST_DB1_KEY=$KEYS_DIR/TestDB1.key
 TEST_DB1_CRT=$KEYS_DIR/TestDB1.crt
 SCT_FRAMEWORK=$TOP_DIR/$SCT_PATH/uefi-sct/Build/bbrSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}/${TARGET_ARCH}
-if [[ $arch != "aarch64" ]]; then
-    CROSS_COMPILE=$TOP_DIR/$GCC
-fi
 
 BUILD_PLAT=$1
 BUILD_TYPE=$2
+
+# if BBR standalone build
+if [[ $BUILD_TYPE = S ]]; then
+    . $TOP_DIR/../../common/config/bbr_common_config.cfg
+else
+    # source common config if arm-systemready ACS build
+    . $TOP_DIR/../../common/config/sr_es_common_config.cfg
+fi
+
+if [[ $arch != "aarch64" ]]; then
+    export CROSS_COMPILE_64=$TOP_DIR/$GCC
+fi
+
 
 if [ $BUILD_PLAT = SR ]; then
    BUILD_PLAT=ES
@@ -102,26 +112,11 @@ fi
 
 do_build()
 {
-   
     pushd $TOP_DIR/$SCT_PATH
     export KEYS_DIR=$TOP_DIR/security-interface-extension-keys
     export EDK2_TOOLCHAIN=$UEFI_TOOLCHAIN
-    export KEYS_DIR=$TOP_DIR/security-interface-extension-keys
-    export EDK2_TOOLCHAIN=$UEFI_TOOLCHAIN
-    if [ $BUILD_PLAT = SIE ]; then
-        CROSS_COMPILE_DIR=$(dirname $CROSS_COMPILE)
-        export PATH="$TOP_DIR/efitools:$PATH:$CROSS_COMPILE_DIR"
-        export ${UEFI_TOOLCHAIN}_AARCH64_PREFIX=$CROSS_COMPILE
-    else
-        export PATH="$TOP_DIR/efitools:$PATH"
-    fi
-
-
-    export EDK2_TOOLCHAIN=$UEFI_TOOLCHAIN
-    if [[ $arch != "aarch64" ]]; then
-        export ${UEFI_TOOLCHAIN}_AARCH64_PREFIX=$CROSS_COMPILE
-    fi
-    
+    # required for SIE keys generation
+    export PATH="$PATH:$TOP_DIR/efitools"
     # export EDK2 enviromnent variables
     export PACKAGES_PATH=$TOP_DIR/$UEFI_PATH
     export PYTHON_COMMAND=/usr/bin/python3
@@ -132,7 +127,6 @@ do_build()
     #Build base tools
     source $TOP_DIR/$UEFI_PATH/edksetup.sh
     make -C $TOP_DIR/$UEFI_PATH/BaseTools
-    
     #Copy over extra files needed for SBBR tests
     if [[ $BUILD_PLAT != SIE ]] ; then
         cp -r $SBBR_TEST_DIR/SbbrBootServices uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/
@@ -141,12 +135,13 @@ do_build()
         cp $SBBR_TEST_DIR/BBR_SCT.dsc uefi-sct/SctPkg/UEFI/
         cp $SBBR_TEST_DIR/build_bbr.sh uefi-sct/SctPkg/
         # copy SIE SCT tests to edk2-test
-        cp -r $BBSR_TEST_DIR/BBSRVariableSizeTest uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices
-        cp -r $BBSR_TEST_DIR/SecureBoot uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices
-        cp -r $BBSR_TEST_DIR/TCG2Protocol uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol
-        cp -r $BBSR_TEST_DIR/TCG2.h uefi-sct/SctPkg/UEFI/Protocol
+        if [[ $BUILD_TYPE != S ]]; then
+            cp -r $BBSR_TEST_DIR/BBSRVariableSizeTest uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices
+            cp -r $BBSR_TEST_DIR/SecureBoot uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices
+            cp -r $BBSR_TEST_DIR/TCG2Protocol uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol
+            cp -r $BBSR_TEST_DIR/TCG2.h uefi-sct/SctPkg/UEFI/Protocol
+        fi
     fi
-    
     #Startup/runtime files.
     mkdir -p uefi-sct/SctPkg/BBR
     if [ $BUILD_PLAT = IR ]; then
@@ -169,10 +164,16 @@ do_build()
         if git apply --check $BBR_DIR/common/patches/edk2-test-bbr.patch; then
             echo "Applying edk2-test BBR patch..."
             git apply --ignore-whitespace --ignore-space-change $BBR_DIR/common/patches/edk2-test-bbr.patch
+        else
+            echo  "Error while applying edk2-test BBR patch..."
         fi
-        if git apply --check $BBR_DIR/bbsr/patches/0001-SIE-Patch-for-UEFI-SCT-Build.patch; then
-            echo "Applying SIE SCT patch..."
-            git apply --ignore-whitespace --ignore-space-change $BBR_DIR/bbsr/patches/0001-SIE-Patch-for-UEFI-SCT-Build.patch
+        if [[ $BUILD_TYPE != S ]]; then
+            if git apply --check $BBR_DIR/bbsr/patches/0001-SIE-Patch-for-UEFI-SCT-Build.patch; then
+                echo "Applying SIE SCT patch..."
+                git apply --ignore-whitespace --ignore-space-change $BBR_DIR/bbsr/patches/0001-SIE-Patch-for-UEFI-SCT-Build.patch
+            else
+                echo  "Error while applying SIE SCT patch..."
+            fi
         fi
     fi
 
@@ -182,17 +183,12 @@ do_build()
     else
         ./SctPkg/build_bbr.sh $TARGET_ARCH GCC $UEFI_BUILD_MODE  -n $PARALLELISM
     fi
-    
     popd
 }
 
 do_clean()
 {
     pushd $TOP_DIR/$SCT_PATH/uefi-sct
-    if [[ $arch != "aarch64" ]]; then
-        CROSS_COMPILE_DIR=$(dirname $CROSS_COMPILE)
-        PATH="$PATH:$CROSS_COMPILE_DIR"
-    fi
     source $TOP_DIR/$UEFI_PATH/edksetup.sh
     make -C $TOP_DIR/$UEFI_PATH/BaseTools clean
     rm -rf Build
@@ -230,6 +226,7 @@ do_package ()
     pushd $TOP_DIR/$SCT_PATH/uefi-sct
 
     mkdir -p ${TARGET_ARCH}_SCT/SCT
+    mkdir -p ${TARGET_ARCH}_SCT/SCT/Sequence
 
     if [ $BUILD_PLAT = IR ]; then
         #EBBR
@@ -240,27 +237,31 @@ do_package ()
 
     elif [ $BUILD_PLAT = ES ]; then
         # Sign the SCT binaries
-        SecureBootSign $SCT_FRAMEWORK
-        SecureBootSign $SCT_FRAMEWORK/Support
-        SecureBootSign $TOP_DIR/$SCT_PATH/uefi-sct/Build/bbrSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}
-        SecureBootSign $SCT_FRAMEWORK/SCRT
-        SecureBootSign $SCT_FRAMEWORK/Test
-        SecureBootSign $SCT_FRAMEWORK/Ents/Support
-        SecureBootSign $SCT_FRAMEWORK/Ents/Test
-        SecureBootSignDependency LoadedImage
-        SecureBootSignDependency ImageServices
-        SecureBootSignDependency ProtocolHandlerServices
-        SecureBootSignDependency ConfigKeywordHandler
-        SecureBootSignDependency PciIo
+        if [ $BUILD_TYPE != S ]; then
+            SecureBootSign $SCT_FRAMEWORK
+            SecureBootSign $SCT_FRAMEWORK/Support
+            SecureBootSign $TOP_DIR/$SCT_PATH/uefi-sct/Build/bbrSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}
+            SecureBootSign $SCT_FRAMEWORK/SCRT
+            SecureBootSign $SCT_FRAMEWORK/Test
+            SecureBootSign $SCT_FRAMEWORK/Ents/Support
+            SecureBootSign $SCT_FRAMEWORK/Ents/Test
+            SecureBootSignDependency LoadedImage
+            SecureBootSignDependency ImageServices
+            SecureBootSignDependency ProtocolHandlerServices
+            SecureBootSignDependency ConfigKeywordHandler
+            SecureBootSignDependency PciIo
+            #BBSR
+            cp $BBR_DIR/bbsr/config/sie_SctStartup.nsh ${TARGET_ARCH}_SCT/sie_SctStartup.nsh
+            cp $BBR_DIR/bbsr/config/BBSR.seq  ${TARGET_ARCH}_SCT/SCT/Sequence/
+        fi
         #SBBR
         cp -r Build/bbrSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}/${TARGET_ARCH}/* ${TARGET_ARCH}_SCT/SCT/
         cp Build/bbrSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}/SBBRStartup.nsh ${TARGET_ARCH}_SCT/SctStartup.nsh
         cp SctPkg/BBR/EfiCompliant_SBBR.ini ${TARGET_ARCH}_SCT/SCT/Dependency/EfiCompliantBBTest/EfiCompliant.ini
         cp SctPkg/BBR/SBBR_manual.seq ${TARGET_ARCH}_SCT/SCT/Sequence/SBBR_manual.seq
         cp SctPkg/BBR/SBBR_extd_run.seq ${TARGET_ARCH}_SCT/SCT/Sequence/SBBR_extd_run.seq
-        #BBSR
-        cp $BBR_DIR/bbsr/config/sie_SctStartup.nsh ${TARGET_ARCH}_SCT/sie_SctStartup.nsh
-        cp $BBR_DIR/bbsr/config/BBSR.seq  ${TARGET_ARCH}_SCT/SCT/Sequence
+
+
 
     elif [ $BUILD_PLAT = SIE ]; then
         cp -r Build/UefiSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}/${TARGET_ARCH}/* ${TARGET_ARCH}_SCT/SCT/
@@ -278,4 +279,3 @@ do_package ()
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $DIR/framework.sh $@
-

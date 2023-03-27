@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (c) 2021, 2023 ARM Limited and Contributors. All rights reserved.
+# Copyright (c) 2021,2023 ARM Limited and Contributors. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -54,16 +54,18 @@ UEFI_TOOLCHAIN=GCC5
 UEFI_BUILD_MODE=DEBUG
 TARGET_ARCH=AARCH64
 KEYS_DIR=$TOP_DIR/security-interface-extension-keys
+BUILD_PLAT=$1
+BUILD_TYPE=$2
+# if BBR standalone build
 if [[ $BUILD_TYPE = S ]]; then
-    GCC=tools/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
+    . $TOP_DIR/../../common/config/bbr_common_config.cfg
+else
+    # source common config if arm-systemready ACS build
+    . $TOP_DIR/../../common/config/sr_es_common_config.cfg
 fi
 if [[ $arch != "aarch64" ]]; then
     CROSS_COMPILE=$TOP_DIR/$GCC
 fi
-
-BUILD_PLAT=$1
-BUILD_TYPE=$2
-
 if [ $BUILD_PLAT = SR ]; then
    BUILD_PLAT=ES
 fi
