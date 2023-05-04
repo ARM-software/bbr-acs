@@ -1066,7 +1066,8 @@ ImageLoadingTestCheckpoint3 (
 
   ImageExecutionInfo = ptr;
 
-  if (VerifyImageEntry(L"TestImage1.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_NOT_FOUND)) {
+  Status = VerifyImageEntry(L"TestImage1.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_NOT_FOUND);
+  if (Status) {
     Result = EFI_TEST_ASSERTION_FAILED;
   } else {
     Result = EFI_TEST_ASSERTION_PASSED;
@@ -1083,7 +1084,8 @@ ImageLoadingTestCheckpoint3 (
                  Status
                  );
 
-  if (VerifyImageEntry(L"TestImage2.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_NOT_FOUND)) {
+  Status = VerifyImageEntry(L"TestImage2.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_NOT_FOUND);
+  if (Status) {
     Result = EFI_TEST_ASSERTION_FAILED;
   } else {
     Result = EFI_TEST_ASSERTION_PASSED;
@@ -1100,7 +1102,8 @@ ImageLoadingTestCheckpoint3 (
                  Status
                  );
 
-  if (VerifyImageEntry(L"TestImage6.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED)) {
+  Status = VerifyImageEntry(L"TestImage6.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED);
+  if (Status) {
     Result = EFI_TEST_ASSERTION_FAILED;
   } else {
     Result = EFI_TEST_ASSERTION_PASSED;
@@ -1117,7 +1120,8 @@ ImageLoadingTestCheckpoint3 (
                  Status
                  );
 
-  if (VerifyImageEntry(L"TestImage7.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED)) {
+  Status = VerifyImageEntry(L"TestImage7.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED);
+  if (Status) {
     Result = EFI_TEST_ASSERTION_FAILED;
   } else {
     Result = EFI_TEST_ASSERTION_PASSED;
@@ -1134,7 +1138,8 @@ ImageLoadingTestCheckpoint3 (
                  Status
                  );
 
-  if (VerifyImageEntry(L"TestImage8.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED)) {
+  Status = VerifyImageEntry(L"TestImage8.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED);
+  if (Status) {
     Result = EFI_TEST_ASSERTION_FAILED;
   } else {
     Result = EFI_TEST_ASSERTION_PASSED;
@@ -1151,7 +1156,8 @@ ImageLoadingTestCheckpoint3 (
                  Status
                  );
 
-  if (VerifyImageEntry(L"TestImage9.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED)) {
+  Status = VerifyImageEntry(L"TestImage9.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED);
+  if (Status) {
     Result = EFI_TEST_ASSERTION_FAILED;
   } else {
     Result = EFI_TEST_ASSERTION_PASSED;
@@ -1168,7 +1174,8 @@ ImageLoadingTestCheckpoint3 (
                  Status
                  );
 
-  if (VerifyImageEntry(L"TestImage10.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED)) {
+  Status = VerifyImageEntry(L"TestImage10.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED);
+  if (Status) {
     Result = EFI_TEST_ASSERTION_FAILED;
   } else {
     Result = EFI_TEST_ASSERTION_PASSED;
