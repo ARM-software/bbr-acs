@@ -988,16 +988,19 @@ VerifyImageEntry (
   for (int i = 0; i < *NumberOfImages; i++) {
     InfoPtr = ptr;
     ImagePath = ptr + sizeof(EFI_IMAGE_EXECUTION_INFO);
-    GetBaseName(ImagePath,&ImageName);
+    ImageName = ImagePath;
 
-    // Verify if this entries image name matches expected image name
-    if (SctStrCmp(FileName,ImageName) == 0) {
+    if (GetBaseName (ImagePath,&ImageName) == EFI_SUCCESS) {
 
-      // Verify if this entries Action matches expected Action
-      if (InfoPtr->Action == Action) {
-         return EFI_SUCCESS;
-      } else {
-         return EFI_NOT_FOUND;
+      // Verify if this entries image name matches expected image name
+      if (SctStrCmp(FileName,ImageName) == 0) {
+
+        // Verify if this entries Action matches expected Action
+        if (InfoPtr->Action == Action) {
+           return EFI_SUCCESS;
+        } else {
+           return EFI_NOT_FOUND;
+        }
       }
     }
     // advance pointer to next element in table
