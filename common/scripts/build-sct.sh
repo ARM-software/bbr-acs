@@ -161,6 +161,12 @@ do_build()
     fi
 
     if [[ $BUILD_PLAT != SIE ]] ; then
+        if git apply --check $BBR_DIR/common/patches/edk2-test-bbr-build.patch; then
+            echo "Applying edk2-test BBR build patch..."
+            git apply --ignore-whitespace --ignore-space-change $BBR_DIR/common/patches/edk2-test-bbr-build.patch
+        else
+            echo  "Error while applying edk2-test BBR build patch..."
+        fi
         if git apply --check $BBR_DIR/common/patches/edk2-test-bbr.patch; then
             echo "Applying edk2-test BBR patch..."
             git apply --ignore-whitespace --ignore-space-change $BBR_DIR/common/patches/edk2-test-bbr.patch
