@@ -988,16 +988,19 @@ VerifyImageEntry (
   for (int i = 0; i < *NumberOfImages; i++) {
     InfoPtr = ptr;
     ImagePath = ptr + sizeof(EFI_IMAGE_EXECUTION_INFO);
-    GetBaseName(ImagePath,&ImageName);
+    ImageName = ImagePath;
 
-    // Verify if this entries image name matches expected image name
-    if (SctStrCmp(FileName,ImageName) == 0) {
+    if (GetBaseName (ImagePath,&ImageName) == EFI_SUCCESS) {
 
-      // Verify if this entries Action matches expected Action
-      if (InfoPtr->Action == Action) {
-         return EFI_SUCCESS;
-      } else {
-         return EFI_NOT_FOUND;
+      // Verify if this entries image name matches expected image name
+      if (SctStrCmp(FileName,ImageName) == 0) {
+
+        // Verify if this entries Action matches expected Action
+        if (InfoPtr->Action == Action) {
+           return EFI_SUCCESS;
+        } else {
+           return EFI_NOT_FOUND;
+        }
       }
     }
     // advance pointer to next element in table
@@ -1063,7 +1066,10 @@ ImageLoadingTestCheckpoint3 (
 
   ImageExecutionInfo = ptr;
 
-  if (VerifyImageEntry(L"TestImage1.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_NOT_FOUND)) {
+// UEFI 2.10 spec table 32.6
+// EFI_IMAGE_EXECUTION_AUTH_UNTESTED The image contained no certificates
+  Status = VerifyImageEntry(L"TestImage1.bin", EFI_IMAGE_EXECUTION_AUTH_UNTESTED);
+  if (Status) {
     Result = EFI_TEST_ASSERTION_FAILED;
   } else {
     Result = EFI_TEST_ASSERTION_PASSED;
@@ -1073,14 +1079,15 @@ ImageLoadingTestCheckpoint3 (
                  StandardLib,
                  Result,
                  gSecureBootImageLoadingBbTestAssertionGuid011,
-                 L"SecureBoot - TestImage1.bin in Image Execution Info Table with SIG_NOT_FOUND.",
+                 L"SecureBoot - TestImage1.bin in Image Execution Info Table with AUTH_UNTESTED.",
                  L"%a:%d:Status - %r",
                  __FILE__,
                  (UINTN)__LINE__,
                  Status
                  );
 
-  if (VerifyImageEntry(L"TestImage2.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_NOT_FOUND)) {
+  Status = VerifyImageEntry(L"TestImage2.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_NOT_FOUND);
+  if (Status) {
     Result = EFI_TEST_ASSERTION_FAILED;
   } else {
     Result = EFI_TEST_ASSERTION_PASSED;
@@ -1097,7 +1104,8 @@ ImageLoadingTestCheckpoint3 (
                  Status
                  );
 
-  if (VerifyImageEntry(L"TestImage6.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED)) {
+  Status = VerifyImageEntry(L"TestImage6.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED);
+  if (Status) {
     Result = EFI_TEST_ASSERTION_FAILED;
   } else {
     Result = EFI_TEST_ASSERTION_PASSED;
@@ -1114,7 +1122,8 @@ ImageLoadingTestCheckpoint3 (
                  Status
                  );
 
-  if (VerifyImageEntry(L"TestImage7.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED)) {
+  Status = VerifyImageEntry(L"TestImage7.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED);
+  if (Status) {
     Result = EFI_TEST_ASSERTION_FAILED;
   } else {
     Result = EFI_TEST_ASSERTION_PASSED;
@@ -1131,7 +1140,8 @@ ImageLoadingTestCheckpoint3 (
                  Status
                  );
 
-  if (VerifyImageEntry(L"TestImage8.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED)) {
+  Status = VerifyImageEntry(L"TestImage8.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED);
+  if (Status) {
     Result = EFI_TEST_ASSERTION_FAILED;
   } else {
     Result = EFI_TEST_ASSERTION_PASSED;
@@ -1148,7 +1158,8 @@ ImageLoadingTestCheckpoint3 (
                  Status
                  );
 
-  if (VerifyImageEntry(L"TestImage9.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED)) {
+  Status = VerifyImageEntry(L"TestImage9.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED);
+  if (Status) {
     Result = EFI_TEST_ASSERTION_FAILED;
   } else {
     Result = EFI_TEST_ASSERTION_PASSED;
@@ -1165,7 +1176,10 @@ ImageLoadingTestCheckpoint3 (
                  Status
                  );
 
-  if (VerifyImageEntry(L"TestImage10.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED)) {
+// UEFI 2.10 spec table 32.6
+// EFI_IMAGE_EXECUTION_AUTH_SIG_FOUND The image has at least one certificate, and the image digest is in the forbidden database.
+  Status = VerifyImageEntry(L"TestImage10.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FOUND);
+  if (Status) {
     Result = EFI_TEST_ASSERTION_FAILED;
   } else {
     Result = EFI_TEST_ASSERTION_PASSED;
@@ -1175,7 +1189,7 @@ ImageLoadingTestCheckpoint3 (
                  StandardLib,
                  Result,
                  gSecureBootImageLoadingBbTestAssertionGuid017,
-                 L"SecureBoot - Verify load of TestImage10.bin recorded in Image Execution Info Table.",
+                 L"SecureBoot - Verify load of TestImage10.bin recorded in Image Execution Info Table with AUTH_SIG_FOUND",
                  L"%a:%d:Status - %r",
                  __FILE__,
                  (UINTN)__LINE__,
