@@ -101,9 +101,17 @@ do_build()
     cp $BBR_DIR/ebbr/config/EBBR_manual.seq uefi-sct/SctPkg/BBR/
     cp $BBR_DIR/ebbr/config/EfiCompliant_EBBR.ini uefi-sct/SctPkg/BBR/
 
-    if ! patch -R -p1 -s -f --dry-run < $BBR_DIR/common/patches/edk2-test-bbr.patch; then
-        echo "Applying SCT patch ..."
-        patch  -p1  < $BBR_DIR/common/patches/edk2-test-bbr.patch
+    if git apply --check $BBR_DIR/common/patches/edk2-test-bbr-build.patch; then
+        echo "Applying edk2-test BBR build patch..."
+        git apply --ignore-whitespace --ignore-space-change $BBR_DIR/common/patches/edk2-test-bbr-build.patch
+    else
+        echo  "Error while applying edk2-test BBR build patch..."
+    fi
+    if git apply --check $BBR_DIR/common/patches/edk2-test-bbr.patch; then
+        echo "Applying edk2-test BBR patch..."
+        git apply --ignore-whitespace --ignore-space-change $BBR_DIR/common/patches/edk2-test-bbr.patch
+    else
+        echo  "Error while applying edk2-test BBR patch..."
     fi
 
     pushd uefi-sct
