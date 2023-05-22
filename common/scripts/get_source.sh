@@ -30,6 +30,14 @@
 
 TOP_DIR=`pwd`
 . $TOP_DIR/../../common/config/bbr_common_config.cfg
+
+#Optional argument 'arm' shall be set when targeting a 32bit Arm device
+if [ "$1" == "arm" ]; then
+    TARGET_ARCH="arm"
+else
+    TARGET_ARCH="aarch64"
+fi
+
 get_cross_compiler()
 {
     if [ $(uname -m) == "aarch64" ]; then
