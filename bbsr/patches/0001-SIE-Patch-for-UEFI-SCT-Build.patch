@@ -1,17 +1,5 @@
-From 1a32976f30381b54f5656d488ab3e65ba76b7d38 Mon Sep 17 00:00:00 2001
-From: edhay <edhaya.chandran@arm.com>
-Date: Mon, 19 Dec 2022 11:26:25 +0530
-Subject: [PATCH] [PATCH] SIE Patch for UEFI-SCT Build
-
-This patch is to be applied over edk2-test-bbr.patch
----
- uefi-sct/SctPkg/CommonGenFramework.sh    | 16 ++++++++++++++--
- uefi-sct/SctPkg/Config/Data/Category.ini | 21 +++++++++++++++++++++
- uefi-sct/SctPkg/UEFI/UEFI_SCT.dsc        |  8 ++++++++
- 3 files changed, 43 insertions(+), 2 deletions(-)
-
 diff --git a/uefi-sct/SctPkg/CommonGenFramework.sh b/uefi-sct/SctPkg/CommonGenFramework.sh
-index c06e1053..8c597173 100755
+index 5e8a3331..a9f05146 100755
 --- a/uefi-sct/SctPkg/CommonGenFramework.sh
 +++ b/uefi-sct/SctPkg/CommonGenFramework.sh
 @@ -92,6 +92,9 @@ CopyDependency()
@@ -72,15 +60,17 @@ index c06e1053..8c597173 100755
      cp $ProcessorType/Hash2BBTest.efi                          $Framework/Test/ > NUL
      cp $ProcessorType/Pkcs7BBTest.efi                          $Framework/Test/ > NUL
      cp $ProcessorType/ConfigKeywordHandlerBBTest.efi           $Framework/Test/ > NUL
-@@ -469,6 +478,7 @@ then
+@@ -468,7 +477,8 @@ then
+     cp $ProcessorType/PartitionInfoBBTest.efi                  $Framework/Test/ > NUL
      cp $ProcessorType/UFSDeviceConfigBBTest.efi                $Framework/Test/ > NUL
      cp $ProcessorType/ResetNotificationBBTest.efi              $Framework/Test/ > NUL
- 
+-
++    
 +    cp $ProcessorType/SecureBootBBTest.efi                     $Framework/Test/ > NUL
      # *********************************************
      # SBBR test cases
      # *********************************************
-@@ -534,5 +544,7 @@ then
+@@ -531,5 +541,6 @@ then
      CopyDependency PciIo
      CopyDependency PciRootBridgeIo
      CopyDependency PxeBaseCode
@@ -90,12 +80,11 @@ index c06e1053..8c597173 100755
 +    CopyDependency ConfigKeywordHandler
 +    CopyDependency SecureBoot
 +fi
-+
 diff --git a/uefi-sct/SctPkg/Config/Data/Category.ini b/uefi-sct/SctPkg/Config/Data/Category.ini
-index 2ad3a7c9..1a5191f3 100644
+index ba7b239f..c717a8b6 100644
 --- a/uefi-sct/SctPkg/Config/Data/Category.ini
 +++ b/uefi-sct/SctPkg/Config/Data/Category.ini
-@@ -172,6 +172,13 @@ InterfaceGuid = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
+@@ -165,6 +165,13 @@ InterfaceGuid = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
  Name          = RuntimeServicesTest
  Description   =
  
@@ -109,7 +98,7 @@ index 2ad3a7c9..1a5191f3 100644
  [Category Data]
  Revision      = 0x00010000
  CategoryGuid  = D6844631-0A1E-42D1-A594-60354847B676
-@@ -179,6 +186,13 @@ InterfaceGuid = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
+@@ -172,6 +179,13 @@ InterfaceGuid = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
  Name          = RuntimeServicesTest\VariableServicesTest
  Description   =
  
@@ -123,7 +112,7 @@ index 2ad3a7c9..1a5191f3 100644
  [Category Data]
  Revision      = 0x00010000
  CategoryGuid  = 0C1D662C-EA60-48F5-9D77-22F853499C4A
-@@ -1068,6 +1082,13 @@ InterfaceGuid = 8D59D32B-C655-4AE9-9B15-F25904992A43
+@@ -1061,6 +1075,13 @@ InterfaceGuid = 8D59D32B-C655-4AE9-9B15-F25904992A43
  Name          = IHV\ConsoleSupportTest\AbsolutePointerProtocolTest
  Description   = Absolute Pointer Protocol Test on IHV Drivers
  
@@ -138,15 +127,67 @@ index 2ad3a7c9..1a5191f3 100644
  Revision      = 0x00010000
  CategoryGuid  = CCD15FEC-6F73-4EEC-8395-3E69E4B940BF
 diff --git a/uefi-sct/SctPkg/UEFI/UEFI_SCT.dsc b/uefi-sct/SctPkg/UEFI/UEFI_SCT.dsc
-index 88d7a317..86254639 100644
+index 88d7a317..d4943270 100644
 --- a/uefi-sct/SctPkg/UEFI/UEFI_SCT.dsc
 +++ b/uefi-sct/SctPkg/UEFI/UEFI_SCT.dsc
+@@ -46,8 +46,8 @@
+   BUILD_TARGETS                  = DEBUG|RELEASE
+   SKUID_IDENTIFIER               = DEFAULT
+   
+-  DEFINE GCC_VER_MACRO           =
+-  DEFINE MSFT_VER_MACRO          =
++  DEFINE GCC_VER_MACRO           =
++  DEFINE MSFT_VER_MACRO          =
+ 
+ 
+ ################################################################################
+@@ -60,25 +60,25 @@
+   0|DEFAULT              # The entry: 0|DEFAULT is reserved and always required.
+ 
+ [BuildOptions]
+-  MSFT:*_*_IA32_CC_FLAGS    = /D EFI32 /wd4133 /Od
+-  MSFT:*_*_IA32_ASM_FLAGS   = /D EFI32
+-  MSFT:*_*_IA32_VFRPP_FLAGS = /D EFI32
+-  MSFT:*_*_IA32_APP_FLAGS   = /D EFI32
+-  MSFT:*_*_IA32_PP_FLAGS    = /D EFI32
+-
+-  MSFT:*_*_X64_CC_FLAGS    = /D EFIX64 /wd4133 /Od
+-  MSFT:*_*_X64_ASM_FLAGS   = /D EFIX64
+-  MSFT:*_*_X64_VFRPP_FLAGS = /D EFIX64
+-  MSFT:*_*_X64_APP_FLAGS   = /D EFIX64
+-  MSFT:*_*_X64_PP_FLAGS    = /D EFIX64
+-
+-#  GCC:*_*_IA32_CC_FLAGS     = -D EFI32 $(GCC_VER_MACRO) -ffreestanding -nostdinc -nostdlib -Wno-error -mno-red-zone -Wno-address -mno-stack-arg-probe "-DEFIAPI=__attribute__((ms_abi))" -m32 -mabi=ms -D MDE_CPU_X32
++  MSFT:*_*_IA32_CC_FLAGS    = /D EFI32 /wd4133 /Od
++  MSFT:*_*_IA32_ASM_FLAGS   = /D EFI32
++  MSFT:*_*_IA32_VFRPP_FLAGS = /D EFI32
++  MSFT:*_*_IA32_APP_FLAGS   = /D EFI32
++  MSFT:*_*_IA32_PP_FLAGS    = /D EFI32
++
++  MSFT:*_*_X64_CC_FLAGS    = /D EFIX64 /wd4133 /Od
++  MSFT:*_*_X64_ASM_FLAGS   = /D EFIX64
++  MSFT:*_*_X64_VFRPP_FLAGS = /D EFIX64
++  MSFT:*_*_X64_APP_FLAGS   = /D EFIX64
++  MSFT:*_*_X64_PP_FLAGS    = /D EFIX64
++
++#  GCC:*_*_IA32_CC_FLAGS     = -D EFI32 $(GCC_VER_MACRO) -ffreestanding -nostdinc -nostdlib -Wno-error -mno-red-zone -Wno-address -mno-stack-arg-probe "-DEFIAPI=__attribute__((ms_abi))" -m32 -mabi=ms -D MDE_CPU_X32
+   GCC:*_*_IA32_CC_FLAGS     = -D EFIX64 $(GCC_VER_MACRO) -Wno-error 
+ #  GCC:*_*_IA32_VFRPP_FLAGS  = -D EFI32 $(GCC_VER_MACRO)
+ #  GCC:*_*_IA32_APP_FLAGS    = -D EFI32 $(GCC_VER_MACRO)
+ #  GCC:*_*_IA32_PP_FLAGS     = -D EFI32 $(GCC_VER_MACRO)
+ 
+-#  GCC:*_*_X64_CC_FLAGS     = -D EFIX64 $(GCC_VER_MACRO) -ffreestanding -nostdinc -nostdlib -Wno-error -mno-red-zone -Wno-address -mno-stack-arg-probe "-DEFIAPI=__attribute__((ms_abi))" -m64 -mcmodel=large -mabi=ms -D MDE_CPU_X64
++#  GCC:*_*_X64_CC_FLAGS     = -D EFIX64 $(GCC_VER_MACRO) -ffreestanding -nostdinc -nostdlib -Wno-error -mno-red-zone -Wno-address -mno-stack-arg-probe "-DEFIAPI=__attribute__((ms_abi))" -m64 -mcmodel=large -mabi=ms -D MDE_CPU_X64
+    GCC:*_*_X64_CC_FLAGS     = -D EFIX64 $(GCC_VER_MACRO) -Wno-error 
+ #  GCC:*_*_X64_VFRPP_FLAGS  = -D EFIX64 $(GCC_VER_MACRO)
+ #  GCC:*_*_X64_APP_FLAGS    = -D EFIX64 $(GCC_VER_MACRO)
 @@ -222,7 +222,9 @@ SctPkg/TestCase/UEFI/EFI/BootServices/ProtocolHandlerServices/BlackBoxTest/Proto
  SctPkg/TestCase/UEFI/EFI/RuntimeServices/MiscRuntimeServices/BlackBoxTest/MiscRuntimeServicesBBTest.inf
  SctPkg/TestCase/UEFI/EFI/RuntimeServices/TimeServices/BlackBoxTest/TimeServicesBBTest.inf
  SctPkg/TestCase/UEFI/EFI/RuntimeServices/VariableServices/BlackBoxTest/VariableServicesBBTest.inf
+-
 +SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTest.inf
- 
++ 
 +SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTest.inf
  SctPkg/TestCase/UEFI/EFI/Protocol/GraphicsOutput/BlackBoxTest/GraphicsOutputBBTest.inf
  SctPkg/TestCase/UEFI/EFI/Protocol/Bis/BlackBoxTest/BisBBTest.inf
@@ -171,6 +212,13 @@ index 88d7a317..86254639 100644
  #
  # Support Files
  #
--- 
-2.17.1
-
+@@ -498,6 +506,6 @@ SctPkg/TestCase/RIVL/Protocol/Http/HttpServiceBinding/HttpServiceBindingENTSTest
+ 
+ [Components.IA32, Components.X64]
+ SctPkg/TestCase/UEFI/EFI/Generic/ExeMode/BlackBoxTest/ExeModeBBTest.inf
+-
+-[Components.RISCV64]
+-SctPkg/TestCase/UEFI/EFI/Protocol/RiscV/BlackBoxTest/RiscVBootProtocolBBTest.inf
++
++[Components.RISCV64]
++SctPkg/TestCase/UEFI/EFI/Protocol/RiscV/BlackBoxTest/RiscVBootProtocolBBTest.inf
