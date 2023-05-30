@@ -2,7 +2,7 @@
 
   Copyright 2006 - 2012 Unified EFI, Inc.<BR>
   Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
-  Copyright 2021, Arm LTD.
+  Copyright 2021, 2023, Arm LTD.
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -150,6 +150,9 @@ ImageLoadingTest(
              );
 
   if (EFI_ERROR(Status)) {
+    EFI_TEST_GENERIC_FAILURE(
+          L"SecureBoot - ImageLoadingTest: Failed to get test support protocol library",
+      Status);
     return Status;
   }
 
@@ -160,6 +163,9 @@ ImageLoadingTest(
   //
   Status = GetSystemData (ProfileLib);
   if (EFI_ERROR(Status)) {
+    EFI_TEST_GENERIC_FAILURE(
+          L"SecureBoot - ImageLoadingTest: Failed to get system data",
+      Status);
     return Status;
   }
 
@@ -241,11 +247,9 @@ ImageLoadingVariableInit  (
 
   // if SecureBoot is not enabled, exit
   if (EFI_ERROR(Status) || Data[0] != 1) {
-    StandardLib->RecordMessage (
-                     StandardLib,
-                     EFI_VERBOSE_LEVEL_DEFAULT,
-                     L"Secure Boot ImageLoadingTest: SecureBoot not enabled\n"
-                     );
+    EFI_TEST_GENERIC_FAILURE(
+          L"SecureBoot - ImageLoadingTest: SecureBoot not enabled",
+      Status);
     return EFI_NOT_FOUND;
   }
 
@@ -265,6 +269,9 @@ ImageLoadingVariableInit  (
              );
 
   if (EFI_ERROR(Status)) {
+    EFI_TEST_GENERIC_FAILURE(
+      L"Secure Boot - ImageLoadingTest: OpenFileAndGetSize() failed for KEKSigList1.auth",
+      Status);
     return EFI_NOT_FOUND;
   }
 
@@ -272,6 +279,9 @@ ImageLoadingVariableInit  (
 
   if (Buffer == NULL) {
     KeyFHandle->Close (KeyFHandle);
+    EFI_TEST_GENERIC_FAILURE(
+      L"Secure Boot - ImageLoadingTest: Failed to allocate buffer for KEKSigList1.auth",
+      Status);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -286,6 +296,9 @@ ImageLoadingVariableInit  (
   if (EFI_ERROR(Status)) {
     KeyFHandle->Close (KeyFHandle);
     gtBS->FreePool (Buffer);
+    EFI_TEST_GENERIC_FAILURE(
+      L"Secure Boot - ImageLoadingTest: Failed to read KEKSigList1.auth",
+      Status);
     return EFI_LOAD_ERROR;
   }
 
@@ -300,12 +313,9 @@ ImageLoadingVariableInit  (
   gtBS->FreePool (Buffer);
 
   if (EFI_ERROR(Status)) {
-    StandardLib->RecordMessage (
-                     StandardLib,
-                     EFI_VERBOSE_LEVEL_DEFAULT,
-                     L"Secure Boot ImageLoadingTest: unable to set KEK. Status=%r.\n",
-                     Status
-                     );
+    EFI_TEST_GENERIC_FAILURE(
+      L"Secure Boot - ImageLoadingTest: unable to set KEK",
+      Status);
     return EFI_NOT_FOUND;
   }
 
@@ -336,12 +346,9 @@ ImageLoadingVariableInit  (
              );
 
   if (EFI_ERROR(Status)) {
-    StandardLib->RecordMessage (
-                     StandardLib,
-                     EFI_VERBOSE_LEVEL_DEFAULT,
-                     L"Secure Boot ImageLoadingTest: couldn't load dbSigList2.auth. Status=%r.\n",
-                     Status
-                     );
+    EFI_TEST_GENERIC_FAILURE(
+      L"Secure Boot - ImageLoadingTest: OpenFileAndGetSize() failed for dbSigList2.auth",
+      Status);
     return EFI_NOT_FOUND;
   }
 
@@ -349,6 +356,9 @@ ImageLoadingVariableInit  (
 
   if (Buffer == NULL) {
     KeyFHandle->Close (KeyFHandle);
+    EFI_TEST_GENERIC_FAILURE(
+      L"Secure Boot - ImageLoadingTest: Failed to allocate buffer for dbSigList2.auth",
+      Status);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -363,6 +373,9 @@ ImageLoadingVariableInit  (
   if (EFI_ERROR(Status)) {
     KeyFHandle->Close (KeyFHandle);
     gtBS->FreePool (Buffer);
+    EFI_TEST_GENERIC_FAILURE(
+      L"Secure Boot - ImageLoadingTest: Failed to read dbSigList2.auth",
+      Status);
     return EFI_LOAD_ERROR;
   }
 
@@ -377,12 +390,9 @@ ImageLoadingVariableInit  (
   gtBS->FreePool (Buffer);
 
   if (EFI_ERROR(Status)) {
-    StandardLib->RecordMessage (
-                     StandardLib,
-                     EFI_VERBOSE_LEVEL_DEFAULT,
-                     L"Secure Boot ImageLoadingTest: unable to set db. Status=%r.\n",
-                     Status
-                     );
+    EFI_TEST_GENERIC_FAILURE(
+      L"Secure Boot - ImageLoadingTest: unable to set db",
+      Status);
     return EFI_NOT_FOUND;
   }
 
@@ -413,12 +423,9 @@ ImageLoadingVariableInit  (
              );
 
   if (EFI_ERROR(Status)) {
-    StandardLib->RecordMessage (
-                     StandardLib,
-                     EFI_VERBOSE_LEVEL_DEFAULT,
-                     L"Secure Boot ImageLoadingTest: unable to load dbxRevokedList1.auth. Status=%r.\n",
-                     Status
-                     );
+    EFI_TEST_GENERIC_FAILURE(
+      L"Secure Boot - ImageLoadingTest: OpenFileAndGetSize() failed for dbxRevokedList1.auth",
+      Status);
     return EFI_NOT_FOUND;
   }
 
@@ -426,6 +433,9 @@ ImageLoadingVariableInit  (
 
   if (Buffer == NULL) {
     KeyFHandle->Close (KeyFHandle);
+    EFI_TEST_GENERIC_FAILURE(
+      L"Secure Boot - ImageLoadingTest: Failed to allocate buffer for dbxRevokedList1.auth",
+      Status);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -440,6 +450,9 @@ ImageLoadingVariableInit  (
   if (EFI_ERROR(Status)) {
     KeyFHandle->Close (KeyFHandle);
     gtBS->FreePool (Buffer);
+    EFI_TEST_GENERIC_FAILURE(
+      L"Secure Boot - ImageLoadingTest: Failed to read dbxRevokedList1.auth",
+      Status);
     return EFI_LOAD_ERROR;
   }
 
@@ -454,12 +467,9 @@ ImageLoadingVariableInit  (
   gtBS->FreePool (Buffer);
 
   if (EFI_ERROR(Status)) {
-    StandardLib->RecordMessage (
-                     StandardLib,
-                     EFI_VERBOSE_LEVEL_DEFAULT,
-                     L"Secure Boot ImageLoadingTest: unable to set dbx. Status=%r.\n",
-                     Status
-                     );
+    EFI_TEST_GENERIC_FAILURE(
+      L"Secure Boot - ImageLoadingTest: unable to set dbx",
+      Status);
     return EFI_NOT_FOUND;
   }
 
@@ -1050,11 +1060,10 @@ ImageLoadingTestCheckpoint3 (
   Status = SctGetSystemConfigurationTable(&gEfiImageSecurityDatabaseGuid, &ptr);
 
   if (Status != EFI_SUCCESS) {
-    StandardLib->RecordMessage (
-                     StandardLib,
-                     EFI_VERBOSE_LEVEL_DEFAULT,
-                     L"Secure Boot ImageLoadingTest: EFI Image Execution Info Table not found.\n"
-                     );
+    EFI_TEST_GENERIC_FAILURE(
+      L"Secure Boot - ImageLoadingTest: EFI Image Execution Info Table not found",
+      Status);
+    
      return EFI_NOT_FOUND;
   }
 

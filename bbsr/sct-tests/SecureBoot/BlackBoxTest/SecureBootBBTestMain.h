@@ -2,6 +2,7 @@
 
   Copyright 2006 - 2016 Unified EFI, Inc.<BR>
   Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright 2021, 2023, Arm LTD.
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -55,6 +56,19 @@ Abstract:
 
 #define IMAGE_LOADING_TEST_GUID \
   { 0xBA4A8DD9, 0x2D6A, 0x43A6, {0x96, 0xCF, 0x79, 0x47, 0x89, 0x2B, 0x73, 0x59 }}
+
+
+#define EFI_TEST_GENERIC_FAILURE(Title, Status)             \
+  StandardLib->RecordAssertion (                            \
+                 StandardLib,                               \
+                 EFI_TEST_ASSERTION_FAILED,                 \
+                 gTestGenericFailureGuid,                   \
+                 Title,                                     \
+                 L"%a:%d:Status - %r",                      \
+                 __FILE__,                                  \
+                 (UINTN)__LINE__,                           \
+                 Status                                     \
+                 );
 
 //
 // Prototypes

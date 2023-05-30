@@ -2,7 +2,7 @@
 
   Copyright 2006 - 2012 Unified EFI, Inc.<BR>
   Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
-  Copyright 2021, Arm LTD.
+  Copyright 2021, 2023, Arm LTD.
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -134,6 +134,9 @@ VariableUpdatesTest(
   // including known timestamps
   Status = SecureBootVariableCleanup (RT, StandardLib, LoggingLib, ProfileLib);
   if (EFI_ERROR(Status)) {
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - VariableUpdatesBBTest: SecureBootVariableCleanup() failed",
+      Status);
     return Status;
   }
 
@@ -220,11 +223,9 @@ VariableUpdatesTestCheckpoint1 (
 
   // if SecureBoot is not enabled, exit
   if (EFI_ERROR(Status) || Data[0] != 1) {
-    StandardLib->RecordMessage (
-                     StandardLib,
-                     EFI_VERBOSE_LEVEL_DEFAULT,
-                     L"VariableUpdatesBBTest: SecureBoot not enabled\n"
-                     );
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - VariableUpdatesBBTest: SecureBoot not enabled",
+      Status);
     return EFI_NOT_FOUND;
   }
 
@@ -240,6 +241,9 @@ VariableUpdatesTestCheckpoint1 (
              );
 
   if (EFI_ERROR(Status)) {
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify unsigned KEK update: OpenFileAndGetSize() failed for TestImage1.bin",
+      Status);
     return EFI_NOT_FOUND;
   }
 
@@ -247,6 +251,9 @@ VariableUpdatesTestCheckpoint1 (
 
   if (Buffer == NULL) {
     KeyFHandle->Close (KeyFHandle);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify unsigned KEK update: Failed to allocate buffer for TestImage1.bin",
+      Status);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -261,6 +268,9 @@ VariableUpdatesTestCheckpoint1 (
   if (EFI_ERROR(Status)) {
     KeyFHandle->Close (KeyFHandle);
     gtBS->FreePool (Buffer);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify unsigned KEK update: Failed to read TestImage1.bin",
+      Status);
     return EFI_LOAD_ERROR;
   }
 
@@ -307,6 +317,9 @@ VariableUpdatesTestCheckpoint1 (
              );
 
   if (EFI_ERROR(Status)) {
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify signed KEK update: OpenFileAndGetSize() failed for KEKSigList1.auth",
+      Status);
     return EFI_NOT_FOUND;
   }
 
@@ -314,6 +327,9 @@ VariableUpdatesTestCheckpoint1 (
 
   if (Buffer == NULL) {
     KeyFHandle->Close (KeyFHandle);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify signed KEK update: Failed to allocate buffer for KEKSigList1.auth",
+      Status);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -328,6 +344,9 @@ VariableUpdatesTestCheckpoint1 (
   if (EFI_ERROR(Status)) {
     KeyFHandle->Close (KeyFHandle);
     gtBS->FreePool (Buffer);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify signed KEK update: Failed to read KEKSigList1.auth",
+      Status);
     return EFI_LOAD_ERROR;
   }
 
@@ -444,6 +463,9 @@ VariableUpdatesTestCheckpoint2 (
              );
 
   if (EFI_ERROR(Status)) {
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify unsigned db update: OpenFileAndGetSize() failed for TestImage1.bin",
+      Status);
     return EFI_NOT_FOUND;
   }
 
@@ -451,6 +473,9 @@ VariableUpdatesTestCheckpoint2 (
 
   if (Buffer == NULL) {
     KeyFHandle->Close (KeyFHandle);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify unsigned db update: Failed to allocate buffer for TestImage1.bin",
+      Status);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -465,6 +490,9 @@ VariableUpdatesTestCheckpoint2 (
   if (EFI_ERROR(Status)) {
     KeyFHandle->Close (KeyFHandle);
     gtBS->FreePool (Buffer);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify unsigned db update: Failed to read TestImage1.bin",
+      Status);
     return EFI_LOAD_ERROR;
   }
 
@@ -509,6 +537,9 @@ VariableUpdatesTestCheckpoint2 (
              );
 
   if (EFI_ERROR(Status)) {
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify signed db update: OpenFileAndGetSize() failed for dbSigList1.auth",
+      Status);
     return EFI_NOT_FOUND;
   }
 
@@ -516,6 +547,9 @@ VariableUpdatesTestCheckpoint2 (
 
   if (Buffer == NULL) {
     KeyFHandle->Close (KeyFHandle);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify signed db update: Failed to allocate buffer for dbSigList1.auth",
+      Status);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -530,6 +564,9 @@ VariableUpdatesTestCheckpoint2 (
   if (EFI_ERROR(Status)) {
     KeyFHandle->Close (KeyFHandle);
     gtBS->FreePool (Buffer);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify signed db update: Failed to read dbSigList1.auth",
+      Status);
     return EFI_LOAD_ERROR;
   }
 
@@ -574,6 +611,9 @@ VariableUpdatesTestCheckpoint2 (
              );
 
   if (EFI_ERROR(Status)) {
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify signed db update: OpenFileAndGetSize() failed for dbSigList2.auth",
+      Status);
     return EFI_NOT_FOUND;
   }
 
@@ -581,6 +621,9 @@ VariableUpdatesTestCheckpoint2 (
 
   if (Buffer == NULL) {
     KeyFHandle->Close (KeyFHandle);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify signed db update: Failed to allocate buffer for dbSigList2.auth",
+      Status);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -595,6 +638,9 @@ VariableUpdatesTestCheckpoint2 (
   if (EFI_ERROR(Status)) {
     KeyFHandle->Close (KeyFHandle);
     gtBS->FreePool (Buffer);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify signed db update: Failed to read dbSigList2.auth",
+      Status);
     return EFI_LOAD_ERROR;
   }
 
@@ -639,6 +685,9 @@ VariableUpdatesTestCheckpoint2 (
              );
 
   if (EFI_ERROR(Status)) {
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify signed db update signed by TESTKEK2: OpenFileAndGetSize() failed for dbSigList4.auth",
+      Status);
     return EFI_NOT_FOUND;
   }
 
@@ -646,6 +695,9 @@ VariableUpdatesTestCheckpoint2 (
 
   if (Buffer == NULL) {
     KeyFHandle->Close (KeyFHandle);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify signed db update signed by TESTKEK2: Failed to allocate buffer for dbSigList4.auth",
+      Status);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -660,6 +712,9 @@ VariableUpdatesTestCheckpoint2 (
   if (EFI_ERROR(Status)) {
     KeyFHandle->Close (KeyFHandle);
     gtBS->FreePool (Buffer);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify signed db update signed by TESTKEK2: Failed to read dbSigList4.auth",
+      Status);
     return EFI_LOAD_ERROR;
   }
 
@@ -778,6 +833,9 @@ VariableUpdatesTestCheckpoint3 (
              );
 
   if (EFI_ERROR(Status)) {
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify unsigned dbx update: OpenFileAndGetSize() failed for TestImage1.bin",
+      Status);
     return EFI_NOT_FOUND;
   }
 
@@ -785,6 +843,9 @@ VariableUpdatesTestCheckpoint3 (
 
   if (Buffer == NULL) {
     KeyFHandle->Close (KeyFHandle);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify unsigned dbx update: Failed to allocate buffer for TestImage1.bin",
+      Status);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -799,6 +860,9 @@ VariableUpdatesTestCheckpoint3 (
   if (EFI_ERROR(Status)) {
     KeyFHandle->Close (KeyFHandle);
     gtBS->FreePool (Buffer);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify unsigned dbx update: Failed to read TestImage1.bin",
+      Status);
     return EFI_LOAD_ERROR;
   }
 
@@ -845,6 +909,9 @@ VariableUpdatesTestCheckpoint3 (
              );
 
   if (EFI_ERROR(Status)) {
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify signed dbx update: OpenFileAndGetSize() failed for dbSigList3.auth",
+      Status);
     return EFI_NOT_FOUND;
   }
 
@@ -852,6 +919,9 @@ VariableUpdatesTestCheckpoint3 (
 
   if (Buffer == NULL) {
     KeyFHandle->Close (KeyFHandle);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify signed dbx update: Failed to allocate buffer for dbSigList3.auth",
+      Status);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -866,6 +936,9 @@ VariableUpdatesTestCheckpoint3 (
   if (EFI_ERROR(Status)) {
     KeyFHandle->Close (KeyFHandle);
     gtBS->FreePool (Buffer);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify signed dbx update: Failed to read dbSigList3.auth",
+      Status);
     return EFI_LOAD_ERROR;
   }
 
@@ -983,6 +1056,9 @@ VariableUpdatesTestCheckpoint4 (
              );
 
   if (EFI_ERROR(Status)) {
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify signed KEK append update: OpenFileAndGetSize() failed for KEKSigList3.auth",
+      Status);
     return EFI_NOT_FOUND;
   }
 
@@ -990,6 +1066,9 @@ VariableUpdatesTestCheckpoint4 (
 
   if (Buffer == NULL) {
     KeyFHandle->Close (KeyFHandle);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify signed KEK append update: Failed to allocate buffer for KEKSigList3.auth",
+      Status);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -1004,6 +1083,9 @@ VariableUpdatesTestCheckpoint4 (
   if (EFI_ERROR(Status)) {
     KeyFHandle->Close (KeyFHandle);
     gtBS->FreePool (Buffer);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify signed KEK append update: Failed to read KEKSigList3.auth",
+      Status);
     return EFI_LOAD_ERROR;
   }
 
@@ -1050,6 +1132,9 @@ VariableUpdatesTestCheckpoint4 (
              );
 
   if (EFI_ERROR(Status)) {
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify signed DB append update: OpenFileAndGetSize() failed for dbSigList5.auth",
+      Status);
     return EFI_NOT_FOUND;
   }
 
@@ -1057,6 +1142,9 @@ VariableUpdatesTestCheckpoint4 (
 
   if (Buffer == NULL) {
     KeyFHandle->Close (KeyFHandle);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify signed DB append update: Failed to allocate buffer for dbSigList5.auth",
+      Status);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -1071,6 +1159,9 @@ VariableUpdatesTestCheckpoint4 (
   if (EFI_ERROR(Status)) {
     KeyFHandle->Close (KeyFHandle);
     gtBS->FreePool (Buffer);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify signed DB append update: Failed to read dbSigList5.auth",
+      Status);
     return EFI_LOAD_ERROR;
   }
 
