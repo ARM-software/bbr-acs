@@ -2,7 +2,7 @@
 
   Copyright 2006 - 2012 Unified EFI, Inc.<BR>
   Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
-  Copyright 2021, Arm LTD.
+  Copyright 2021, 2023 Arm LTD.
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -91,6 +91,9 @@ VariableAttributesTest(
              );
 
   if (EFI_ERROR(Status)) {
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - VariableAttributesBBTest: Failed to get test support protocol library",
+      Status);
     return Status;
   }
 
@@ -118,11 +121,8 @@ VariableAttributesTest(
 
   // if SecureBoot is not enabled, exit
   if (EFI_ERROR(Status) || Data[0] != 1) {
-    StandardLib->RecordMessage (
-                     StandardLib,
-                     EFI_VERBOSE_LEVEL_DEFAULT,
-                     L"VariableAttributesBBTest: SecureBoot not enabled\n"
-                     );
+    EFI_TEST_GENERIC_FAILURE(L"SecureBoot - VariableAttributesBBTest: SecureBoot not enabled",
+      Status);
     return EFI_NOT_FOUND;
   }
 
@@ -148,11 +148,7 @@ VariableAttributesTest(
 
   // if SetupMode != 0, exit
   if (EFI_ERROR(Status) || Data[0] != 0) {
-    StandardLib->RecordMessage (
-                     StandardLib,
-                     EFI_VERBOSE_LEVEL_DEFAULT,
-                     L"VariableAttributesBBTest: SetupMode != 0\n"
-                     );
+    EFI_TEST_GENERIC_FAILURE(L"SecureBoot - VariableAttributesBBTest: SetupMode != 0", Status);
     return EFI_NOT_FOUND;
   }
 
