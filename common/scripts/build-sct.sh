@@ -115,15 +115,16 @@ do_build()
     pushd $TOP_DIR/$SCT_PATH
     export KEYS_DIR=$TOP_DIR/security-interface-extension-keys
     export EDK2_TOOLCHAIN=$UEFI_TOOLCHAIN
+
     # required for SIE keys generation
     export PATH="$PATH:$TOP_DIR/efitools"
+
     # export EDK2 enviromnent variables
     export PACKAGES_PATH=$TOP_DIR/$UEFI_PATH
     export PYTHON_COMMAND=/usr/bin/python3
     export WORKSPACE=$TOP_DIR/$SCT_PATH/uefi-sct
     #export HOST_ARCH = `uname -m`
     #MACHINE=`uname -m`
-
     #Build base tools
     source $TOP_DIR/$UEFI_PATH/edksetup.sh
     make -C $TOP_DIR/$UEFI_PATH/BaseTools
@@ -134,6 +135,7 @@ do_build()
         cp -r $SBBR_TEST_DIR/SBBRRuntimeServices uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/
         cp $SBBR_TEST_DIR/BBR_SCT.dsc uefi-sct/SctPkg/UEFI/
         cp $SBBR_TEST_DIR/build_bbr.sh uefi-sct/SctPkg/
+
         # copy SIE SCT tests to edk2-test
         if [[ $BUILD_TYPE != S ]]; then
             cp -r $BBSR_TEST_DIR/BBSRVariableSizeTest uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices
@@ -159,6 +161,11 @@ do_build()
     cp $BBR_DIR/sbbr/config/SBBR_extd_run.seq uefi-sct/SctPkg/BBR/
     cp $BBR_DIR/sbbr/config/EfiCompliant_SBBR.ini  uefi-sct/SctPkg/BBR/
     fi
+
+    #Common
+    #SCRT
+    cp $BBR_DIR/common/config/ScrtStartup.nsh uefi-sct/SctPkg/BBR/
+    cp $BBR_DIR/common/config/SCRT.conf uefi-sct/SctPkg/BBR/
 
     if [[ $BUILD_PLAT != SIE ]] ; then
         if git apply --check $BBR_DIR/common/patches/edk2-test-bbr-build.patch; then
@@ -203,6 +210,7 @@ do_clean()
     popd
 
 }
+
 # sign SCT efi files
 SecureBootSign() {
     echo "KEYS_DIR = $KEYS_DIR"
@@ -232,6 +240,7 @@ do_package ()
     pushd $TOP_DIR/$SCT_PATH/uefi-sct
 
     mkdir -p ${TARGET_ARCH}_SCT/SCT
+    mkdir -p ${TARGET_ARCH}_SCT/SCT/SCRT
     mkdir -p ${TARGET_ARCH}_SCT/SCT/Sequence
 
     if [ $BUILD_PLAT = IR ]; then
@@ -268,7 +277,6 @@ do_package ()
         cp SctPkg/BBR/SBBR_extd_run.seq ${TARGET_ARCH}_SCT/SCT/Sequence/SBBR_extd_run.seq
 
 
-
     elif [ $BUILD_PLAT = SIE ]; then
         cp -r Build/UefiSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}/${TARGET_ARCH}/* ${TARGET_ARCH}_SCT/SCT/
         cp $BBR_DIR/bbsr/config/BBSRStartup.nsh ${TARGET_ARCH}_SCT/SctStartup.nsh
@@ -279,9 +287,15 @@ do_package ()
          exit
     fi
 
+    #Common
+    #SCRT
+    cp SctPkg/BBR/ScrtStartup.nsh ${TARGET_ARCH}_SCT/ScrtStartup.nsh
+    cp SctPkg/BBR/SCRT.conf ${TARGET_ARCH}_SCT/SCT/SCRT/SCRT.conf
+
     pushd $TOP_DIR
 
 }
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $DIR/framework.sh $@
+
