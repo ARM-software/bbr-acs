@@ -63,7 +63,7 @@ get_cross_compiler()
 
 get_fwts_src()
 {
-    git clone --single-branch https://git.launchpad.net/fwts
+    git clone --single-branch git://kernel.ubuntu.com/hwe/fwts.git
     pushd $TOP_DIR/fwts
     git checkout V23.01.00
     git submodule update --init
