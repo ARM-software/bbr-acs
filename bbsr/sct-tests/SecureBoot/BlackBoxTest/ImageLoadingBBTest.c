@@ -1000,10 +1000,10 @@ VerifyImageEntry (
     ImagePath = ptr + sizeof(EFI_IMAGE_EXECUTION_INFO);
     ImageName = ImagePath;
 
-    if (GetBaseName (ImagePath,&ImageName) == EFI_SUCCESS) {
+    if (GetBaseName (ImagePath, &ImageName) == EFI_SUCCESS) {
 
       // Verify if this entries image name matches expected image name
-      if (SctStrCmp(FileName,ImageName) == 0) {
+      if (SctStrCmp(FileName, ImageName) == 0) {
 
         // Verify if this entries Action matches expected Action
         if (InfoPtr->Action == Action) {
@@ -1186,7 +1186,8 @@ ImageLoadingTestCheckpoint3 (
                  );
 
 // UEFI 2.10 spec table 32.6
-// EFI_IMAGE_EXECUTION_AUTH_SIG_FOUND The image has at least one certificate, and the image digest is in the forbidden database.
+// EFI_IMAGE_EXECUTION_AUTH_SIG_FOUND The image has at least one certificate,
+// and the image digest is in the forbidden database.
   Status = VerifyImageEntry(L"TestImage10.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FOUND);
   if (Status) {
     Result = EFI_TEST_ASSERTION_FAILED;
@@ -1198,7 +1199,8 @@ ImageLoadingTestCheckpoint3 (
                  StandardLib,
                  Result,
                  gSecureBootImageLoadingBbTestAssertionGuid017,
-                 L"SecureBoot - Verify load of TestImage10.bin recorded in Image Execution Info Table with AUTH_SIG_FOUND",
+                 L"SecureBoot - Verify load of TestImage10.bin recorded in"
+                  " Image Execution Info Table with AUTH_SIG_FOUND",
                  L"%a:%d:Status - %r",
                  __FILE__,
                  (UINTN)__LINE__,

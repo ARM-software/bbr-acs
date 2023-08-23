@@ -1,7 +1,7 @@
 /** @file
 
   Copyright 2006 - 2016 Unified EFI, Inc.<BR>
-  Copyright (c) 2021, Arm Inc. All rights reserved.<BR>
+  Copyright (c) 2021-2023, Arm Inc. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -354,7 +354,8 @@ BBTestGetCapabilityConformanceTestCheckpoint2 (
   }
 
  for (int i = 0; i < sizeof(BootServiceCap.ActivePcrBanks); i++) {
-    if (((BootServiceCap.ActivePcrBanks & (1u << i)) != 0) && ((BootServiceCap.HashAlgorithmBitmap & (1u << i)) == 0)) {
+    if (((BootServiceCap.ActivePcrBanks & (1u << i)) != 0) &&
+        ((BootServiceCap.HashAlgorithmBitmap & (1u << i)) == 0)) {
       StandardLib->RecordMessage (
                      StandardLib,
                      EFI_VERBOSE_LEVEL_DEFAULT,

@@ -29,6 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 TOP_DIR=`pwd`
+
 . $TOP_DIR/../../common/config/bbr_common_config.cfg
 
 #Optional argument 'arm' shall be set when targeting a 32bit Arm device

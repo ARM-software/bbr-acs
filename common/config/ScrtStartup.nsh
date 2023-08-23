@@ -35,7 +35,7 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
     #
     FS%i:
     cd FS%i:\EFI\BOOT\bbr\SCT\SCRT
-    
+
     #Check if SCRT run is already in progress
     if  exist SCRT_run_progress.flag then
         #This is a restart case after SCRT run.
@@ -43,7 +43,7 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
         echo "SCRT run is in progress. Saving the logs"
         rm -q SCRT_run_progress.flag
         SCRTAPP.efi -g SCRT.log
-        
+
         #Save the logs in acs_results
         for %j in 0 1 2 3 4 5 6 7 8 9 A B C D E F then
             if exists FS%j:\acs_results\ then
@@ -56,7 +56,7 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
 
         goto Done
     endif
-    
+
     echo SCRT run. Press any key to stop the EFI SCRT running
     FS%i:\EFI\BOOT\bbr\SCT\stallforkey.efi 5
     if %lasterror% == 0 then
