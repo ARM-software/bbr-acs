@@ -1,7 +1,7 @@
 /*
- * Copyright © 2011 Guillem Jover <guillem@hadrons.org>
+ * Copyright (c) 2011 Guillem Jover <guillem@hadrons.org>
  *
- * Copyright © 2002 Thomas Moestl <tmm@FreeBSD.org>
+ * Copyright (c) 2002 Thomas Moestl <tmm@FreeBSD.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

@@ -2,7 +2,7 @@
 #define LIBBSD_STRING_H
 
 #include <stdlib.h>
-
+#include <string.h>
 /*	$OpenBSD: strlcpy.c,v 1.12 2015/01/15 03:54:12 millert Exp $	*/
 
 /*
@@ -24,7 +24,7 @@
 /*
  * Copy string src to buffer dst of size dsize.  At most dsize-1
  * chars will be copied.  Always NUL terminates (unless dsize == 0).
- * Returns strlen(src); if retval >= dsize, truncation occurred.
+ * Returns strnlen(src); if retval >= dsize, truncation occurred.
  */
 static inline size_t
 strlcpy(char *dst, const char *src, size_t dsize)
@@ -72,8 +72,8 @@ strlcpy(char *dst, const char *src, size_t dsize)
 /*
  * Appends src to string dst of size dsize (unlike strncat, dsize is the
  * full size of dst, not space left).  At most dsize-1 characters
- * will be copied.  Always NUL terminates (unless dsize <= strlen(dst)).
- * Returns strlen(src) + MIN(dsize, strlen(initial dst)).
+ * will be copied.  Always NUL terminates (unless dsize <= strnlen(dst)).
+ * Returns strnlen(src) + MIN(dsize, strnlen(initial dst)).
  * If retval >= dsize, truncation occurred.
  */
 static inline size_t
@@ -91,7 +91,7 @@ strlcat(char *dst, const char *src, size_t dsize)
 	n = dsize - dlen;
 
 	if (n-- == 0)
-		return(dlen + strlen(src));
+		return(dlen + strnlen(src,dsize-1));
 	while (*src != '\0') {
 		if (n != 0) {
 			*dst++ = *src;

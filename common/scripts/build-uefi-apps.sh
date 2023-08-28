@@ -54,8 +54,10 @@ UEFI_TOOLCHAIN=GCC5
 UEFI_BUILD_MODE=DEBUG
 TARGET_ARCH=AARCH64
 KEYS_DIR=$TOP_DIR/security-interface-extension-keys
+
 BUILD_PLAT=$1
 BUILD_TYPE=$2
+
 # if BBR standalone build
 if [[ $BUILD_TYPE = S ]]; then
     . $TOP_DIR/../../common/config/bbr_common_config.cfg
@@ -63,9 +65,11 @@ else
     # source common config if arm-systemready ACS build
     . $TOP_DIR/../../common/config/sr_es_common_config.cfg
 fi
+
 if [[ $arch != "aarch64" ]]; then
     CROSS_COMPILE=$TOP_DIR/$GCC
 fi
+
 if [ $BUILD_PLAT = SR ]; then
    BUILD_PLAT=ES
 fi
@@ -113,6 +117,7 @@ do_build()
     #Build base tools
     source $TOP_DIR/$UEFI_PATH/edksetup.sh
     make -C $TOP_DIR/$UEFI_PATH/BaseTools
+
     build -a AARCH64 -t GCC5 -p MdeModulePkg/MdeModulePkg.dsc
     popd
 }
@@ -133,9 +138,12 @@ do_clean()
 
 do_package ()
 {
+    echo "Packaging CapsuleApp...";
+
     if [ $BUILD_TYPE = F ]; then
         sbsign --key $KEYS_DIR/TestDB1.key --cert $KEYS_DIR/TestDB1.crt $TOP_DIR/$UEFI_PATH/Build/MdeModule/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/CapsuleApp.efi --output $TOP_DIR/$UEFI_PATH/Build/MdeModule/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/CapsuleApp.efi
     fi
+
     if [ -f $TOP_DIR/$UEFI_PATH/Build/MdeModule/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/CapsuleApp.efi ]; then
      echo "CapsuleApp.efi successfully generated at $TOP_DIR/$UEFI_PATH/Build/MdeModule/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/CapsuleApp.efi"
     else
