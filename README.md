@@ -42,6 +42,10 @@ To run SCT manually, follow these steps:
 
 You can also select and run tests individually. For more information on running the tests, see the [SCT User Guide](http://www.uefi.org/testtools).
 
+#### Note:
+
+> For BBR ACS UEFI-SCT testlists for SBBR, EBBR and BBSR recipes, see the [Documentaion directory](./docs/).
+
 ### Manual intervention tests
 Some SCT tests for the ACS require manual intervention or interaction.
 To run the tests, follow these steps.
