@@ -359,7 +359,9 @@ BBTestGetCapabilityConformanceTestCheckpoint2 (
       StandardLib->RecordMessage (
                      StandardLib,
                      EFI_VERBOSE_LEVEL_DEFAULT,
-                     L"\r\nTCG2 Protocol GetCapability Test: ActivePcrBanks is not a subset of HashAlgorithmBitmap"
+                     L"\r\nTCG2 Protocol GetCapability Test: ActivePcrBanks is not a subset of HashAlgorithmBitmap. Reported ActivePcrBanks:0x%x HashAlgorithmBitmap=0x%x",
+                     BootServiceCap.ActivePcrBanks,
+                     BootServiceCap.HashAlgorithmBitmap
                      );
       AssertionType = EFI_TEST_ASSERTION_FAILED;
     }
