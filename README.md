@@ -11,7 +11,7 @@ The BBR test suites check for compliance against the SBBR and EBBR specification
   - Firmware Test Suite (FWTS)
 
 ## Release details
-- Code Quality: v1.0.4
+- Code Quality: v1.0.5
 - The SBBR tests are written for version 1.0 of the BBR specification.
 - The EBBR tests are written for version 2.0 of the BBR specification.
 - The compliance suite is not a substitute for design verification.
