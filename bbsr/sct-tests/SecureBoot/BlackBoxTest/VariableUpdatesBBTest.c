@@ -233,7 +233,7 @@ VariableUpdatesTestCheckpoint1 (
   // Test KEK update with unsigned data, expect security violation
   //
 
-  FileName = L"TestImage1.bin";
+  FileName = L"unsignedKeyUpdate.auth";
   Status = OpenFileAndGetSize (
              FileName,
              &KeyFHandle,
@@ -242,7 +242,7 @@ VariableUpdatesTestCheckpoint1 (
 
   if (EFI_ERROR(Status)) {
     EFI_TEST_GENERIC_FAILURE(
-      L"SecureBoot - Verify unsigned KEK update: OpenFileAndGetSize() failed for TestImage1.bin",
+      L"SecureBoot - Verify unsigned KEK update: OpenFileAndGetSize() failed for unsignedKeyUpdate.auth",
       Status);
     return EFI_NOT_FOUND;
   }
@@ -252,7 +252,7 @@ VariableUpdatesTestCheckpoint1 (
   if (Buffer == NULL) {
     KeyFHandle->Close (KeyFHandle);
     EFI_TEST_GENERIC_FAILURE(
-      L"SecureBoot - Verify unsigned KEK update: Failed to allocate buffer for TestImage1.bin",
+      L"SecureBoot - Verify unsigned KEK update: Failed to allocate buffer for unsignedKeyUpdate.auth",
       Status);
     return EFI_OUT_OF_RESOURCES;
   }
@@ -269,7 +269,7 @@ VariableUpdatesTestCheckpoint1 (
     KeyFHandle->Close (KeyFHandle);
     gtBS->FreePool (Buffer);
     EFI_TEST_GENERIC_FAILURE(
-      L"SecureBoot - Verify unsigned KEK update: Failed to read TestImage1.bin",
+      L"SecureBoot - Verify unsigned KEK update: Failed to read unsignedKeyUpdate.auth",
       Status);
     return EFI_LOAD_ERROR;
   }
@@ -452,7 +452,7 @@ VariableUpdatesTestCheckpoint2 (
   // Test db update with unsigned data
   //
 
-  FileName = L"TestImage1.bin";
+  FileName = L"unsignedKeyUpdate.auth";
   //
   // read the key data into memory.
   //
@@ -464,7 +464,7 @@ VariableUpdatesTestCheckpoint2 (
 
   if (EFI_ERROR(Status)) {
     EFI_TEST_GENERIC_FAILURE(
-      L"SecureBoot - Verify unsigned db update: OpenFileAndGetSize() failed for TestImage1.bin",
+      L"SecureBoot - Verify unsigned db update: OpenFileAndGetSize() failed for unsignedKeyUpdate.auth",
       Status);
     return EFI_NOT_FOUND;
   }
@@ -474,7 +474,7 @@ VariableUpdatesTestCheckpoint2 (
   if (Buffer == NULL) {
     KeyFHandle->Close (KeyFHandle);
     EFI_TEST_GENERIC_FAILURE(
-      L"SecureBoot - Verify unsigned db update: Failed to allocate buffer for TestImage1.bin",
+      L"SecureBoot - Verify unsigned db update: Failed to allocate buffer for unsignedKeyUpdate.auth",
       Status);
     return EFI_OUT_OF_RESOURCES;
   }
@@ -491,7 +491,7 @@ VariableUpdatesTestCheckpoint2 (
     KeyFHandle->Close (KeyFHandle);
     gtBS->FreePool (Buffer);
     EFI_TEST_GENERIC_FAILURE(
-      L"SecureBoot - Verify unsigned db update: Failed to read TestImage1.bin",
+      L"SecureBoot - Verify unsigned db update: Failed to read unsignedKeyUpdate.auth",
       Status);
     return EFI_LOAD_ERROR;
   }
@@ -821,7 +821,7 @@ VariableUpdatesTestCheckpoint3 (
   // Test dbx update with unsigned data
   //
 
-  FileName = L"TestImage1.bin";
+  FileName = L"unsignedKeyUpdate.auth";
 
   //
   // read the key data into memory.
@@ -834,7 +834,7 @@ VariableUpdatesTestCheckpoint3 (
 
   if (EFI_ERROR(Status)) {
     EFI_TEST_GENERIC_FAILURE(
-      L"SecureBoot - Verify unsigned dbx update: OpenFileAndGetSize() failed for TestImage1.bin",
+      L"SecureBoot - Verify unsigned dbx update: OpenFileAndGetSize() failed for unsignedKeyUpdate.auth",
       Status);
     return EFI_NOT_FOUND;
   }
@@ -844,7 +844,7 @@ VariableUpdatesTestCheckpoint3 (
   if (Buffer == NULL) {
     KeyFHandle->Close (KeyFHandle);
     EFI_TEST_GENERIC_FAILURE(
-      L"SecureBoot - Verify unsigned dbx update: Failed to allocate buffer for TestImage1.bin",
+      L"SecureBoot - Verify unsigned dbx update: Failed to allocate buffer for unsignedKeyUpdate.auth",
       Status);
     return EFI_OUT_OF_RESOURCES;
   }
@@ -861,7 +861,7 @@ VariableUpdatesTestCheckpoint3 (
     KeyFHandle->Close (KeyFHandle);
     gtBS->FreePool (Buffer);
     EFI_TEST_GENERIC_FAILURE(
-      L"SecureBoot - Verify unsigned dbx update: Failed to read TestImage1.bin",
+      L"SecureBoot - Verify unsigned dbx update: Failed to read unsignedKeyUpdate.auth",
       Status);
     return EFI_LOAD_ERROR;
   }
