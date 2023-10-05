@@ -50,7 +50,7 @@ TEST_PK1_CRT=$(BIN_DIR)/SecureBoot_TestPK1.crt
 TEST_PK1_KEY=$(BIN_DIR)/SecureBoot_TestPK1.key
 endif
 
-all: $(TEST_KEYS) TestKEK2 TestKEK3 KEKSigList1.auth KEKSigList3.auth TestImage1.bin TestImage2.bin TestImage3.bin TestImage4.bin TestImage5.bin TestImage6.bin TestImage7.bin TestImage8.bin TestImage9.bin TestImage10.bin NullKEK.auth NullDB.auth NullDBX.auth TestKEK1.auth TestDB1.auth TestDBX1.auth SignCert1 dbSigList1.auth SignCert2 SignCert3 SignCert4 RevokedCert1 RevokedCert2 RevokedCert3 RevokedCert4 dbSigList2.auth dbSigList3.auth dbSigList4.auth dbxRevokedList1.auth dbSigList5.auth
+all: $(TEST_KEYS) TestKEK2 TestKEK3 KEKSigList1.auth KEKSigList3.auth TestImage1.bin TestImage2.bin TestImage3.bin TestImage4.bin TestImage5.bin TestImage6.bin TestImage7.bin TestImage8.bin TestImage9.bin TestImage10.bin NullKEK.auth NullDB.auth NullDBX.auth TestKEK1.auth TestDB1.auth TestDBX1.auth SignCert1 dbSigList1.auth SignCert2 SignCert3 SignCert4 RevokedCert1 RevokedCert2 RevokedCert3 RevokedCert4 dbSigList2.auth dbSigList3.auth dbSigList4.auth dbxRevokedList1.auth dbSigList5.auth unsignedKeyUpdate
 
 TestImage1.bin:
 	cp $(SOURCE_DIR)/Application1.efi $(TARGET)_$(@)
@@ -210,6 +210,12 @@ dbxRevokedList1.auth: RevokedCert1 RevokedCert2 RevokedCert3 RevokedCert4
 dbSigList5.auth: Sign_Cert5
 	cert-to-efi-sig-list $(BIN_DIR)/SecureBoot_Sign_Cert5.crt $(BIN_DIR)/SecureBoot_TestDB10.esl
 	sign-efi-sig-list -a -c $(BIN_DIR)/SecureBoot_TestKEK3.crt -k $(BIN_DIR)/SecureBoot_TestKEK3.key -t "$(FUTURE_DATE4)" db $(BIN_DIR)/SecureBoot_TestDB10.esl $(BIN_DIR)/SecureBoot_DBSigList5.auth
+
+unsignedKeyUpdate:
+	openssl req -x509 -sha256 -newkey rsa:2048 -subj /CN=ACS_UNSIGNED_KEY/ -keyout $(TARGET)_$(@).key -out $(TARGET)_$(@).crt -nodes -days 4000
+	cert-to-efi-sig-list $(TARGET)_$(@).crt $(TARGET)_$(@).esl
+	# exporting a .auth file without signing it with PK or KEK for testing purposes
+	mv $(TARGET)_$(@).esl $(TARGET)_$(@).auth
 
 clean:
 	$(RM) $(BIN_DIR)/$(TARGET)_*.key
