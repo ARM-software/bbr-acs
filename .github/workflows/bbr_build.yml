@@ -1,0 +1,75 @@
+name: Build EBBR and SBBR images
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: '30 17 * * *'
+  workflow_dispatch:
+
+jobs:
+  build_image:
+    name: Build EBBR and SBBR images
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        env:
+        - ARCH: x86_64
+    steps:
+    - name: Maximize build space
+      uses: easimon/maximize-build-space@master
+      with:
+        remove-dotnet: 'true'
+        remove-android: 'true'
+        remove-haskell: 'true'
+        remove-codeql: 'true'
+        remove-docker-images: 'true'
+    - name: Checkout BBR repository
+      uses: actions/checkout@v3
+      with:
+        path: 'bbr-acs'
+    - name: Get required source codes and tools for EBBR
+      run: |
+        cd bbr-acs/ebbr/scripts  
+        ./build-scripts/get_ebbr_source.sh  
+    - name: Build EBBR
+      run: |
+        cd bbr-acs/ebbr/scripts 
+        ./build-scripts/build_ebbr.sh 
+    - name: Check for AARCH64_SCT (EBBR)
+      run: |
+        if [ ! -e "bbr-acs/ebbr/scripts/edk2-test/uefi-sct/AARCH64_SCT" ]; then
+          echo "AARCH64_SCT not found for EBBR, raising an error."
+          exit 1
+        fi
+    - name: Check for CapsuleApp.efi (EBBR)
+      run: |
+        if [ ! -e "bbr-acs/ebbr/scripts/edk2/Build/MdeModule/DEBUG_GCC5/AARCH64/CapsuleApp.efi" ]; then
+          echo "CapsuleApp.efi not found for EBBR, raising an error."
+          exit 1
+        fi
+    - name: Get required source codes and tools for SBBR
+      run: |
+        cd $GITHUB_WORKSPACE  # Go back to the root directory of the repository
+        cd bbr-acs/sbbr/scripts
+        ./build-scripts/get_sbbr_source.sh
+    - name: Build SBBR
+      run: |
+        cd bbr-acs/sbbr/scripts
+        ./build-scripts/build_sbbr.sh
+    - name: Check for AARCH64_SCT (SBBR)
+      run: |
+        if [ ! -e "bbr-acs/sbbr/scripts/edk2-test/uefi-sct/AARCH64_SCT" ]; then
+          echo "AARCH64_SCT not found for SBBR, raising an error."
+          exit 1
+        fi
+    - name: Check for CapsuleApp.efi (SBBR)
+      run: |
+        if [ ! -e "bbr-acs/sbbr/scripts/edk2/Build/MdeModule/DEBUG_GCC5/AARCH64/CapsuleApp.efi" ]; then
+          echo "CapsuleApp.efi not found for SBBR, raising an error."
+          exit 1
+        fi
