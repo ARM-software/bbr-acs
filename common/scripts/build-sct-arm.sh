@@ -88,7 +88,6 @@ do_build()
     cp -r $SBBR_TEST_DIR/SbbrEfiSpecVerLvl         uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/
     cp -r $SBBR_TEST_DIR/SbbrRequiredUefiProtocols uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/
     cp -r $SBBR_TEST_DIR/SbbrSysEnvConfig          uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/
-    cp -r $SBBR_TEST_DIR/SBBRRuntimeServices       uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/
     cp $SBBR_TEST_DIR/BBR_SCT_arm.dsc              uefi-sct/SctPkg/UEFI/
     cp $SBBR_TEST_DIR/build_bbr_arm.sh             uefi-sct/SctPkg/
     

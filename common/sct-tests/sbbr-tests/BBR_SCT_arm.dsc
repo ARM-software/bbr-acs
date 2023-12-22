@@ -594,9 +594,6 @@ SctPkg/TestCase/UEFI/EFI/BootServices/SbbrBootServices/BlackBoxTest/SbbrBootServ
 #
 ## 12. EFI_SET_VIRTUAL_ADDRESS_MAP
 ## 13. EFI_CONVERT_POINTER
-SctPkg/TestCase/UEFI/EFI/RuntimeServices/SBBRRuntimeServices/BlackBoxTest/SBBRRuntimeServicesBBTest.inf
-# End of Runtime Services Tests - SBBR v1.0 Appendix B
-
 #
 # UEFI Required Protocols Tests - SBBR Appendix C
 #

@@ -1,8 +1,8 @@
 diff --git a/uefi-sct/SctPkg/CommonGenFramework.sh b/uefi-sct/SctPkg/CommonGenFramework.sh
-index fb9043b5..5e8a3331 100755
+index fb9043b5..16634636 100755
 --- a/uefi-sct/SctPkg/CommonGenFramework.sh
 +++ b/uefi-sct/SctPkg/CommonGenFramework.sh
-@@ -342,4 +342,194 @@ then
+@@ -342,4 +342,191 @@ then
    CopyDependency Ebc
    CopyDependency PxeBaseCode
  fi
@@ -44,7 +44,7 @@ index fb9043b5..5e8a3331 100755
 +    cp $ProcessorType/VariableServicesBBTest.efi               $Framework/Test/ > NUL
 +    cp $ProcessorType/TimeServicesBBTest.efi                   $Framework/Test/ > NUL
 +    cp $ProcessorType/MiscRuntimeServicesBBTest.efi            $Framework/Test/ > NUL
-+
+ 
 +    cp $ProcessorType/BisBBTest.efi                            $Framework/Test/ > NUL
 +    cp $ProcessorType/BlockIoBBTest.efi                        $Framework/Test/ > NUL
 +    cp $ProcessorType/BlockIo2BBTest.efi                       $Framework/Test/ > NUL
@@ -144,10 +144,7 @@ index fb9043b5..5e8a3331 100755
 +    cp $ProcessorType/SbbrBootServicesBBTest.efi               $Framework/Test/ > NUL
 +
 +    # Check if EFI Specification Version is 2.5 or greater
-+    cp $ProcessorType/EfiSpecVerLvlBBTest.efi                  $Framework/Test/ > NUL
-+
-+    # Runtime Services Tests - SBBR v1.0 Appendix B
-+    cp $ProcessorType/SBBRRuntimeServicesBBTest.efi            $Framework/Test/ > NUL
++    cp $ProcessorType/EfiSpecVerLvlBBTest.efi                  $Framework/Test/ > NULq
 +
 +    # Tests SBBR Appendix C
 +    cp $ProcessorType/RequiredUefiProtocolsBBTest.efi          $Framework/Test/ > NUL
@@ -184,7 +181,7 @@ index fb9043b5..5e8a3331 100755
 +    # *********************************************
 +    # Copy the test dependency files
 +    # *********************************************
- 
++
 +    CopyDependency EfiCompliant
 +    CopyDependency ProtocolHandlerServices
 +    CopyDependency ImageServices
@@ -199,7 +196,7 @@ index fb9043b5..5e8a3331 100755
 +fi
 \ No newline at end of file
 diff --git a/uefi-sct/SctPkg/Config/Data/Category.ini b/uefi-sct/SctPkg/Config/Data/Category.ini
-index b34d35db..ba7b239f 100644
+index b34d35db..ac4f6013 100644
 --- a/uefi-sct/SctPkg/Config/Data/Category.ini
 +++ b/uefi-sct/SctPkg/Config/Data/Category.ini
 @@ -88,6 +88,27 @@ InterfaceGuid = 71652D04-BF38-434A-BCB8-6547D7FD8384
@@ -244,21 +241,7 @@ index b34d35db..ba7b239f 100644
  [Category Data]
  Revision      = 0x00010000
  CategoryGuid  = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
-@@ -165,6 +193,13 @@ InterfaceGuid = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
- Name          = RuntimeServicesTest\MiscRuntimeServicesTest
- Description   =
- 
-+[Category Data]
-+Revision      = 0x00010000
-+CategoryGuid  = 52A69BBF-E19F-4e82-93D6-AAC46E2E1E06
-+InterfaceGuid = AFF115FB-387B-4c18-8C41-6AFC7F03BB90
-+Name          = RuntimeServicesTest\SBBRRuntimeServicesTest
-+Description   = SBBR Runtime Services Tests
-+
- [Category Data]
- Revision      = 0x00010000
- CategoryGuid  = 5B1B31A1-9562-11D2-8E3F-00A0C969723B
-@@ -1026,9 +1061,9 @@ InterfaceGuid = 8D59D32B-C655-4AE9-9B15-F25904992A43
+@@ -1026,9 +1054,9 @@ InterfaceGuid = 8D59D32B-C655-4AE9-9B15-F25904992A43
  Name          = IHV\ConsoleSupportTest\AbsolutePointerProtocolTest
  Description   = Absolute Pointer Protocol Test on IHV Drivers
  
