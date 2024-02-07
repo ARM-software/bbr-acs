@@ -2,7 +2,7 @@
 
   Copyright 2006 - 2016 Unified EFI, Inc.<BR>
   Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
-  Copyright 2021, Arm LTD.
+  Copyright 2021, 2024, Arm LTD.
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -102,3 +102,9 @@ EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid015 = EFI_TEST_SECUREBOOTIMAG
 EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid016 = EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_016_GUID;
 
 EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid017 = EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_017_GUID;
+
+EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid018 = EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_018_GUID;
+
+EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid019 = EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_019_GUID;
+
+EFI_GUID gSecureBootImageLoadingBbTestAssertionGuid020 = EFI_TEST_SECUREBOOTIMAGELOADING_ASSERTION_020_GUID;
