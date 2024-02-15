@@ -179,12 +179,7 @@ BBTestRuntimeServices (
                  L"  ConvertPointer            : %X\n"
                  L"  GetVariable               : %X\n"
                  L"  GetNextVariableName       : %X\n"
-                 L"  SetVariable               : %X\n"
-                 L"  GetNextHighMonotonicCount : %X\n"
-                 L"  ResetSystem               : %X\n"
-                 L"  QueryVariableInfo         : %X\n"
-                 L"  QueryCapsuleCapabilities  : %X\n"
-                 L"  UpdateCapsule             : %X\n",
+                 L"  SetVariable               : %X\n",
                  gtRT->GetTime,
                  gtRT->SetTime,
                  gtRT->GetWakeupTime,
@@ -193,7 +188,17 @@ BBTestRuntimeServices (
                  gtRT->ConvertPointer,
                  gtRT->GetVariable,
                  gtRT->GetNextVariableName,
-                 gtRT->SetVariable,
+                 gtRT->SetVariable
+                 );
+
+  StandardLib->RecordMessage (
+                 StandardLib,
+                 EFI_VERBOSE_LEVEL_DEFAULT,
+                 L"  GetNextHighMonotonicCount : %X\n"
+                 L"  ResetSystem               : %X\n"
+                 L"  QueryVariableInfo         : %X\n"
+                 L"  QueryCapsuleCapabilities  : %X\n"
+                 L"  UpdateCapsule             : %X\n",
                  gtRT->GetNextHighMonotonicCount,
                  gtRT->ResetSystem,
                  gtRT->QueryVariableInfo,
