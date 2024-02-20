@@ -2,8 +2,7 @@
 
   Copyright 2006 - 2017 Unified EFI, Inc.<BR>
   Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2021, Arm Inc. All rights reserved.<BR>
-
+  Copyright (c) 2021 - 2024, Arm Inc. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -31,8 +30,6 @@ Abstract:
 
 #define EFI_TCG2_TEST_REVISION 0x00010000
 
-extern EFI_HANDLE   mImageHandle;
-
 //////////////////////////////////////////////////////////////////////////////
 //
 // Entry GUIDs for Function Test
@@ -57,38 +54,63 @@ extern EFI_HANDLE   mImageHandle;
 
 #define PE_COFF_IMAGE 0x0000000000000010
 
-// ST_NO_SESSION as definied in Table 19 of TPM Library Part 2: Structures
+// ST_NO_SESSION as defined in Table 19 of TPM Library Part 2: Structures
 #define ST_NO_SESSIONS (UINT16) 0x8001
 
-// TPM_RC_SUCCESS as definied in Table 16 of TPM Library Spec Part 2: Structures
+// TPM_RC_SUCCESS as defined in Table 16 of TPM Library Spec Part 2: Structures
 #define TPM_RC_SUCCESS (UINT32) 0x0000000
 
-// TPM_CC_GetRandom as definied in Table 12 of TPM Library Spec Part 2: Structures
-#define TPM_CC_GetRandom (UINT32) 0x0000017B
+// TPM_CC_Hash as defined in Table 12 of TPM Library Spec Part 2: Structures
+#define TPM_CC_Hash    (UINT32)(0x0000017D)
+
+#define TPM_RH_NULL    (UINT32) 0x40000007
+
+#define TPM_ALG_SHA256 (UINT16) 0x000B
+
+#define SHA256_LENGTH (UINT16) 0x0020
 
 #pragma pack(1)
-// TPM2B_DIGEST as definied in Table 73 of TPM Library Spec Part 2: Structures
+// TPM2B_MAX_BUFFER as defined in Table 86 of TPM Library Spec Part 2: Structures
+// Size of buffer in spec is variable length, but hash test will always use a fixed length string
+// of length 43
+#define TEST_STRING_LEN 43
 typedef struct {
   UINT16 size;
-  UINT8  digest[8];  // Size of buffer in spec is defined to be variable length but for this test will always be 8
+  UINT8  buffer[TEST_STRING_LEN];
+} TPM2B_MAX_BUFFER;
+
+#pragma pack(1)
+// TPM2B_DIGEST as defined in Table 73 of TPM Library Spec Part 2: Structures
+typedef struct {
+  UINT16 size;
+  UINT8  digest[32];  // Size of buffer in spec is defined to be variable length but for this test will always be 32
 } TPM2B_DIGEST;
 
-// GetRandomCommand Structure as defined in Sectin 16.1 of TPM Spec Part 3: Commands
+typedef struct {
+  UINT16           tag;
+  UINT32           hierarchy;
+  UINT16           digest;  // Size of buffer in spec is defined to be variable length but for this test will always be UINT16
+} TPMT_TK_HASHCHECK;
+
+// TPM2_Hash command Structure as defined in Section 15.4 of TPM Spec Part 3: Commands
 typedef struct {
   UINT16 Tag;
   UINT32 CommandSize;
   UINT32 CommandCode;
-  UINT16 BytesRequested;
-} GET_RANDOM_COMMAND;
+  TPM2B_MAX_BUFFER data;
+  UINT16 hashAlg;
+  UINT32 hierarchy;
+} TPM2_HASH_COMMAND;
 
-// GetRandomResponse Structure as defined in Sectin 16.1 of TPM Spec Part 3: Commands
+// TPM2_Hash Response Structure as defined in Section 15.4 of TPM Spec Part 3: Commands
 typedef struct {
   UINT16 Tag;
   UINT32 ResponseSize;
   UINT32 ResponseCode;
-  TPM2B_DIGEST randomBytes;
-} GET_RANDOM_RESPONSE;
-#pragma
+  TPM2B_DIGEST data;
+  TPMT_TK_HASHCHECK validation;
+} TPM2_HASH_RESPONSE;
+#pragma pack()
 
 EFI_STATUS
 EFIAPI
@@ -145,13 +167,13 @@ BBTestHashLogExtendEventConformanceTestCheckpoint2 (
   );
 
 EFI_STATUS
-BBTestHashLogExtendEventConformanceTestCheckpoint3 (
+BBTestGetEventLogConformanceTestCheckpoint1 (
   IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
   IN EFI_TCG2_PROTOCOL                     *TCG2
   );
 
 EFI_STATUS
-BBTestHashLogExtendEventConformanceTestCheckpoint4 (
+BBTestGetEventLogConformanceTestCheckpoint2 (
   IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL    *StandardLib,
   IN EFI_TCG2_PROTOCOL                     *TCG2
   );
