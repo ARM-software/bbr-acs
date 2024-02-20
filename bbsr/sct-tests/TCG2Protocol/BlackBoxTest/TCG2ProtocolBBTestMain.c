@@ -2,8 +2,7 @@
 
   Copyright 2006 - 2017 Unified EFI, Inc.<BR>
   Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2021, Arm Inc. All rights reserved.<BR>
-
+  Copyright (c) 2021 - 2023, Arm Inc. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -25,8 +24,6 @@ Abstract:
 --*/
 
 #include "TCG2ProtocolBBTest.h"
-
-EFI_HANDLE      mImageHandle;
 
 EFI_BB_TEST_PROTOCOL_FIELD gBBTestProtocolField = {
   EFI_TCG2_TEST_REVISION,
@@ -77,7 +74,6 @@ EFI_BB_TEST_ENTRY_FIELD gBBTestEntryField[] = {
     EFI_TEST_CASE_AUTO,
     BBTestSubmitCommandConformanceTest
   },
-
   0
 };
 
@@ -105,8 +101,6 @@ InitializeBBTestTCG2Protocol (
   // initialize test utility lib
   //
   SctInitializeLib (ImageHandle, SystemTable);
-
-  mImageHandle = ImageHandle;
 
   return EfiInitAndInstallBBTestInterface (
            &ImageHandle,
