@@ -2,8 +2,7 @@
 
   Copyright 2006 - 2013 Unified EFI, Inc.<BR>
   Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2021, Arm Inc. All rights reserved.<BR>
-
+  Copyright (c) 2021 - 2024, Arm Inc. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -60,3 +59,5 @@ EFI_GUID gTcg2ConformanceTestAssertionGuid014 = EFI_TEST_TCG2CONFORMANCE_ASSERTI
 EFI_GUID gTcg2ConformanceTestAssertionGuid015 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_015_GUID;
 
 EFI_GUID gTcg2ConformanceTestAssertionGuid016 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_016_GUID;
+
+EFI_GUID gTcg2ConformanceTestAssertionGuid017 = EFI_TEST_TCG2CONFORMANCE_ASSERTION_017_GUID;

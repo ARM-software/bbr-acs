@@ -2,8 +2,7 @@
 
   Copyright 2006 - 2016 Unified EFI, Inc.<BR>
   Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2021, Arm Inc. All rights reserved.<BR>
-
+  Copyright (c) 2021 - 2024, Arm Inc. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -27,11 +26,16 @@ Abstract:
 --*/
 
 
+#ifndef __TCG2_PROTOCOL_H__
+#define __TCG2_PROTOCOL_H__
+
 //
 // Global ID for the TCG2 Protocol
+//
 #define EFI_TCG2_PROTOCOL_GUID    \
    {0x607f766c, 0x7455, 0x42be, {0x93, 0x0b, 0xe4, 0xd7, 0x6d, 0xb2, 0x72, 0x0f}}
 
+// Following defintions come from TCG2 Efi Protocol Spec
 #define EFI_TCG2_BOOT_HASH_ALG_SHA1 0x00000001
 
 #define EFI_TCG2_BOOT_HASH_ALG_SHA256 0x00000002
@@ -42,14 +46,13 @@ Abstract:
 
 #define EFI_TCG2_BOOT_HASH_ALG_SM3_256 0x00000010
 
-typedef struct _EFI_TCG2_PROTOCOL EFI_TCG2_PROTOCOL;
-
 #define EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2 0x00000001
 
 #define EFI_TCG2_EVENT_LOG_FORMAT_TCG_2 0x00000002
+
 #define HASH_NUMBER 0x04
 
-typedef UINT64 EFI_PHYSICAL_ADDRESS;
+typedef struct _EFI_TCG2_PROTOCOL EFI_TCG2_PROTOCOL;
 
 typedef UINT32 EFI_TCG2_EVENT_LOG_BITMAP;
 
@@ -57,6 +60,11 @@ typedef UINT32 EFI_TCG2_EVENT_LOG_FORMAT;
 
 typedef UINT32 EFI_TCG2_EVENT_ALGORITHM_BITMAP;
 
+typedef UINT32 TCG_PCRINDEX;
+
+typedef UINT32 TCG_EVENTTYPE;
+
+// Following struct defintions come from TCG2 Efi Protocol Spec
 typedef struct {
   UINT8 Major;
   UINT8 Minor;
@@ -93,11 +101,9 @@ EFI_STATUS
   OUT BOOLEAN *EventLogTruncated
 );
 
-typedef UINT32 TCG_PCRINDEX;
-
-typedef UINT32 TCG_EVENTTYPE;
-
+// all structs except EFI_TCG2_BOOT_SERVICE_CAPABILITY are packed
 #pragma pack(1)
+
 typedef struct tdEFI_TCG2_EVENT_HEADER {
   UINT32 HeaderSize;
   UINT16 HeaderVersion;
@@ -120,7 +126,6 @@ typedef struct tdTPML_DIGEST_VALUES {
   UINT32 Count;                    // number of digests
   TPMT_HA Digests[HASH_NUMBER];    // Count digests
 } TPML_DIGEST_VALUES;
-
 
 // This Declaration is for parsing the eventlog header which is defined to be 20 bytes in TCG EFI Protocol Spec
 typedef UINT8 TCG_DIGEST[20];
@@ -155,6 +160,7 @@ typedef struct tdTCG_EfiSpecIdEventStruct {
    UINT8 specErrata;
    UINT8 uintnSize;
 } TCG_EfiSpecIDEventStruct;
+
 #pragma pack()
 
 typedef
@@ -201,6 +207,7 @@ EFI_STATUS
 
 //
 // Interface structure for the TCG2 Protocol
+//
 struct _EFI_TCG2_PROTOCOL {
   EFI_TCG2_GET_CAPABILITY GetCapability;
   EFI_TCG2_GET_EVENT_LOG GetEventLog;
@@ -213,3 +220,4 @@ struct _EFI_TCG2_PROTOCOL {
 
 extern EFI_GUID gEfiTcg2ProtocolGuid;
 
+#endif
