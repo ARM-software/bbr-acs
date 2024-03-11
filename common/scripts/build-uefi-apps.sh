@@ -75,9 +75,9 @@ if [ $BUILD_PLAT = SR ]; then
 fi
 
 #Currently the BUILD_PLAT flag is not used. For future use
-if ! [[ $BUILD_PLAT = IR ]] && ! [[ $BUILD_PLAT = ES ]] && ! [[ $BUILD_PLAT = SIE ]]; then
+if ! [[ $BUILD_PLAT = IR ]] && ! [[ $BUILD_PLAT = ES ]]; then
     echo "Please provide a target."
-    echo "Usage $0 <IR/ES/SIE> <BUILD_TYPE>"
+    echo "Usage $0 <IR/ES> <BUILD_TYPE>"
     echo "S->Standalone BBR,F->Full systemready"
     exit
 fi
