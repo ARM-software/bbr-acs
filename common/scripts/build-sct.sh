@@ -79,9 +79,9 @@ if [ $BUILD_PLAT = SR ]; then
    BUILD_PLAT=ES
 fi
 
-if ! [[ $BUILD_PLAT = IR ]] && ! [[ $BUILD_PLAT = ES ]] && ! [[ $BUILD_PLAT = SIE ]]  ; then
+if ! [[ $BUILD_PLAT = IR ]] && ! [[ $BUILD_PLAT = ES ]]  ; then
     echo "Please provide a target."
-    echo "Usage build-sct.sh <IR/ES/SIE> <BUILD_TYPE>"
+    echo "Usage build-sct.sh <IR/ES> <BUILD_TYPE>"
     exit
 fi
 
@@ -129,21 +129,20 @@ do_build()
     source $TOP_DIR/$UEFI_PATH/edksetup.sh
     make -C $TOP_DIR/$UEFI_PATH/BaseTools
     #Copy over extra files needed for SBBR tests
-    if [[ $BUILD_PLAT != SIE ]] ; then
-        cp -r $SBBR_TEST_DIR/SbbrBootServices uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/
-        cp -r $SBBR_TEST_DIR/SbbrEfiSpecVerLvl $SBBR_TEST_DIR/SbbrRequiredUefiProtocols $SBBR_TEST_DIR/SbbrSysEnvConfig uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/
-        cp -r $SBBR_TEST_DIR/SBBRRuntimeServices uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/
-        cp $SBBR_TEST_DIR/BBR_SCT.dsc uefi-sct/SctPkg/UEFI/
-        cp $SBBR_TEST_DIR/build_bbr.sh uefi-sct/SctPkg/
+    cp -r $SBBR_TEST_DIR/SbbrBootServices uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/
+    cp -r $SBBR_TEST_DIR/SbbrEfiSpecVerLvl $SBBR_TEST_DIR/SbbrRequiredUefiProtocols $SBBR_TEST_DIR/SbbrSysEnvConfig uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/
+    cp -r $SBBR_TEST_DIR/SBBRRuntimeServices uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/
+    cp $SBBR_TEST_DIR/BBR_SCT.dsc uefi-sct/SctPkg/UEFI/
+    cp $SBBR_TEST_DIR/build_bbr.sh uefi-sct/SctPkg/
 
-        # copy SIE SCT tests to edk2-test
-        if [[ $BUILD_TYPE != S ]]; then
-            cp -r $BBSR_TEST_DIR/BBSRVariableSizeTest uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices
-            cp -r $BBSR_TEST_DIR/SecureBoot uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices
-            cp -r $BBSR_TEST_DIR/TCG2Protocol uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol
-            cp -r $BBSR_TEST_DIR/TCG2.h uefi-sct/SctPkg/UEFI/Protocol
-        fi
+    # copy SIE SCT tests to edk2-test
+    if [[ $BUILD_TYPE != S ]]; then
+        cp -r $BBSR_TEST_DIR/BBSRVariableSizeTest uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices
+        cp -r $BBSR_TEST_DIR/SecureBoot uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices
+        cp -r $BBSR_TEST_DIR/TCG2Protocol uefi-sct/SctPkg/TestCase/UEFI/EFI/Protocol
+        cp -r $BBSR_TEST_DIR/TCG2.h uefi-sct/SctPkg/UEFI/Protocol
     fi
+
     #Startup/runtime files.
     mkdir -p uefi-sct/SctPkg/BBR
     if [ $BUILD_PLAT = IR ]; then
@@ -167,35 +166,29 @@ do_build()
     cp $BBR_DIR/common/config/ScrtStartup.nsh uefi-sct/SctPkg/BBR/
     cp $BBR_DIR/common/config/SCRT.conf uefi-sct/SctPkg/BBR/
 
-    if [[ $BUILD_PLAT != SIE ]] ; then
-        if git apply --check $BBR_DIR/common/patches/edk2-test-bbr-build.patch; then
-            echo "Applying edk2-test BBR build patch..."
-            git apply --ignore-whitespace --ignore-space-change $BBR_DIR/common/patches/edk2-test-bbr-build.patch
+    if git apply --check $BBR_DIR/common/patches/edk2-test-bbr-build.patch; then
+        echo "Applying edk2-test BBR build patch..."
+        git apply --ignore-whitespace --ignore-space-change $BBR_DIR/common/patches/edk2-test-bbr-build.patch
+    else
+        echo  "Error while applying edk2-test BBR build patch..."
+    fi
+    if git apply --check $BBR_DIR/common/patches/edk2-test-bbr.patch; then
+        echo "Applying edk2-test BBR patch..."
+        git apply --ignore-whitespace --ignore-space-change $BBR_DIR/common/patches/edk2-test-bbr.patch
+    else
+        echo  "Error while applying edk2-test BBR patch..."
+    fi
+    if [[ $BUILD_TYPE != S ]]; then
+        if git apply --check $BBR_DIR/bbsr/patches/0001-SIE-Patch-for-UEFI-SCT-Build.patch; then
+            echo "Applying SIE SCT patch..."
+            git apply --ignore-whitespace --ignore-space-change $BBR_DIR/bbsr/patches/0001-SIE-Patch-for-UEFI-SCT-Build.patch
         else
-            echo  "Error while applying edk2-test BBR build patch..."
-        fi
-        if git apply --check $BBR_DIR/common/patches/edk2-test-bbr.patch; then
-            echo "Applying edk2-test BBR patch..."
-            git apply --ignore-whitespace --ignore-space-change $BBR_DIR/common/patches/edk2-test-bbr.patch
-        else
-            echo  "Error while applying edk2-test BBR patch..."
-        fi
-        if [[ $BUILD_TYPE != S ]]; then
-            if git apply --check $BBR_DIR/bbsr/patches/0001-SIE-Patch-for-UEFI-SCT-Build.patch; then
-                echo "Applying SIE SCT patch..."
-                git apply --ignore-whitespace --ignore-space-change $BBR_DIR/bbsr/patches/0001-SIE-Patch-for-UEFI-SCT-Build.patch
-            else
-                echo  "Error while applying SIE SCT patch..."
-            fi
+            echo  "Error while applying SIE SCT patch..."
         fi
     fi
 
     pushd uefi-sct
-    if [[ $BUILD_PLAT = SIE ]] ; then
-        ./SctPkg/build.sh $TARGET_ARCH GCC $UEFI_BUILD_MODE  -n $PARALLELISM
-    else
-        ./SctPkg/build_bbr.sh $TARGET_ARCH GCC $UEFI_BUILD_MODE  -n $PARALLELISM
-    fi
+    ./SctPkg/build_bbr.sh $TARGET_ARCH GCC $UEFI_BUILD_MODE  -n $PARALLELISM
     popd
 }
 
@@ -275,13 +268,6 @@ do_package ()
         cp SctPkg/BBR/EfiCompliant_SBBR.ini ${TARGET_ARCH}_SCT/SCT/Dependency/EfiCompliantBBTest/EfiCompliant.ini
         cp SctPkg/BBR/SBBR_manual.seq ${TARGET_ARCH}_SCT/SCT/Sequence/SBBR_manual.seq
         cp SctPkg/BBR/SBBR_extd_run.seq ${TARGET_ARCH}_SCT/SCT/Sequence/SBBR_extd_run.seq
-
-
-    elif [ $BUILD_PLAT = SIE ]; then
-        cp -r Build/UefiSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}/${TARGET_ARCH}/* ${TARGET_ARCH}_SCT/SCT/
-        cp $BBR_DIR/bbsr/config/BBSRStartup.nsh ${TARGET_ARCH}_SCT/SctStartup.nsh
-        cp $BBR_DIR/bbsr/config/BBSR.seq  ${TARGET_ARCH}_SCT/SCT/Sequence
-
     else
          echo "Error: unexpected platform type"
          exit
