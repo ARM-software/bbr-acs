@@ -1,11 +1,22 @@
+From 97745aebfb31eb7b83e78f58490ec89723d547e4 Mon Sep 17 00:00:00 2001
+From: Guru9902 <gururaj.revankar@arm.com>
+Date: Fri, 22 Mar 2024 13:07:22 +0000
+Subject: [PATCH] edk2-test-bbr-build
+
+---
+ uefi-sct/SctPkg/CommonGenFramework.sh         | 191 ++++++++++++++++++
+ uefi-sct/SctPkg/Config/Data/Category.ini      |  54 ++++-
+ .../SctPkg/Library/SctGuidLib/SctGuidLib.inf  |   1 +
+ 3 files changed, 240 insertions(+), 6 deletions(-)
+
 diff --git a/uefi-sct/SctPkg/CommonGenFramework.sh b/uefi-sct/SctPkg/CommonGenFramework.sh
-index fb9043b5..5e8a3331 100755
+index fb9043b5..f2e6eff8 100755
 --- a/uefi-sct/SctPkg/CommonGenFramework.sh
 +++ b/uefi-sct/SctPkg/CommonGenFramework.sh
-@@ -342,4 +342,194 @@ then
-   CopyDependency Ebc
+@@ -343,3 +343,194 @@ then
    CopyDependency PxeBaseCode
  fi
+ 
 +# *********************************************
 +# For BBR v1.0 SCT
 +# *********************************************
@@ -16,7 +27,7 @@ index fb9043b5..5e8a3331 100755
 +    # *********************************************
 +    # Copy the UEFI 2.1 Test Cases
 +    # *********************************************
-+  
++
 +    # StartupScript items.
 +    cp ../../../SctPkg/BBR/EBBRStartup.nsh           SctPackage$ProcessorType/ > NUL
 +    cp ../../../SctPkg/BBR/SBBRStartup.nsh           SctPackage$ProcessorType/ > NUL
@@ -40,7 +51,7 @@ index fb9043b5..5e8a3331 100755
 +    cp $ProcessorType/ProtocolHandlerServicesBBTest.efi        $Framework/Test/ > NUL
 +    cp $ProcessorType/ImageServicesBBTest.efi                  $Framework/Test/ > NUL
 +    cp $ProcessorType/MiscBootServicesBBTest.efi               $Framework/Test/ > NUL
-+    
++
 +    cp $ProcessorType/VariableServicesBBTest.efi               $Framework/Test/ > NUL
 +    cp $ProcessorType/TimeServicesBBTest.efi                   $Framework/Test/ > NUL
 +    cp $ProcessorType/MiscRuntimeServicesBBTest.efi            $Framework/Test/ > NUL
@@ -85,7 +96,7 @@ index fb9043b5..5e8a3331 100755
 +#   cp $ProcessorType/UgaDrawBbTest.efi                        $Framework/Test/ > NUL
 +    cp $ProcessorType/GraphicsOutputBBTest.efi                 $Framework/Test/ > NUL
 +    cp $ProcessorType/UnicodeCollation2BBTest.efi              $Framework/Test/ > NUL
-+#Note: USB Host Controller Protocol BB is deprecated in SCT 2.3	
++#Note: USB Host Controller Protocol BB is deprecated in SCT 2.3
 +#   cp $ProcessorType/UsbHcTest.efi                            $Framework/Test/ > NUL
 +    cp $ProcessorType/UsbIoTest.efi                            $Framework/Test/ > NUL
 +    cp $ProcessorType/Usb2HcTest.efi                           $Framework/Test/ > NUL
@@ -96,7 +107,7 @@ index fb9043b5..5e8a3331 100755
 +    cp $ProcessorType/SimpleTextInputExBBTest.efi              $Framework/Test/ > NUL
 +    cp $ProcessorType/ComponentName2BBTest.efi                 $Framework/Test/ > NUL
 +    cp $ProcessorType/DriverDiagnostics2BBTest.efi             $Framework/Test/ > NUL
-+    
++
 +    cp $ProcessorType/HIIDatabaseBBTest.efi                    $Framework/Test/ > NUL
 +    cp $ProcessorType/HIIStringBBTest.efi                      $Framework/Test/ > NUL
 +    cp $ProcessorType/HIIFontBBTest.efi                        $Framework/Test/ > NUL
@@ -164,7 +175,7 @@ index fb9043b5..5e8a3331 100755
 +    cp $ProcessorType/BootService_ENTSTest.efi         $Framework/Ents/Test/    > NUL
 +    cp $ProcessorType/RuntimeService_ENTSTest.efi      $Framework/Ents/Test/    > NUL
 +    cp $ProcessorType/GenericService_ENTSTest.efi      $Framework/Ents/Test/    > NUL
-+    
++
 +    cp $ProcessorType/SimpleNetwork_ENTSTest.efi       $Framework/Ents/Test/    > NUL
 +    cp $ProcessorType/PXEBaseCode_ENTSTest.efi         $Framework/Ents/Test/    > NUL
 +    cp $ProcessorType/Mnp*_ENTSTest.efi                $Framework/Ents/Test/    > NUL
@@ -184,7 +195,7 @@ index fb9043b5..5e8a3331 100755
 +    # *********************************************
 +    # Copy the test dependency files
 +    # *********************************************
- 
++
 +    CopyDependency EfiCompliant
 +    CopyDependency ProtocolHandlerServices
 +    CopyDependency ImageServices
@@ -195,11 +206,11 @@ index fb9043b5..5e8a3331 100755
 +    CopyDependency PciIo
 +    CopyDependency PciRootBridgeIo
 +    CopyDependency PxeBaseCode
-+    CopyDependency ConfigKeywordHandler 
++    CopyDependency ConfigKeywordHandler
 +fi
 \ No newline at end of file
 diff --git a/uefi-sct/SctPkg/Config/Data/Category.ini b/uefi-sct/SctPkg/Config/Data/Category.ini
-index b34d35db..ba7b239f 100644
+index b34d35db..a6dd6884 100644
 --- a/uefi-sct/SctPkg/Config/Data/Category.ini
 +++ b/uefi-sct/SctPkg/Config/Data/Category.ini
 @@ -88,6 +88,27 @@ InterfaceGuid = 71652D04-BF38-434A-BCB8-6547D7FD8384
@@ -213,7 +224,7 @@ index b34d35db..ba7b239f 100644
 +Name          = GenericTest\SbbrRequiredUefiProtocols
 +Description   = Checks that UEFI protocols required by ARM SBBR are present.
 +
-+[Category Data] 
++[Category Data]
 +Revision      = 0x00010000
 +CategoryGuid  = d6e40d12-7a51-4454-b4fd-4c93887ed6cf
 +InterfaceGuid = 71652D04-BF38-434A-BCB8-6547D7FD8384
@@ -258,7 +269,7 @@ index b34d35db..ba7b239f 100644
  [Category Data]
  Revision      = 0x00010000
  CategoryGuid  = 5B1B31A1-9562-11D2-8E3F-00A0C969723B
-@@ -1026,9 +1061,9 @@ InterfaceGuid = 8D59D32B-C655-4AE9-9B15-F25904992A43
+@@ -1026,9 +1061,16 @@ InterfaceGuid = 8D59D32B-C655-4AE9-9B15-F25904992A43
  Name          = IHV\ConsoleSupportTest\AbsolutePointerProtocolTest
  Description   = Absolute Pointer Protocol Test on IHV Drivers
  
@@ -274,6 +285,13 @@ index b34d35db..ba7b239f 100644
 +InterfaceGuid = CCD15FEC-6F73-4EEC-8395-3E69E4B940BF
 +Name          = RiscvBootProtocolTest
 +Description   = RISC-V Boot Protocol Test
++
++[Category Data]
++Revision      = 0x00010000
++CategoryGuid  = 607f766c-7455-42be-930b-e4d76db2720f
++InterfaceGuid = 607f766c-7455-42be-930b-e4d76db2720f
++Name          = TCG2ProtocolTest
++Description   = TCG2 Protocol Test
 diff --git a/uefi-sct/SctPkg/Library/SctGuidLib/SctGuidLib.inf b/uefi-sct/SctPkg/Library/SctGuidLib/SctGuidLib.inf
 index 8f918b26..2bbd22c6 100644
 --- a/uefi-sct/SctPkg/Library/SctGuidLib/SctGuidLib.inf
@@ -286,3 +304,6 @@ index 8f918b26..2bbd22c6 100644
  
  [sources.common]
    SctGuidLib.c
+-- 
+2.34.1
+

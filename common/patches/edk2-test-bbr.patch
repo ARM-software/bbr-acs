@@ -1,5 +1,21 @@
+From fc9be3bcc84e909928e795dc2fd19ae420475cb8 Mon Sep 17 00:00:00 2001
+From: Guru9902 <gururaj.revankar@arm.com>
+Date: Fri, 22 Mar 2024 12:17:17 +0000
+Subject: [PATCH] edk2-test-bbr
+
+Signed-off-by: Guru9902 <gururaj.revankar@arm.com>
+---
+ .../BlackBoxTest/ImageBBTestConformance.c     | 141 +++++-------------
+ .../BlackBoxTest/ImageBBTestFunction.c        |   4 +-
+ .../ImageServices/BlackBoxTest/Misc.h         |   1 +
+ ...emoryAllocationServicesBBTestConformance.c |  81 +---------
+ .../MemoryAllocationServicesBBTestMain.c      |  18 ---
+ .../Dependency/Config/EfiCompliant.ini        |  60 ++++----
+ .../AuthVariableServicesBBTestConformance.c   |   2 +-
+ 7 files changed, 76 insertions(+), 231 deletions(-)
+
 diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/ImageBBTestConformance.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/ImageBBTestConformance.c
-index 2bd79db8..57cdcf81 100644
+index 90081f04..5586f184 100644
 --- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/ImageBBTestConformance.c
 +++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/ImageBBTestConformance.c
 @@ -32,6 +32,7 @@ Abstract:
@@ -10,7 +26,7 @@ index 2bd79db8..57cdcf81 100644
  
  EFI_GUID gTestVendor1Guid = TEST_VENDOR1_GUID;
  
-@@ -790,6 +791,7 @@ BBTestExitBootServicesConsistencyTest (
+@@ -795,6 +796,7 @@ BBTestExitBootServicesConsistencyTest (
    UINT8                                Data[STATUS_BUFFER_SIZE];
    UINT8                                Buffer[RECOVER_BUFFER_SIZE];
    EFI_STATUS                           ReturnStatus;
@@ -18,7 +34,7 @@ index 2bd79db8..57cdcf81 100644
  
    //
    // Init
-@@ -832,102 +834,13 @@ BBTestExitBootServicesConsistencyTest (
+@@ -837,99 +839,8 @@ BBTestExitBootServicesConsistencyTest (
      return Status;
    }
  
@@ -56,9 +72,7 @@ index 2bd79db8..57cdcf81 100644
 -                         &DataSize,                          // DataSize
 -                         &ReturnStatus                       // Data
 -                         );
-+  RecoveryDataSize = sizeof(RecoveryData);
-+  Status = RecoveryLib->ReadResetRecord(RecoveryLib, &RecoveryDataSize, &RecoveryData);
- 
+-
 -        if (EFI_ERROR(Status)) {
 -          StandardLib->RecordAssertion (
 -                       StandardLib,
@@ -85,10 +99,8 @@ index 2bd79db8..57cdcf81 100644
 -      //
 -      return EFI_LOAD_ERROR;
 -    }
-+  if (!EFI_ERROR(Status) && RecoveryData == 1) {
-+      goto CheckResult;
-   }
- 
+-  }
+-
 -  //
 -  // Step 0: No recovery data is found.
 -  //
@@ -119,16 +131,16 @@ index 2bd79db8..57cdcf81 100644
 -                   Status
 -                   );
 -    return Status;
--  }
--
--
-   //
-   // Checkpoint 1:
-   // 3.5.2.1  ExitBootServices should not succeed with an invalid MapKey
-@@ -954,15 +867,18 @@ BBTestExitBootServicesConsistencyTest (
++  RecoveryDataSize = sizeof(RecoveryData);
++  Status = RecoveryLib->ReadResetRecord(RecoveryLib, &RecoveryDataSize, &RecoveryData);
+   }
+ 
+ 
+@@ -959,6 +870,15 @@ BBTestExitBootServicesConsistencyTest (
  
    MapKey += MapKey;
  
++
 +  RecoveryData = 1;
 +  RecoveryLib->WriteResetRecord (RecoveryLib, sizeof(RecoveryData), &RecoveryData);
 +
@@ -140,21 +152,12 @@ index 2bd79db8..57cdcf81 100644
    ReturnStatus = gtBS->ExitBootServices (
                           mImageHandle,
                           MapKey
-                          );
--  if (ReturnStatus == EFI_INVALID_PARAMETER) {
--    AssertionType = EFI_TEST_ASSERTION_PASSED;
--  } else {
--    AssertionType = EFI_TEST_ASSERTION_FAILED;
--  }
- 
-   Status = gtRT->SetVariable (
-                      L"ExitBootServicesTestVariable",                                                           // VariableName
-@@ -975,9 +891,35 @@ BBTestExitBootServicesConsistencyTest (
+@@ -980,9 +900,36 @@ BBTestExitBootServicesConsistencyTest (
    //reset system
    gtRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
  
--
 +  // get var to get the status
+ 
  CheckResult:
  
 +  DataSize = MAX_BUFFER_SIZE;
@@ -186,11 +189,10 @@ index 2bd79db8..57cdcf81 100644
    if (ReturnStatus == EFI_INVALID_PARAMETER) {
      AssertionType = EFI_TEST_ASSERTION_PASSED;
    } else {
-@@ -995,14 +937,7 @@ CheckResult:
-                  ReturnStatus,
+@@ -1001,13 +948,7 @@ CheckResult:
                   EFI_INVALID_PARAMETER
                   );
--
+ 
 -  Status = gtRT->SetVariable (
 -                     L"ExitBootServicesTestVariable",                                                           // VariableName
 -                     &gTestVendor1Guid,                                                                         // VendorGuid
@@ -203,10 +205,10 @@ index 2bd79db8..57cdcf81 100644
    Status = ImageTestCheckForCleanEnvironment (&Numbers);
    if (EFI_ERROR(Status)) {
 diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/ImageBBTestFunction.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/ImageBBTestFunction.c
-index 11f78cd4..ec9d6dae 100644
+index b48833a6..a403f1b1 100644
 --- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/ImageBBTestFunction.c
 +++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/ImageBBTestFunction.c
-@@ -161,9 +161,9 @@ BBTestLoadImageInterfaceTest (
+@@ -163,9 +163,9 @@ BBTestLoadImageInterfaceTest (
    //Checkpoint 8:
    //4.1.2.8  Call LoadImage to load image for HII protocol
    //
@@ -219,7 +221,7 @@ index 11f78cd4..ec9d6dae 100644
    return EFI_SUCCESS;
  }
 diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/Misc.h b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/Misc.h
-index 3e713f44..4bc0cd29 100644
+index b5e34c95..9d299215 100644
 --- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/Misc.h
 +++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/Misc.h
 @@ -29,6 +29,7 @@ Abstract:
@@ -231,22 +233,25 @@ index 3e713f44..4bc0cd29 100644
  typedef struct {
    VOID          *Registration;
 diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/MemoryAllocationServices/BlackBoxTest/MemoryAllocationServicesBBTestConformance.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/MemoryAllocationServices/BlackBoxTest/MemoryAllocationServicesBBTestConformance.c
-index 1b81ecbc..2bab3420 100644
+index 4c2b468a..6b228703 100644
 --- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/MemoryAllocationServices/BlackBoxTest/MemoryAllocationServicesBBTestConformance.c
 +++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/MemoryAllocationServices/BlackBoxTest/MemoryAllocationServicesBBTestConformance.c
-@@ -288,7 +288,7 @@ BBTestGetMemoryMapConsistencyTest (
-                  L"%a:%d:Status - %r",
-                  __FILE__,
-                  (UINTN)__LINE__,
--                 Status
-+                 Status2
-                  ); 
+@@ -80,7 +80,7 @@ BBTestGetMemoryMapConsistencyTest (
+                    L"%a:%d:Status - %r",
+                    __FILE__,
+                    (UINTN)__LINE__,
+-                   Status
++                   Status2
+                    );
+     return Status;
+   }
+@@ -1080,85 +1080,6 @@ BBTestAllocatePoolConsistencyTest (
+     }
+   }
  
-   FreeMemoryMap ();
-@@ -1079,81 +1079,3 @@ BBTestAllocatePoolConsistencyTest (
-   FreeMemoryMap ();
-   return EFI_SUCCESS;
- }
+-  FreeMemoryMap ();
+-  return EFI_SUCCESS;
+-}
 -
 -/**
 - *  Entrypoint for gtBS->FreePool () Consistency Test.
@@ -260,6 +265,7 @@ index 1b81ecbc..2bab3420 100644
 -// TDS 3.5
 -//
 -EFI_STATUS
+-EFIAPI
 -BBTestFreePoolConsistencyTest (
 -  IN EFI_BB_TEST_PROTOCOL       *This,
 -  IN VOID                       *ClientInterface,
@@ -322,134 +328,12 @@ index 1b81ecbc..2bab3420 100644
 -                 Status
 -                 );
 -
--  FreeMemoryMap ();
--  return EFI_SUCCESS;
--}
-\ No newline at end of file
-diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/MemoryAllocationServices/BlackBoxTest/MemoryAllocationServicesBBTestFunction.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/MemoryAllocationServices/BlackBoxTest/MemoryAllocationServicesBBTestFunction.c
-index 82c9baab..30db8c51 100644
---- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/MemoryAllocationServices/BlackBoxTest/MemoryAllocationServicesBBTestFunction.c
-+++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/MemoryAllocationServices/BlackBoxTest/MemoryAllocationServicesBBTestFunction.c
-@@ -1832,117 +1832,3 @@ BBTestAllocatePoolInterfaceTest (
    FreeMemoryMap ();
    return EFI_SUCCESS;
  }
--
--/**
-- *  Entrypoint for gtBS->FreePool () Interface Test.
-- *  @param This a pointer of EFI_BB_TEST_PROTOCOL.
-- *  @param ClientInterface a pointer to the interface to be tested.
-- *  @param TestLevel test "thoroughness" control.
-- *  @param SupportHandle a handle containing protocols required.
-- *  @return EFI_SUCCESS Finish the test successfully.
-- */
--//
--// TDS 4.5
--//
--EFI_STATUS
--BBTestFreePoolInterfaceTest (
--  IN EFI_BB_TEST_PROTOCOL       *This,
--  IN VOID                       *ClientInterface,
--  IN EFI_TEST_LEVEL             TestLevel,
--  IN EFI_HANDLE                 SupportHandle
--  )
--{
--  EFI_STANDARD_TEST_LIBRARY_PROTOCOL   *StandardLib;
--  EFI_STATUS                           Status;
--  VOID                                 *Memory;
--  EFI_TEST_ASSERTION                   AssertionType;
--  UINTN                                Index;
--  UINTN                                TypeIndex;
--  EFI_TPL                              OldTpl;
--
--  //
--  // Get the Standard Library Interface
--  //
--  Status = gtBS->HandleProtocol (
--                   SupportHandle,
--                   &gEfiStandardTestLibraryGuid,
--                   (VOID **) &StandardLib
--                   );
--
--  if (EFI_ERROR(Status)) {
--    return Status;
--  }
--
--  Status = InitMemoryMap ();
--  if (EFI_ERROR(Status)) {
--    StandardLib->RecordAssertion (
--                   StandardLib,
--                   EFI_TEST_ASSERTION_FAILED,
--                   gTestGenericFailureGuid,
--                   L"InitMemoryMap - Allocate memory map buffer",
--                   L"%a:%d:Status - %r",
--                   __FILE__,
--                   (UINTN)__LINE__,
--                   Status
--                   );
--    return Status;
--  }
--
--  for (Index = 0; Index < TPL_ARRAY_SIZE; Index++) {
--    //
--    // 4.5.2.1  FreePool must succeed with valid parameters.
--    //
--    for (TypeIndex = 0; TypeIndex < ALLOCATEPOOL_MEMORYTYPE_NUM; TypeIndex++) {
--      Status = gtBS->AllocatePool (
--                       AllocatePoolMemoryType[TypeIndex],
--                       1,
--                       (VOID **)&Memory
--                       );
--      if (EFI_ERROR(Status)) {
--        StandardLib->RecordAssertion (
--                       StandardLib,
--                       EFI_TEST_ASSERTION_FAILED,
--                       gTestGenericFailureGuid,
--                       L"BS.AllocatePool - 1 byte",
--                       L"%a:%d:Status - %r, TPL - %d, MemType - %d",
--                       __FILE__,
--                       (UINTN)__LINE__,
--                       Status,
--                       TplArray[Index],
--                       AllocatePoolMemoryType[TypeIndex]
--                       );
--        continue;
--      }
--      OldTpl = gtBS->RaiseTPL (TplArray[Index]);
--      Status = gtBS->FreePool (
--                       Memory
--                       );
--      gtBS->RestoreTPL (OldTpl);
--      if (!EFI_ERROR(Status)) {
--        AssertionType = EFI_TEST_ASSERTION_PASSED;
--      } else {
--        AssertionType = EFI_TEST_ASSERTION_FAILED;
--      }
--      StandardLib->RecordAssertion (
--                     StandardLib,
--                     AssertionType,
--                     Index==0? \
--                     gMemoryAllocationServicesInterfaceTestAssertionGuid038: \
--                     (Index == 1? \
--                      gMemoryAllocationServicesBBTestFunctionAssertionGuid075: \
--                      gMemoryAllocationServicesBBTestFunctionAssertionGuid076),
--                     L"BS.FreePool - 1 byte",
--                     L"%a:%d:Status - %r, TPL - %d, MemType - %d",
--                     __FILE__,
--                     (UINTN)__LINE__,
--                     Status,
--                     TplArray[Index],
--                     AllocatePoolMemoryType[TypeIndex]
--                     );
--    }
--
--  }
--
--  FreeMemoryMap ();
--  return EFI_SUCCESS;
--}
+\ No newline at end of file
 diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/MemoryAllocationServices/BlackBoxTest/MemoryAllocationServicesBBTestMain.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/MemoryAllocationServices/BlackBoxTest/MemoryAllocationServicesBBTestMain.c
-index 8aa89a93..1c902d82 100644
+index 8aa89a93..6fa51f46 100644
 --- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/MemoryAllocationServices/BlackBoxTest/MemoryAllocationServicesBBTestMain.c
 +++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/MemoryAllocationServices/BlackBoxTest/MemoryAllocationServicesBBTestMain.c
 @@ -85,15 +85,6 @@ EFI_BB_TEST_ENTRY_FIELD gBBTestEntryField[] = {
@@ -468,7 +352,7 @@ index 8aa89a93..1c902d82 100644
    {
      MEMORY_ALLOCATION_SERVICES_GETMEMORYMAP_INTERFACE_GUID,
      L"GetMemoryMap_Func",
-@@ -130,16 +121,6 @@ EFI_BB_TEST_ENTRY_FIELD gBBTestEntryField[] = {
+@@ -130,15 +121,6 @@ EFI_BB_TEST_ENTRY_FIELD gBBTestEntryField[] = {
      EFI_TEST_CASE_AUTO,
      BBTestAllocatePoolInterfaceTest
    },
@@ -481,10 +365,9 @@ index 8aa89a93..1c902d82 100644
 -    EFI_TEST_CASE_AUTO,
 -    BBTestFreePoolInterfaceTest
 -  },
--
+ 
  #ifdef EFI_TEST_EXHAUSTIVE
    {
-     MEMORY_ALLOCATION_SERVICES_GETMEMORYMAP_STRESS_TEST_GUID,
 diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/EfiCompliant/BlackBoxTest/Dependency/Config/EfiCompliant.ini b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/EfiCompliant/BlackBoxTest/Dependency/Config/EfiCompliant.ini
 index 4deaae3b..c5b9460b 100644
 --- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/EfiCompliant/BlackBoxTest/Dependency/Config/EfiCompliant.ini
@@ -555,31 +438,18 @@ index 4deaae3b..c5b9460b 100644
 +IPSecSupport              = no
  
 diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/VariableServices/BlackBoxTest/AuthVariableServicesBBTestConformance.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/VariableServices/BlackBoxTest/AuthVariableServicesBBTestConformance.c
-index a415111e..45b979b6 100644
+index 03d50066..483fa9bf 100644
 --- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/VariableServices/BlackBoxTest/AuthVariableServicesBBTestConformance.c
 +++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/VariableServices/BlackBoxTest/AuthVariableServicesBBTestConformance.c
-@@ -291,7 +291,7 @@ AuthVariableDERConfTest (
+@@ -292,7 +292,7 @@ AuthVariableDERConfTest (
                     &MaximumVariableSize
                     );
  
 -    if (Status == EFI_SUCCESS || Status == EFI_UNSUPPORTED) {
-+    if (Status == EFI_UNSUPPORTED) {
++    if (Status == EFI_UNSUPPORTED) { {
        Result = EFI_TEST_ASSERTION_PASSED;
      } else {
        Result = EFI_TEST_ASSERTION_FAILED;
-diff --git a/uefi-sct/SctPkg/TestInfrastructure/SCT/Drivers/StandardTest/StandardTest.c b/uefi-sct/SctPkg/TestInfrastructure/SCT/Drivers/StandardTest/StandardTest.c
-index 94cae289..cf9d64f8 100644
---- a/uefi-sct/SctPkg/TestInfrastructure/SCT/Drivers/StandardTest/StandardTest.c
-+++ b/uefi-sct/SctPkg/TestInfrastructure/SCT/Drivers/StandardTest/StandardTest.c
-@@ -1088,7 +1088,10 @@ Returns:
- 
-   } else {
-     StslWriteLogFile (Private, DashLine);
--    
-+
-+    SctSPrint (Buffer, EFI_MAX_PRINT_BUFFER, L"Arm ACS Version: %s\n", L""ACS_VERSION);
-+    StslWriteLogFile (Private, Buffer);
-+
-     SctSPrint (Buffer, EFI_MAX_PRINT_BUFFER, L"%s\n", Private->EntryName);
-     StslWriteLogFile (Private, Buffer);
-     SctSPrint (Buffer, EFI_MAX_PRINT_BUFFER, L"Revision 0x%08x\n", Private->TestRevision);
+-- 
+2.34.1
+
