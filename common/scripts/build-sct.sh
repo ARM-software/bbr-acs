@@ -171,12 +171,14 @@ do_build()
         git apply --ignore-whitespace --ignore-space-change $BBR_DIR/common/patches/edk2-test-bbr-build.patch
     else
         echo  "Error while applying edk2-test BBR build patch..."
+        exit
     fi
     if git apply --check $BBR_DIR/common/patches/edk2-test-bbr.patch; then
         echo "Applying edk2-test BBR patch..."
         git apply --ignore-whitespace --ignore-space-change $BBR_DIR/common/patches/edk2-test-bbr.patch
     else
         echo  "Error while applying edk2-test BBR patch..."
+        exit
     fi
     if [[ $BUILD_TYPE != S ]]; then
         if git apply --check $BBR_DIR/bbsr/patches/0001-SIE-Patch-for-UEFI-SCT-Build.patch; then
@@ -184,6 +186,7 @@ do_build()
             git apply --ignore-whitespace --ignore-space-change $BBR_DIR/bbsr/patches/0001-SIE-Patch-for-UEFI-SCT-Build.patch
         else
             echo  "Error while applying SIE SCT patch..."
+            exit
         fi
     fi
 
