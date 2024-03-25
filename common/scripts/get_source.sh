@@ -74,7 +74,7 @@ get_sct_src()
 {
     git clone --single-branch https://github.com/tianocore/edk2-test
     pushd $TOP_DIR/edk2-test
-    git checkout 8713740892bdb857e970a2841de9800b2c6b5552
+    git checkout 315e3a56a6d9261d4fad4c1950f2d01a052eeba4
     popd
 }
 
