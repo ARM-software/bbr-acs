@@ -1,5 +1,23 @@
+From 8d24275aab1743c92ec97e1c28b9a17dcf2fe8d3 Mon Sep 17 00:00:00 2001
+From: Amrathesh <amrathesh@arm.com>
+Date: Mon, 25 Mar 2024 11:28:29 +0530
+Subject: [PATCH] edk2-test-bbr.patch
+
+ - changes to sct tests in edk2-test
+---
+ .../BlackBoxTest/ImageBBTestConformance.c     | 149 +++++-------------
+ .../BlackBoxTest/ImageBBTestFunction.c        |   4 +-
+ .../ImageServices/BlackBoxTest/Misc.h         |   1 +
+ ...emoryAllocationServicesBBTestConformance.c |  80 +---------
+ .../MemoryAllocationServicesBBTestFunction.c  | 115 --------------
+ .../MemoryAllocationServicesBBTestMain.c      |  19 ---
+ .../Dependency/Config/EfiCompliant.ini        |  60 +++----
+ .../AuthVariableServicesBBTestConformance.c   |   2 +-
+ .../SCT/Drivers/StandardTest/StandardTest.c   |   5 +-
+ 9 files changed, 81 insertions(+), 354 deletions(-)
+
 diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/ImageBBTestConformance.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/ImageBBTestConformance.c
-index 2bd79db8..57cdcf81 100644
+index 90081f04..b902c6d9 100644
 --- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/ImageBBTestConformance.c
 +++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/ImageBBTestConformance.c
 @@ -32,6 +32,7 @@ Abstract:
@@ -10,7 +28,7 @@ index 2bd79db8..57cdcf81 100644
  
  EFI_GUID gTestVendor1Guid = TEST_VENDOR1_GUID;
  
-@@ -790,6 +791,7 @@ BBTestExitBootServicesConsistencyTest (
+@@ -795,6 +796,7 @@ BBTestExitBootServicesConsistencyTest (
    UINT8                                Data[STATUS_BUFFER_SIZE];
    UINT8                                Buffer[RECOVER_BUFFER_SIZE];
    EFI_STATUS                           ReturnStatus;
@@ -18,12 +36,14 @@ index 2bd79db8..57cdcf81 100644
  
    //
    // Init
-@@ -832,102 +834,13 @@ BBTestExitBootServicesConsistencyTest (
+@@ -837,102 +839,13 @@ BBTestExitBootServicesConsistencyTest (
      return Status;
    }
  
 -  ResetData = (RESET_DATA *)Buffer;
--
++  RecoveryDataSize = sizeof(RecoveryData);
++  Status = RecoveryLib->ReadResetRecord(RecoveryLib, &RecoveryDataSize, &RecoveryData);
+ 
 -  //
 -  // Read reset record
 -  //
@@ -56,9 +76,7 @@ index 2bd79db8..57cdcf81 100644
 -                         &DataSize,                          // DataSize
 -                         &ReturnStatus                       // Data
 -                         );
-+  RecoveryDataSize = sizeof(RecoveryData);
-+  Status = RecoveryLib->ReadResetRecord(RecoveryLib, &RecoveryDataSize, &RecoveryData);
- 
+-
 -        if (EFI_ERROR(Status)) {
 -          StandardLib->RecordAssertion (
 -                       StandardLib,
@@ -85,10 +103,8 @@ index 2bd79db8..57cdcf81 100644
 -      //
 -      return EFI_LOAD_ERROR;
 -    }
-+  if (!EFI_ERROR(Status) && RecoveryData == 1) {
-+      goto CheckResult;
-   }
- 
+-  }
+-
 -  //
 -  // Step 0: No recovery data is found.
 -  //
@@ -119,13 +135,15 @@ index 2bd79db8..57cdcf81 100644
 -                   Status
 -                   );
 -    return Status;
--  }
--
++  if (!EFI_ERROR(Status) && RecoveryData == 1) {
++      goto CheckResult;
+   }
+ 
 -
    //
    // Checkpoint 1:
    // 3.5.2.1  ExitBootServices should not succeed with an invalid MapKey
-@@ -954,15 +867,18 @@ BBTestExitBootServicesConsistencyTest (
+@@ -959,15 +872,18 @@ BBTestExitBootServicesConsistencyTest (
  
    MapKey += MapKey;
  
@@ -149,7 +167,7 @@ index 2bd79db8..57cdcf81 100644
  
    Status = gtRT->SetVariable (
                       L"ExitBootServicesTestVariable",                                                           // VariableName
-@@ -975,9 +891,35 @@ BBTestExitBootServicesConsistencyTest (
+@@ -980,9 +896,35 @@ BBTestExitBootServicesConsistencyTest (
    //reset system
    gtRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
  
@@ -186,7 +204,7 @@ index 2bd79db8..57cdcf81 100644
    if (ReturnStatus == EFI_INVALID_PARAMETER) {
      AssertionType = EFI_TEST_ASSERTION_PASSED;
    } else {
-@@ -995,14 +937,7 @@ CheckResult:
+@@ -1000,14 +942,7 @@ CheckResult:
                   ReturnStatus,
                   EFI_INVALID_PARAMETER
                   );
@@ -203,10 +221,10 @@ index 2bd79db8..57cdcf81 100644
    Status = ImageTestCheckForCleanEnvironment (&Numbers);
    if (EFI_ERROR(Status)) {
 diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/ImageBBTestFunction.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/ImageBBTestFunction.c
-index 11f78cd4..ec9d6dae 100644
+index b48833a6..a403f1b1 100644
 --- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/ImageBBTestFunction.c
 +++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/ImageBBTestFunction.c
-@@ -161,9 +161,9 @@ BBTestLoadImageInterfaceTest (
+@@ -163,9 +163,9 @@ BBTestLoadImageInterfaceTest (
    //Checkpoint 8:
    //4.1.2.8  Call LoadImage to load image for HII protocol
    //
@@ -219,7 +237,7 @@ index 11f78cd4..ec9d6dae 100644
    return EFI_SUCCESS;
  }
 diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/Misc.h b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/Misc.h
-index 3e713f44..4bc0cd29 100644
+index b5e34c95..9d299215 100644
 --- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/Misc.h
 +++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/Misc.h
 @@ -29,6 +29,7 @@ Abstract:
@@ -231,10 +249,10 @@ index 3e713f44..4bc0cd29 100644
  typedef struct {
    VOID          *Registration;
 diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/MemoryAllocationServices/BlackBoxTest/MemoryAllocationServicesBBTestConformance.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/MemoryAllocationServices/BlackBoxTest/MemoryAllocationServicesBBTestConformance.c
-index 1b81ecbc..2bab3420 100644
+index 4c2b468a..d15567b5 100644
 --- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/MemoryAllocationServices/BlackBoxTest/MemoryAllocationServicesBBTestConformance.c
 +++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/MemoryAllocationServices/BlackBoxTest/MemoryAllocationServicesBBTestConformance.c
-@@ -288,7 +288,7 @@ BBTestGetMemoryMapConsistencyTest (
+@@ -289,7 +289,7 @@ BBTestGetMemoryMapConsistencyTest (
                   L"%a:%d:Status - %r",
                   __FILE__,
                   (UINTN)__LINE__,
@@ -243,11 +261,10 @@ index 1b81ecbc..2bab3420 100644
                   ); 
  
    FreeMemoryMap ();
-@@ -1079,81 +1079,3 @@ BBTestAllocatePoolConsistencyTest (
-   FreeMemoryMap ();
+@@ -1084,81 +1084,3 @@ BBTestAllocatePoolConsistencyTest (
    return EFI_SUCCESS;
  }
--
+ 
 -/**
 - *  Entrypoint for gtBS->FreePool () Consistency Test.
 - *  @param This a pointer of EFI_BB_TEST_PROTOCOL.
@@ -260,6 +277,7 @@ index 1b81ecbc..2bab3420 100644
 -// TDS 3.5
 -//
 -EFI_STATUS
+-EFIAPI
 -BBTestFreePoolConsistencyTest (
 -  IN EFI_BB_TEST_PROTOCOL       *This,
 -  IN VOID                       *ClientInterface,
@@ -327,10 +345,10 @@ index 1b81ecbc..2bab3420 100644
 -}
 \ No newline at end of file
 diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/MemoryAllocationServices/BlackBoxTest/MemoryAllocationServicesBBTestFunction.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/MemoryAllocationServices/BlackBoxTest/MemoryAllocationServicesBBTestFunction.c
-index 82c9baab..30db8c51 100644
+index db9df08f..2defb6e5 100644
 --- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/MemoryAllocationServices/BlackBoxTest/MemoryAllocationServicesBBTestFunction.c
 +++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/MemoryAllocationServices/BlackBoxTest/MemoryAllocationServicesBBTestFunction.c
-@@ -1832,117 +1832,3 @@ BBTestAllocatePoolInterfaceTest (
+@@ -1836,118 +1836,3 @@ BBTestAllocatePoolInterfaceTest (
    FreeMemoryMap ();
    return EFI_SUCCESS;
  }
@@ -347,6 +365,7 @@ index 82c9baab..30db8c51 100644
 -// TDS 4.5
 -//
 -EFI_STATUS
+-EFIAPI
 -BBTestFreePoolInterfaceTest (
 -  IN EFI_BB_TEST_PROTOCOL       *This,
 -  IN VOID                       *ClientInterface,
@@ -555,10 +574,10 @@ index 4deaae3b..c5b9460b 100644
 +IPSecSupport              = no
  
 diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/VariableServices/BlackBoxTest/AuthVariableServicesBBTestConformance.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/VariableServices/BlackBoxTest/AuthVariableServicesBBTestConformance.c
-index a415111e..45b979b6 100644
+index 03d50066..9aa7fb0c 100644
 --- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/VariableServices/BlackBoxTest/AuthVariableServicesBBTestConformance.c
 +++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/VariableServices/BlackBoxTest/AuthVariableServicesBBTestConformance.c
-@@ -291,7 +291,7 @@ AuthVariableDERConfTest (
+@@ -292,7 +292,7 @@ AuthVariableDERConfTest (
                     &MaximumVariableSize
                     );
  
@@ -583,3 +602,6 @@ index 94cae289..cf9d64f8 100644
      SctSPrint (Buffer, EFI_MAX_PRINT_BUFFER, L"%s\n", Private->EntryName);
      StslWriteLogFile (Private, Buffer);
      SctSPrint (Buffer, EFI_MAX_PRINT_BUFFER, L"Revision 0x%08x\n", Private->TestRevision);
+-- 
+2.25.1
+
