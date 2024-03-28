@@ -31,7 +31,6 @@ SOURCE_DIR=$(WORKSPACE)/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/Blac
 FUTURE_DATE=$(shell date --rfc-3339=date -d "+5 year")
 FUTURE_DATE2=$(shell date --rfc-3339=date -d "+1 day")
 FUTURE_DATE3=$(shell date --rfc-3339=date -d "+2 day")
-FUTURE_DATE4=$(shell date --rfc-3339=date -d "+3 day")
 PAST_DATE=$(shell date --rfc-3339=date -d "-1 year")
 
 ifdef KEYS_DIR
@@ -172,7 +171,7 @@ TestDBX1.auth:
 
 KEKSigList3.auth: TestKEK3
 	cert-to-efi-sig-list $(BIN_DIR)/SecureBoot_TestKEK3.crt $(BIN_DIR)/SecureBoot_KEKSigList3.esl
-	sign-efi-sig-list -a -t $(FUTURE_DATE2) -c $(TEST_PK1_CRT) -k $(TEST_PK1_KEY) KEK $(BIN_DIR)/SecureBoot_KEKSigList3.esl $(BIN_DIR)/SecureBoot_KEKSigList3.auth
+	sign-efi-sig-list -a -c $(TEST_PK1_CRT) -k $(TEST_PK1_KEY) KEK $(BIN_DIR)/SecureBoot_KEKSigList3.esl $(BIN_DIR)/SecureBoot_KEKSigList3.auth
 
 dbSigList1.auth: SignCert1
 	cert-to-efi-sig-list $(BIN_DIR)/SecureBoot_SignCert1.crt $(BIN_DIR)/SecureBoot_TestDB1.esl
@@ -209,7 +208,7 @@ dbxRevokedList1.auth: RevokedCert1 RevokedCert2 RevokedCert3 RevokedCert4
 
 dbSigList5.auth: Sign_Cert5
 	cert-to-efi-sig-list $(BIN_DIR)/SecureBoot_Sign_Cert5.crt $(BIN_DIR)/SecureBoot_TestDB10.esl
-	sign-efi-sig-list -a -c $(BIN_DIR)/SecureBoot_TestKEK3.crt -k $(BIN_DIR)/SecureBoot_TestKEK3.key -t "$(FUTURE_DATE4)" db $(BIN_DIR)/SecureBoot_TestDB10.esl $(BIN_DIR)/SecureBoot_DBSigList5.auth
+	sign-efi-sig-list -a -c $(BIN_DIR)/SecureBoot_TestKEK3.crt -k $(BIN_DIR)/SecureBoot_TestKEK3.key db $(BIN_DIR)/SecureBoot_TestDB10.esl $(BIN_DIR)/SecureBoot_DBSigList5.auth
 
 unsignedKeyUpdate:
 	openssl req -x509 -sha256 -newkey rsa:2048 -subj /CN=ACS_UNSIGNED_KEY/ -keyout $(TARGET)_$(@).key -out $(TARGET)_$(@).crt -nodes -days 4000
