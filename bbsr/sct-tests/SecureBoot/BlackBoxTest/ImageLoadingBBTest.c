@@ -182,6 +182,14 @@ ImageLoadingTest(
     return Status;
   }
 
+  /* call ImageLoadingVariableInit() again to restore test db, that was overwritten during
+     Test Assertion 6 */
+  SecureBootVariableCleanup (RT, StandardLib, LoggingLib, ProfileLib);
+  Status = ImageLoadingVariableInit (RT, StandardLib, LoggingLib, ProfileLib);
+  if (EFI_ERROR(Status)) {
+    SecureBootVariableCleanup (RT, StandardLib, LoggingLib, ProfileLib);
+    return Status;
+  }
 
   Status = ImageLoadingTestCheckpoint2 (RT, StandardLib, LoggingLib, ProfileLib);
   if (EFI_ERROR(Status)) {
@@ -506,6 +514,13 @@ ImageLoadingTestCheckpoint1 (
   CHAR16                   *EntireFileName;
   CHAR16                   *FileName;
   EFI_HANDLE               ImageHandle;
+  UINTN                    DataSize;
+  UINT32                   Attributes;
+  UINT32                   DBAttributes;
+  EFI_FILE_HANDLE          KeyFHandle;
+  UINT32                   KeyFileSize;
+  VOID                     *Buffer;
+  UINTN                    BufferSize;
 
   //
   // Trace ...
@@ -711,6 +726,155 @@ ImageLoadingTestCheckpoint1 (
                  );
 
   //
+  // Test Assertion 6: Verify loading an image (TestImage19.bin) containing two signatures
+  // (Image19ACert and Image19BCert),  with each certificate in db. Expected Result: EFI_SUCCESS
+  //
+
+  // Image19ACert is part of dbSigList2.auth signature list set to db during ImageLoadingVariableInit()
+  // Load TestImage19.bin and verify if LoadImage returns EFI_SUCCESS
+
+  FileName = L"TestImage19.bin";
+  EntireFileName = SctPoolPrint (L"%s\\%s", gFilePath, FileName);
+  FilePath = SctFileDevicePath (gDeviceHandle, EntireFileName);
+  SctFreePool (EntireFileName);
+
+  ImageHandle = NULL;
+  Status = gtBS->LoadImage (
+                     FALSE,
+                     gImageHandle,
+                     FilePath,
+                     NULL,
+                     0,
+                     &ImageHandle
+                     );
+
+  if (Status == EFI_SUCCESS) {
+    Result = EFI_TEST_ASSERTION_PASSED;
+  } else {
+    Result = EFI_TEST_ASSERTION_FAILED;
+    StandardLib->RecordMessage (
+                     StandardLib,
+                     EFI_VERBOSE_LEVEL_DEFAULT,
+                     L"\r\nSecureBoot - Verify load of image containing multiple signatures: LoadImage failed with one of the key in db. Status = %r",
+                     Status
+                     );
+  }
+
+  // overwrite db with second signature with which TestImage19 is signed.
+
+  // Get db variable attributes.
+  DataSize = 0;
+  DBAttributes = 0;
+  Status = RT->GetVariable (
+                 L"db",                          // VariableName
+                 &gEfiImageSecurityDatabaseGuid, // VendorGuid
+                 &DBAttributes,                  // Attributes
+                 &DataSize,                      // DataSize
+                 NULL                            // Data
+                 );
+
+  // Load and set db with Image19BCert
+  FileName = L"Image19BCert.auth";
+
+  Status = OpenFileAndGetSize (
+             FileName,
+             &KeyFHandle,
+             &KeyFileSize
+             );
+
+  if (EFI_ERROR(Status)) {
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify load of image containing multiple signatures: OpenFileAndGetSize() failed for Image19BCert.auth",
+      Status);
+    return EFI_NOT_FOUND;
+  }
+
+  Buffer = SctAllocatePool (KeyFileSize);
+  BufferSize = KeyFileSize;
+  if (Buffer == NULL) {
+    KeyFHandle->Close (KeyFHandle);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify load of image containing multiple signatures: Failed to allocate buffer for Image19BCert.auth",
+      Status);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = KeyFHandle->Read (
+                      KeyFHandle,
+                      &BufferSize,
+                      Buffer
+                      );
+
+  if (EFI_ERROR(Status)) {
+    KeyFHandle->Close (KeyFHandle);
+    gtBS->FreePool (Buffer);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify load of image containing multiple signatures: Failed to read Image19BCert.auth",
+      Status);
+    return EFI_LOAD_ERROR;
+  }
+
+  Status = RT->SetVariable (
+                     L"db",                                       // VariableName
+                     &gEfiImageSecurityDatabaseGuid,              // VendorGuid
+                     DBAttributes,                                // Attributes
+                     BufferSize,                                  // DataSize
+                     Buffer                                       // Data
+                     );
+
+  if (EFI_ERROR(Status)) {
+    KeyFHandle->Close (KeyFHandle);
+    gtBS->FreePool (Buffer);
+    EFI_TEST_GENERIC_FAILURE(
+      L"SecureBoot - Verify load of image containing multiple signatures: Failed to overwrite db with Image19BCert.auth",
+      Status);
+    return EFI_LOAD_ERROR;
+  }
+
+  // close Key file handle and free the memory
+  KeyFHandle->Close (KeyFHandle);
+  gtBS->FreePool (Buffer);
+
+  // verify if LoadImage returns EFI_SUCCESS with second key in db
+  FileName = L"TestImage19.bin";
+  EntireFileName = SctPoolPrint (L"%s\\%s", gFilePath, FileName);
+  FilePath = SctFileDevicePath (gDeviceHandle, EntireFileName);
+  SctFreePool (EntireFileName);
+
+  ImageHandle = NULL;
+  Status = gtBS->LoadImage (
+                     FALSE,
+                     gImageHandle,
+                     FilePath,
+                     NULL,
+                     0,
+                     &ImageHandle
+                     );
+
+  if (Status == EFI_SUCCESS) {
+    Result = EFI_TEST_ASSERTION_PASSED;
+  } else {
+    Result = EFI_TEST_ASSERTION_FAILED;
+    StandardLib->RecordMessage (
+                     StandardLib,
+                     EFI_VERBOSE_LEVEL_DEFAULT,
+                     L"\r\nSecureBoot - Verify load of image containing multiple signatures: LoadImage failed with both the keys in db."
+                     );
+  }
+
+
+  StandardLib->RecordAssertion (
+                 StandardLib,
+                 Result,
+                 gSecureBootImageLoadingBbTestAssertionGuid018,
+                 L"SecureBoot - Verify load of image containing multiple signatures.",
+                 L"%a:%d:Status - %r",
+                 __FILE__,
+                 (UINTN)__LINE__,
+                 Status
+                 );
+
+  //
   // Done
   //
   return EFI_SUCCESS;
@@ -756,7 +920,7 @@ ImageLoadingTestCheckpoint2 (
   }
 
   //
-  //  Test assertion 1: Verify revocation with signed image with signature in db 
+  //  Test assertion 1: Verify revocation with signed image with signature in db
   //  but revoked in dbx with EFI_CERT_X509_SHA256_GUID.  Load image (TestImage6)
   //  signed with RevokedCert1.  Expect result: SECURITY_VIOLATION.
   //
@@ -955,6 +1119,44 @@ ImageLoadingTestCheckpoint2 (
                  Status
                  );
 
+  //
+  // Verify loading an image (TestImage20.bin) containing two signatures
+  // (Image20ACert and Image20BCert), with Image20ACert in db and
+  // Image20BCert revoked in dbX with SHA256 of signature. Expected Result: EFI_SECURITY_VIOLATION
+
+  FileName = L"TestImage20.bin";
+  EntireFileName = SctPoolPrint (L"%s\\%s", gFilePath, FileName);
+  FilePath = SctFileDevicePath (gDeviceHandle, EntireFileName);
+  SctFreePool (EntireFileName);
+
+  ImageHandle = NULL;
+  Status = gtBS->LoadImage (
+                     FALSE,
+                     gImageHandle,
+                     FilePath,
+                     NULL,
+                     0,
+                     &ImageHandle
+                     );
+
+  if (Status == EFI_SECURITY_VIOLATION) {
+    Result = EFI_TEST_ASSERTION_PASSED;
+  } else if (Status == EFI_ACCESS_DENIED && ImageHandle == NULL) {
+    Result = EFI_TEST_ASSERTION_PASSED;
+  } else {
+    Result = EFI_TEST_ASSERTION_FAILED;
+  }
+
+  StandardLib->RecordAssertion (
+                 StandardLib,
+                 Result,
+                 gSecureBootImageLoadingBbTestAssertionGuid019,
+                 L"SecureBoot - SecureBoot - Verify load of image containing multiple signatures, second cert in dbx.",
+                 L"%a:%d:Status - %r",
+                 __FILE__,
+                 (UINTN)__LINE__,
+                 Status
+                 );
 
   //
   // Trace ...
@@ -1063,7 +1265,7 @@ ImageLoadingTestCheckpoint3 (
     EFI_TEST_GENERIC_FAILURE(
       L"Secure Boot - ImageLoadingTest: EFI Image Execution Info Table not found",
       Status);
-    
+
      return EFI_NOT_FOUND;
   }
 
@@ -1201,6 +1403,25 @@ ImageLoadingTestCheckpoint3 (
                  gSecureBootImageLoadingBbTestAssertionGuid017,
                  L"SecureBoot - Verify load of TestImage10.bin recorded in"
                   " Image Execution Info Table with AUTH_SIG_FOUND",
+                 L"%a:%d:Status - %r",
+                 __FILE__,
+                 (UINTN)__LINE__,
+                 Status
+                 );
+
+// Verify Image Execution Info Table entry for TestImage20, revoked by hash of Image20BCert in dbX
+  Status = VerifyImageEntry(L"TestImage20.bin", EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED);
+  if (Status) {
+    Result = EFI_TEST_ASSERTION_FAILED;
+  } else {
+    Result = EFI_TEST_ASSERTION_PASSED;
+  }
+
+  StandardLib->RecordAssertion (
+                 StandardLib,
+                 Result,
+                 gSecureBootImageLoadingBbTestAssertionGuid020,
+                 L"SecureBoot - Verify Image Execution Info Table entry for TestImage20, revoked by hash of cert.",
                  L"%a:%d:Status - %r",
                  __FILE__,
                  (UINTN)__LINE__,
