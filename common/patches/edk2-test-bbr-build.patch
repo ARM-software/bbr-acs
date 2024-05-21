@@ -1,8 +1,8 @@
 diff --git a/uefi-sct/SctPkg/CommonGenFramework.sh b/uefi-sct/SctPkg/CommonGenFramework.sh
-index fb9043b5..16634636 100755
+index 089faac7..e319d4cd 100755
 --- a/uefi-sct/SctPkg/CommonGenFramework.sh
 +++ b/uefi-sct/SctPkg/CommonGenFramework.sh
-@@ -342,4 +342,191 @@ then
+@@ -344,4 +344,194 @@ then
    CopyDependency Ebc
    CopyDependency PxeBaseCode
  fi
@@ -16,7 +16,7 @@ index fb9043b5..16634636 100755
 +    # *********************************************
 +    # Copy the UEFI 2.1 Test Cases
 +    # *********************************************
-+  
++
 +    # StartupScript items.
 +    cp ../../../SctPkg/BBR/EBBRStartup.nsh           SctPackage$ProcessorType/ > NUL
 +    cp ../../../SctPkg/BBR/SBBRStartup.nsh           SctPackage$ProcessorType/ > NUL
@@ -29,7 +29,7 @@ index fb9043b5..16634636 100755
 +    cp ../../../SctPkg/Config/Data/SCRT.conf                   $Framework/SCRT  > NUL
 +
 +    cp $ProcessorType/EfiCompliantBBTest.efi                   $Framework/Test/ > NUL
-+
+ 
 +  # Only include ExeModeBBTest.efi if the file exists
 +  if [ -e $ProcessorType/ExeModeBBTest.efi ]; then
 +    cp $ProcessorType/ExeModeBBTest.efi                      $Framework/Test/ > NUL
@@ -40,11 +40,11 @@ index fb9043b5..16634636 100755
 +    cp $ProcessorType/ProtocolHandlerServicesBBTest.efi        $Framework/Test/ > NUL
 +    cp $ProcessorType/ImageServicesBBTest.efi                  $Framework/Test/ > NUL
 +    cp $ProcessorType/MiscBootServicesBBTest.efi               $Framework/Test/ > NUL
-+    
++
 +    cp $ProcessorType/VariableServicesBBTest.efi               $Framework/Test/ > NUL
 +    cp $ProcessorType/TimeServicesBBTest.efi                   $Framework/Test/ > NUL
 +    cp $ProcessorType/MiscRuntimeServicesBBTest.efi            $Framework/Test/ > NUL
- 
++
 +    cp $ProcessorType/BisBBTest.efi                            $Framework/Test/ > NUL
 +    cp $ProcessorType/BlockIoBBTest.efi                        $Framework/Test/ > NUL
 +    cp $ProcessorType/BlockIo2BBTest.efi                       $Framework/Test/ > NUL
@@ -85,7 +85,7 @@ index fb9043b5..16634636 100755
 +#   cp $ProcessorType/UgaDrawBbTest.efi                        $Framework/Test/ > NUL
 +    cp $ProcessorType/GraphicsOutputBBTest.efi                 $Framework/Test/ > NUL
 +    cp $ProcessorType/UnicodeCollation2BBTest.efi              $Framework/Test/ > NUL
-+#Note: USB Host Controller Protocol BB is deprecated in SCT 2.3	
++#Note: USB Host Controller Protocol BB is deprecated in SCT 2.3
 +#   cp $ProcessorType/UsbHcTest.efi                            $Framework/Test/ > NUL
 +    cp $ProcessorType/UsbIoTest.efi                            $Framework/Test/ > NUL
 +    cp $ProcessorType/Usb2HcTest.efi                           $Framework/Test/ > NUL
@@ -96,7 +96,7 @@ index fb9043b5..16634636 100755
 +    cp $ProcessorType/SimpleTextInputExBBTest.efi              $Framework/Test/ > NUL
 +    cp $ProcessorType/ComponentName2BBTest.efi                 $Framework/Test/ > NUL
 +    cp $ProcessorType/DriverDiagnostics2BBTest.efi             $Framework/Test/ > NUL
-+    
++
 +    cp $ProcessorType/HIIDatabaseBBTest.efi                    $Framework/Test/ > NUL
 +    cp $ProcessorType/HIIStringBBTest.efi                      $Framework/Test/ > NUL
 +    cp $ProcessorType/HIIFontBBTest.efi                        $Framework/Test/ > NUL
@@ -144,7 +144,10 @@ index fb9043b5..16634636 100755
 +    cp $ProcessorType/SbbrBootServicesBBTest.efi               $Framework/Test/ > NUL
 +
 +    # Check if EFI Specification Version is 2.5 or greater
-+    cp $ProcessorType/EfiSpecVerLvlBBTest.efi                  $Framework/Test/ > NULq
++    cp $ProcessorType/EfiSpecVerLvlBBTest.efi                  $Framework/Test/ > NUL
++
++    # Runtime Services Tests - SBBR v1.0 Appendix B
++    cp $ProcessorType/SBBRRuntimeServicesBBTest.efi            $Framework/Test/ > NUL
 +
 +    # Tests SBBR Appendix C
 +    cp $ProcessorType/RequiredUefiProtocolsBBTest.efi          $Framework/Test/ > NUL
@@ -161,7 +164,7 @@ index fb9043b5..16634636 100755
 +    cp $ProcessorType/BootService_ENTSTest.efi         $Framework/Ents/Test/    > NUL
 +    cp $ProcessorType/RuntimeService_ENTSTest.efi      $Framework/Ents/Test/    > NUL
 +    cp $ProcessorType/GenericService_ENTSTest.efi      $Framework/Ents/Test/    > NUL
-+    
++
 +    cp $ProcessorType/SimpleNetwork_ENTSTest.efi       $Framework/Ents/Test/    > NUL
 +    cp $ProcessorType/PXEBaseCode_ENTSTest.efi         $Framework/Ents/Test/    > NUL
 +    cp $ProcessorType/Mnp*_ENTSTest.efi                $Framework/Ents/Test/    > NUL
@@ -192,11 +195,11 @@ index fb9043b5..16634636 100755
 +    CopyDependency PciIo
 +    CopyDependency PciRootBridgeIo
 +    CopyDependency PxeBaseCode
-+    CopyDependency ConfigKeywordHandler 
++    CopyDependency ConfigKeywordHandler
 +fi
 \ No newline at end of file
 diff --git a/uefi-sct/SctPkg/Config/Data/Category.ini b/uefi-sct/SctPkg/Config/Data/Category.ini
-index b34d35db..ac4f6013 100644
+index 16f9d637..1e88a593 100644
 --- a/uefi-sct/SctPkg/Config/Data/Category.ini
 +++ b/uefi-sct/SctPkg/Config/Data/Category.ini
 @@ -88,6 +88,27 @@ InterfaceGuid = 71652D04-BF38-434A-BCB8-6547D7FD8384
@@ -210,7 +213,7 @@ index b34d35db..ac4f6013 100644
 +Name          = GenericTest\SbbrRequiredUefiProtocols
 +Description   = Checks that UEFI protocols required by ARM SBBR are present.
 +
-+[Category Data] 
++[Category Data]
 +Revision      = 0x00010000
 +CategoryGuid  = d6e40d12-7a51-4454-b4fd-4c93887ed6cf
 +InterfaceGuid = 71652D04-BF38-434A-BCB8-6547D7FD8384
@@ -241,7 +244,21 @@ index b34d35db..ac4f6013 100644
  [Category Data]
  Revision      = 0x00010000
  CategoryGuid  = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
-@@ -1026,9 +1054,9 @@ InterfaceGuid = 8D59D32B-C655-4AE9-9B15-F25904992A43
+@@ -172,6 +200,13 @@ InterfaceGuid = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
+ Name          = RuntimeServicesTest\TCGMemoryOverwriteRequestTest
+ Description   = Test TCG Platform Reset Attack Mitigation EFI variables
+ 
++[Category Data]
++Revision      = 0x00010000
++CategoryGuid  = 52A69BBF-E19F-4e82-93D6-AAC46E2E1E06
++InterfaceGuid = AFF115FB-387B-4c18-8C41-6AFC7F03BB90
++Name          = RuntimeServicesTest\SBBRRuntimeServicesTest
++Description   = SBBR Runtime Services Tests
++
+ [Category Data]
+ Revision      = 0x00010000
+ CategoryGuid  = 5B1B31A1-9562-11D2-8E3F-00A0C969723B
+@@ -1033,12 +1068,12 @@ InterfaceGuid = 8D59D32B-C655-4AE9-9B15-F25904992A43
  Name          = IHV\ConsoleSupportTest\AbsolutePointerProtocolTest
  Description   = Absolute Pointer Protocol Test on IHV Drivers
  
@@ -257,6 +274,9 @@ index b34d35db..ac4f6013 100644
 +InterfaceGuid = CCD15FEC-6F73-4EEC-8395-3E69E4B940BF
 +Name          = RiscvBootProtocolTest
 +Description   = RISC-V Boot Protocol Test
+ 
+ [Category Data]
+ Revision      = 0x00010000
 diff --git a/uefi-sct/SctPkg/Library/SctGuidLib/SctGuidLib.inf b/uefi-sct/SctPkg/Library/SctGuidLib/SctGuidLib.inf
 index 8f918b26..2bbd22c6 100644
 --- a/uefi-sct/SctPkg/Library/SctGuidLib/SctGuidLib.inf

@@ -266,7 +266,8 @@ SctPkg/TestCase/UEFI/EFI/Protocol/AdapterInfo/BlackBoxTest/AdapterInfoProtocolBB
 SctPkg/TestCase/UEFI/EFI/Protocol/TimeStamp/BlackBoxTest/TimeStampProtocolBBTest.inf
 SctPkg/TestCase/UEFI/EFI/Protocol/RandomNumber/BlackBoxTest/RandomNumberBBTest.inf
 
-SctPkg/TestCase/UEFI/EFI/Protocol/TCG2Protocol/BlackBoxTest/TCG2ProtocolBBTest.inf
+SctPkg/TestCase/UEFI/EFI/Protocol/TCG2/BlackBoxTest/TCG2ProtocolBBTest.inf
+SctPkg/TestCase/UEFI/EFI/RuntimeServices/TCGMemoryOverwriteRequest/BlackBoxTest/TCGMemoryOverwriteRequestBBTest.inf
 SctPkg/TestCase/UEFI/EFI/Protocol/Hash2/BlackBoxTest/Hash2BBTest.inf
 SctPkg/TestCase/UEFI/EFI/Protocol/PKCS7Verify/BlackBoxTest/Pkcs7BBTest.inf
 SctPkg/TestCase/UEFI/EFI/Protocol/ConfigKeywordHandler/BlackBoxTest/ConfigKeywordHandlerBBTest.inf

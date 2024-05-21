@@ -66,7 +66,7 @@ get_fwts_src()
 {
     git clone --single-branch https://github.com/fwts/fwts
     pushd $TOP_DIR/fwts
-    git checkout V23.01.00
+    git checkout $FWTS_SRC_TAG
     git submodule update --init
     popd
 }
@@ -74,14 +74,14 @@ get_sct_src()
 {
     git clone --single-branch https://github.com/tianocore/edk2-test
     pushd $TOP_DIR/edk2-test
-    git checkout 032822757792c5d4d0bfed1fd8524e69ef4f2d17
+    git checkout $SCT_SRC_TAG
     popd
 }
 
 get_uefi_src()
 {
     git clone --depth 1 --single-branch \
-    --branch edk2-stable202208 https://github.com/tianocore/edk2.git
+    --branch $EDK2_SRC_VERSION https://github.com/tianocore/edk2.git
     pushd $TOP_DIR/edk2
     git submodule update --init
     popd
