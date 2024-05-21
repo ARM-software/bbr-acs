@@ -12,7 +12,7 @@ Disabled:❌ <br>
 <th rowspan=1 colspan=1>Testcase</th>
 </tr>
 <tr>
-<td rowspan=31 colspan=1>🔲 RuntimeServicesTest</td>
+<td rowspan=32 colspan=1>🔲 RuntimeServicesTest</td>
 <td rowspan=3 colspan=1>✅ SecureBootTest</td>
 <td rowspan=1 colspan=1>✅ ImageLoading</td>
 </tr>
@@ -60,6 +60,10 @@ Disabled:❌ <br>
 </tr>
 <td rowspan=1 colspan=1>✅ BBSRVariableSizeTest</td>
 <td rowspan=1 colspan=1>✅ BBSRVariableSizeTest_func</td>
+<tr>
+<td rowspan=1 colspan=1>✅ TCGMemoryOverwriteRequestTest</td>
+<td rowspan=1 colspan=1>✅ Test MOR and MORLOCK</td>
+</tr>
 </tr>
 <td rowspan=8 colspan=1>❌ TimeServicesTest</td>
 <td rowspan=1 colspan=1>❌ GetTime_Conf</td>
