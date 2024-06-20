@@ -34,9 +34,15 @@ create_scripts_link()
 {
  ln -s $TOP_DIR/../../common/scripts/framework.sh             $TOP_DIR/build-scripts/framework.sh
  ln -s $TOP_DIR/../../common/scripts/parse_params.sh          $TOP_DIR/build-scripts/parse_params.sh
- ln -s $TOP_DIR/../../common/scripts/build-sct.sh             $TOP_DIR/build-scripts/build-sct.sh
+ if [[ $1 = "fwts" ]]; then
+	ln -s $TOP_DIR/../../common/scripts/build-fwts.sh            $TOP_DIR/build-scripts/build-fwts.sh
+ elif [[ $1 = "uefi-sct" ]]; then
+	ln -s $TOP_DIR/../../common/scripts/build-sct.sh             $TOP_DIR/build-scripts/build-sct.sh
+ else
+	ln -s $TOP_DIR/../../common/scripts/build-sct.sh             $TOP_DIR/build-scripts/build-sct.sh
+	ln -s $TOP_DIR/../../common/scripts/build-fwts.sh            $TOP_DIR/build-scripts/build-fwts.sh
+ fi
  ln -s $TOP_DIR/../../common/scripts/build-uefi-apps.sh       $TOP_DIR/build-scripts/build-uefi-apps.sh
- ln -s $TOP_DIR/../../common/scripts/build-fwts.sh            $TOP_DIR/build-scripts/build-fwts.sh
 }
 
 init_dir()
@@ -48,6 +54,12 @@ init_dir()
 create_scripts_link
 init_dir
 
-source ./build-scripts/build-fwts.sh ES S
-source ./build-scripts/build-sct.sh  ES S
+if [[ $1 = "fwts" ]]; then
+	source ./build-scripts/build-fwts.sh ES S
+elif [[ $1 = "uefi-sct" ]]; then
+	source ./build-scripts/build-sct.sh  ES S
+else
+	source ./build-scripts/build-fwts.sh ES S
+	source ./build-scripts/build-sct.sh  ES S
+fi
 source ./build-scripts/build-uefi-apps.sh ES S
