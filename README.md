@@ -112,6 +112,14 @@ The binaries of FWTS are generated here
 
 NOTE: The UEFI application, CapsuleApp.efi is also built and can be found at the location bbr-acs/<ebbr/sbbr>/scripts/edk2/Build/MdeModule/DEBUG_GCC5/AARCH64 <br />
 
+NOTE: SBBR and EBBR build scripts also supports bulding fwts and sct individually.
+
+      To build only SCT, pass the sct option to build script
+      - `./build-scripts/build_<ebbr/sbbr>.sh` sct
+      
+      To build only FWTS, pass the fwts option to build script
+      - `./build-scripts/build_<ebbr/sbbr>.sh` fwts
+
 ## License
  
 Arm BBR ACS is distributed under Apache v2.0 License.
