@@ -1,7 +1,7 @@
 /** @file
 
-  Copyright 2006 - 2012 Unified EFI, Inc.<BR>
-  Copyright (c) 2021, Arm Inc. All rights reserved.<BR>
+  Copyright 2006-2012 Unified EFI, Inc.<BR>
+  Copyright (c) 2021-2024, Arm Ltd, All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at 
@@ -163,6 +163,9 @@ BBSRVariableSizeTestSub1 (
                    __FILE__,
                    (UINTN)__LINE__
                    );
+
+   // Reset Result variable
+   Result = EFI_TEST_ASSERTION_PASSED;
 
    //Check MaxVariableSize is larger than 64kb as per R050
 
