@@ -2,7 +2,7 @@
 
   Copyright 2006 - 2012 Unified EFI, Inc.<BR>
   Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
-  Copyright 2021, 2023 Arm LTD.
+  Copyright 2021 - 2024, Arm Ltd.
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -36,6 +36,17 @@ Abstract:
                        EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS)
 #define DB_ATTRIBUTES (EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS)
 #define DBX_ATTRIBUTES (EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS)
+
+VARIABLE_DATA DefSecureBootVarArray[DEF_SECURE_VARS_NUM] = {
+  {L"PKDefault",   (EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS),
+   EFI_TEST_SECUREBOOTVARIABLEATTRIBUTES_ASSERTION_009_GUID},
+  {L"KEKDefault",  (EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS),
+   EFI_TEST_SECUREBOOTVARIABLEATTRIBUTES_ASSERTION_010_GUID},
+  {L"dbDefault",   (EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS),
+   EFI_TEST_SECUREBOOTVARIABLEATTRIBUTES_ASSERTION_011_GUID},
+  {L"dbxDefault",  (EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS),
+   EFI_TEST_SECUREBOOTVARIABLEATTRIBUTES_ASSERTION_012_GUID},
+};
 
 //
 // Prototypes (external)
@@ -79,6 +90,8 @@ VariableAttributesTest(
   UINTN                               DataSize;
   UINT8                               Data[MAX_BUFFER_SIZE];
   UINT32                              Attributes;
+  VOID                                *DataPtr;
+  UINT32                              Index;
 
   //
   // Get test support library interfaces
@@ -372,6 +385,76 @@ VariableAttributesTest(
                  L"Attributes=0x%x, Expected=0x%x\n",
                  Attributes, DB_ATTRIBUTES
                  );
+
+  // verify implementation of default secureboot variables
+  Result = EFI_TEST_ASSERTION_PASSED;
+  for (Index = 0; Index < DEF_SECURE_VARS_NUM; Index++) {
+    // discover buffer size required
+    DataSize = 0;
+    DataPtr     = NULL;
+    Status = gtRT->GetVariable (
+                          DefSecureBootVarArray[Index].Name,
+                          &gEfiGlobalVariableGuid,
+                          &Attributes,
+                          &DataSize,
+                          DataPtr
+                          );
+
+    if (Status == EFI_BUFFER_TOO_SMALL) {
+      gtBS->AllocatePool (
+                  EfiBootServicesData,
+                  DataSize,
+                  (VOID **) &DataPtr
+                  );
+
+      Status = gtRT->GetVariable (
+                          DefSecureBootVarArray[Index].Name,
+                          &gEfiGlobalVariableGuid,
+                          &Attributes,
+                          &DataSize,
+                          DataPtr
+                          );
+    }
+
+    if (Status == EFI_SUCCESS) {
+      // check the attributes
+      if (Attributes != DefSecureBootVarArray[Index].Attributes) {
+        Result   = EFI_TEST_ASSERTION_FAILED;
+        StandardLib->RecordMessage (
+                    StandardLib,
+                    EFI_VERBOSE_LEVEL_DEFAULT,
+                    L"Variable Name: %s, Variable Attribute: 0x%08x, Expected Attribute: 0x%08x\n",
+                    DefSecureBootVarArray[Index].Name,
+                    Attributes,
+                    DefSecureBootVarArray[Index].Attributes
+                    );
+      }
+    } else {
+      Result   = EFI_TEST_ASSERTION_FAILED;
+      StandardLib->RecordMessage (
+                    StandardLib,
+                    EFI_VERBOSE_LEVEL_DEFAULT,
+                    L"Failed to fetch Variable = %s, Status = 0x%x\n",
+                    DefSecureBootVarArray[Index].Name,
+                    Status
+                    );
+    }
+
+    // Record assertion
+    StandardLib->RecordAssertion (
+                  StandardLib,
+                  Result,
+                  DefSecureBootVarArray[Index].TestAssertionGuid,
+                  L"BBSR Check Default SecureBoot Variable",
+                  L"%s :%a:%d:Status - %r",
+                  DefSecureBootVarArray[Index].Name,
+                  __FILE__,
+                  (UINTN)__LINE__,
+                  Status
+                  );
+    // reset the Result for next iteration
+    Result = EFI_TEST_ASSERTION_PASSED;
+  }
 
   //
   // Trace ...
