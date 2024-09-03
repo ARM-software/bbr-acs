@@ -2,7 +2,7 @@
 
   Copyright 2006 - 2016 Unified EFI, Inc.<BR>
   Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
-  Copyright 2021, 2023, Arm LTD.
+  Copyright 2021 - 2024, Arm Ltd.
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -42,6 +42,15 @@ Abstract:
 //
 
 #define SECURE_BOOT_BB_TEST_REVISION    0x00010000
+
+#define DEF_SECURE_VARS_NUM 4
+#define MAX_VAR_NAME_LEN    1024
+
+typedef struct {
+  CHAR16    Name[MAX_VAR_NAME_LEN];
+  UINT32   Attributes;
+  EFI_GUID TestAssertionGuid;
+} VARIABLE_DATA;
 
 #define SECURE_BOOT_BB_TEST_GUID        \
   { 0xCBADA58E, 0xA1AA, 0x45DF, {0xBD, 0xDF, 0xF9, 0xBA, 0x12, 0x92, 0xF8, 0x87 }}

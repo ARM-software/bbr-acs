@@ -2,7 +2,7 @@
 
   Copyright 2006 - 2016 Unified EFI, Inc.<BR>
   Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
-  Copyright 2021, Arm LTD.
+  Copyright 2021 - 2024, Arm Ltd.
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -74,6 +74,18 @@ extern EFI_GUID gSecureBootVariableAttributesBbTestAssertionGuid007;
 { 0xbc37e48e, 0x614f, 0x44e1, {0x9d, 0x9a, 0x80, 0xe5, 0x6c, 0x9b, 0x00, 0x90 }}
 
 extern EFI_GUID gSecureBootVariableAttributesBbTestAssertionGuid008;
+
+#define EFI_TEST_SECUREBOOTVARIABLEATTRIBUTES_ASSERTION_009_GUID \
+{0xaba4f85b, 0x7b07, 0x4e6b, {0x93, 0xa6, 0x29, 0x19, 0x8d, 0x50, 0x89, 0x34} }
+
+#define EFI_TEST_SECUREBOOTVARIABLEATTRIBUTES_ASSERTION_010_GUID \
+{0xbfa3ad10, 0x1c20, 0x48e5, {0x9d, 0x0d, 0x1c, 0x1b, 0x0b, 0x3d, 0xc2, 0x7b} }
+
+#define EFI_TEST_SECUREBOOTVARIABLEATTRIBUTES_ASSERTION_011_GUID \
+{0xaf0d74e7, 0xa36c, 0x4b07, {0x95, 0xf9, 0xdb, 0x6a, 0x24, 0xac, 0xe1, 0x7f} }
+
+#define EFI_TEST_SECUREBOOTVARIABLEATTRIBUTES_ASSERTION_012_GUID \
+{0xdc5c7717, 0xed10, 0x476c, {0xb6, 0x5e, 0x6e, 0x00, 0x9e, 0xe0, 0x03, 0x23} }
 
 #define EFI_TEST_SECUREBOOTVARIABLEUPDATES_ASSERTION_001_GUID \
 { 0xd2073163, 0xedb0, 0x4d6b, {0xba, 0x8f, 0x5c, 0x61, 0x16, 0xc1, 0x59, 0x2c }}
