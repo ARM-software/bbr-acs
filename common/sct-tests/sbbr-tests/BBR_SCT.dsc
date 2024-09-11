@@ -42,7 +42,7 @@
 #
 # Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 #
-# Copyright (c) 2016-2023, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2016-2024, ARM Ltd. All rights reserved.<BR>
 #
 #
 #/*++
@@ -146,6 +146,7 @@
 [LibraryClasses.AARCH64]
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
+  ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
 
 ###############################################################################
 #
@@ -269,6 +270,7 @@ SctPkg/TestCase/UEFI/EFI/Protocol/RandomNumber/BlackBoxTest/RandomNumberBBTest.i
 
 SctPkg/TestCase/UEFI/EFI/Protocol/TCG2/BlackBoxTest/TCG2ProtocolBBTest.inf
 SctPkg/TestCase/UEFI/EFI/RuntimeServices/TCGMemoryOverwriteRequest/BlackBoxTest/TCGMemoryOverwriteRequestBBTest.inf
+SctPkg/TestCase/UEFI/EFI/Generic/PlatformResetAttackMitigationPsciTest/BlackBoxTest/PlatformResetAttackMitigationPsciBBTest.inf
 SctPkg/TestCase/UEFI/EFI/Protocol/Hash2/BlackBoxTest/Hash2BBTest.inf
 SctPkg/TestCase/UEFI/EFI/Protocol/PKCS7Verify/BlackBoxTest/Pkcs7BBTest.inf
 SctPkg/TestCase/UEFI/EFI/Protocol/ConfigKeywordHandler/BlackBoxTest/ConfigKeywordHandlerBBTest.inf

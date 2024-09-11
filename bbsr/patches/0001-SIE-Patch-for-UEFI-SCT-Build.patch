@@ -1,5 +1,5 @@
 diff --git a/uefi-sct/SctPkg/CommonGenFramework.sh b/uefi-sct/SctPkg/CommonGenFramework.sh
-index e319d4cd..de71584f 100755
+index e319d4cd..ff3b327f 100755
 --- a/uefi-sct/SctPkg/CommonGenFramework.sh
 +++ b/uefi-sct/SctPkg/CommonGenFramework.sh
 @@ -92,6 +92,9 @@ CopyDependency()
@@ -12,7 +12,7 @@ index e319d4cd..de71584f 100755
      ls -h $ProcessorType/$1_*.cmp   >> temp.txt 2>NUL
      ls -h $ProcessorType/$1_*.ucmp  >> temp.txt 2>NUL
  
-@@ -379,6 +382,12 @@ then
+@@ -379,6 +382,13 @@ then
      cp $ProcessorType/ImageServicesBBTest.efi                  $Framework/Test/ > NUL
      cp $ProcessorType/MiscBootServicesBBTest.efi               $Framework/Test/ > NUL
  
@@ -21,19 +21,21 @@ index e319d4cd..de71584f 100755
 +    cp $ProcessorType/TCGMemoryOverwriteRequestBBTest.efi      $Framework/Test/ > NUL
 +    cp $ProcessorType/TCG2ProtocolBBTest.efi                   $Framework/Test/ > NUL
 +    cp $ProcessorType/SecureBootBBTest.efi                     $Framework/Test/ > NUL
++    cp $ProcessorType/PlatformResetAttackMitigationPsciTest.efi $Framework/Test/ > NUL
 +
      cp $ProcessorType/VariableServicesBBTest.efi               $Framework/Test/ > NUL
      cp $ProcessorType/TimeServicesBBTest.efi                   $Framework/Test/ > NUL
      cp $ProcessorType/MiscRuntimeServicesBBTest.efi            $Framework/Test/ > NUL
-@@ -534,4 +543,5 @@ then
+@@ -534,4 +544,5 @@ then
      CopyDependency PciRootBridgeIo
      CopyDependency PxeBaseCode
      CopyDependency ConfigKeywordHandler
-+    CopyDependency SecureBoot
- fi
+-fi
 \ No newline at end of file
++    CopyDependency SecureBoot
++fi
 diff --git a/uefi-sct/SctPkg/Config/Data/Category.ini b/uefi-sct/SctPkg/Config/Data/Category.ini
-index 1e88a593..9d2e2301 100644
+index 1e88a593..62645552 100644
 --- a/uefi-sct/SctPkg/Config/Data/Category.ini
 +++ b/uefi-sct/SctPkg/Config/Data/Category.ini
 @@ -172,6 +172,20 @@ InterfaceGuid = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
@@ -78,7 +80,7 @@ index 1e88a593..9d2e2301 100644
  [Category Data]
  Revision      = 0x00010000
  CategoryGuid  = 52A69BBF-E19F-4e82-93D6-AAC46E2E1E06
-@@ -1074,10 +1088,10 @@ CategoryGuid  = CCD15FEC-6F73-4EEC-8395-3E69E4B940BF
+@@ -1074,10 +1088,17 @@ CategoryGuid  = CCD15FEC-6F73-4EEC-8395-3E69E4B940BF
  InterfaceGuid = CCD15FEC-6F73-4EEC-8395-3E69E4B940BF
  Name          = RiscvBootProtocolTest
  Description   = RISC-V Boot Protocol Test
@@ -96,3 +98,10 @@ index 1e88a593..9d2e2301 100644
 +InterfaceGuid = 607f766c-7455-42be-930b-e4d76db2720f
 +Name          = TCG2ProtocolTest
 +Description   = TCG2 Protocol Test
++
++[Category Data]
++Revision      = 0x00010000
++CategoryGuid  = C4567D24-BB60-484E-80EC-A36ACEEA5C43
++InterfaceGuid = 71652D04-BF38-434A-BCB8-6547D7FD8384
++Name          = GenericTest\PlatformResetAttackMitigationPsciTest
++Description   = Check Platform Reset Attack Mitigation Via PSCI
