@@ -1,0 +1,55 @@
+## @file
+#
+#  Copyright (c) 2024, Arm Ltd,. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+#/*++
+#
+# Module Name:
+#
+#   PlatformResetAttackMitigationPsciBBTest.inf
+#
+# Abstract:
+#
+#   Component description file for Platform Reset Attack Mitigation Via PSCI Black-Box Test.
+#
+#--*/
+
+[Defines]
+  INF_VERSION          = 0x00010005
+  BASE_NAME            = PlatformResetAttackMitigationPsciTest
+  FILE_GUID            = 5c2c18d0-62be-40fe-8ba6-692bf06c97ad
+  MODULE_TYPE          = UEFI_DRIVER
+  VERSION_STRING       = 1.0
+  ENTRY_POINT          = InitializePlatformResetAttackMitigationPsciBBTest
+
+[Sources.common]
+  PlatformResetAttackMitigationPsciBBTestMain.h
+  PlatformResetAttackMitigationPsciBBTestMain.c
+  PlatformResetAttackMitigationPsciBBTestFunction.c
+  Guid.h
+  Guid.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SctPkg/SctPkg.dec
+  SctPkg/UEFI/UEFI.dec
+  ArmPkg/ArmPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  SctLib
+  EfiTestLib
+  ArmSmcLib
+
+[Protocols]
+  gEfiTestRecoveryLibraryGuid
+  gEfiTestLoggingLibraryGuid

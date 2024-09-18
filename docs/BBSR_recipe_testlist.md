@@ -128,4 +128,9 @@ Disabled:❌ <br>
 <td rowspan=1 colspan=1>✅ SubmitCommand_Conf</td>
 </tr>
 </tr>
+<tr>
+<td rowspan=1 colspan=1>✅ PlatformResetAttackMitigationPsciTest</td>
+<td rowspan=1 colspan=1>✅ PlatformResetAttackMitigationPsciTest_func</td>
+<td rowspan=1 colspan=1>✅ PlatformResetAttackMitigationPsciTest_func</td>
+</tr>
 </table>
