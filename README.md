@@ -33,11 +33,11 @@ To run SCT manually, follow these steps:
 
 
 1. `Shell>FS(X):`
-- `FS(X):>cd EFI\BOOT\bbr\SCT`
+- `FS(X):>cd acs_tests\bbr\SCT`
 - To run EBBR or SBBR tests
- `FS(X):EFI\BOOT\bbr\SCT>SCT -s <ebbr.seq/sbbr.seq>`
+ `FS(X):acs_tests\bbr\SCT>SCT -s <ebbr.seq/sbbr.seq>`
  - To run all tests
- `FS(X):EFI\BOOT\bbr\SCT>SCT -a -v`
+ `FS(X):acs_tests\bbr\SCT>SCT -a -v`
  
 
 You can also select and run tests individually. For more information on running the tests, see the [SCT User Guide](http://www.uefi.org/testtools).
@@ -60,7 +60,7 @@ To run the tests, follow these steps.
 
 2. Run manual tests.
 
-	- `FS(X):EFI\BOOT\bbr\SCT>SCT -s <ebbr_manual.seq/sbbr_manual.seq>`
+	- `FS(X):acs_tests\bbr\SCT>SCT -s <ebbr_manual.seq/sbbr_manual.seq>`
  
 3. While the system runs the reset tests, you may have to manually reset the system if it hangs.
 
