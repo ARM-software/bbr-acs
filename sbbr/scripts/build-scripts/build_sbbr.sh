@@ -43,11 +43,11 @@ create_scripts_link
 init_dir
 
 if [[ $1 = "fwts" ]]; then
-	source ./build-scripts/build-fwts.sh ES S
+	source ./build-scripts/build-fwts.sh SBBR S
 elif [[ $1 = "sct" ]]; then
-	source ./build-scripts/build-sct.sh  ES S
+	source ./build-scripts/build-sct.sh  SBBR S
 else
-	source ./build-scripts/build-fwts.sh ES S
-	source ./build-scripts/build-sct.sh  ES S
+	source ./build-scripts/build-fwts.sh SBBR S
+	source ./build-scripts/build-sct.sh  SBBR S
 fi
-source ./build-scripts/build-uefi-apps.sh ES S
+source ./build-scripts/build-uefi-apps.sh SBBR S
