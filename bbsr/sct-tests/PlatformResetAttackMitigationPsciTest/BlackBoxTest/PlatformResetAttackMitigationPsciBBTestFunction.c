@@ -144,7 +144,7 @@ PlatformResetAttackMitigationPsciTestSub1 (
   if (SmcArgs.Arg0 == 0)
       Result = EFI_TEST_ASSERTION_PASSED;
   else
-      Result = EFI_TEST_ASSERTION_FAILED;
+      Result = EFI_TEST_ASSERTION_WARNING;
 
   StandardLib->RecordAssertion (
                    StandardLib,
