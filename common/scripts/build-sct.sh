@@ -150,7 +150,7 @@ do_build()
         cp $BBR_DIR/sbbr/config/SBBR_extd_run.seq uefi-sct/SctPkg/BBR/
         cp $BBR_DIR/sbbr/config/EfiCompliant_SBBR.ini  uefi-sct/SctPkg/BBR/
         if [[ $BUILD_TYPE != S ]]; then
-	    if git apply --check $TOP_DIR/patches/sctversion.patch; then
+        if git apply --check $TOP_DIR/patches/sctversion.patch; then
                 echo "Applying edk2-test BBR sctversion patch..."
                 git apply --ignore-whitespace --ignore-space-change $TOP_DIR/patches/sctversion.patch
             else
@@ -164,6 +164,26 @@ do_build()
     cp $BBR_DIR/common/config/ScrtStartup.nsh uefi-sct/SctPkg/BBR/
     cp $BBR_DIR/common/config/SCRT.conf uefi-sct/SctPkg/BBR/
 
+    # apply version patches for standalone BBR builds
+    if [[ $BUILD_TYPE = S ]]; then
+        if [ $BUILD_PLAT = EBBR ]; then
+            if git apply --check $BBR_DIR/ebbr/patches/standalone_ebbr_ver.patch; then
+                echo "Applying EBBR SCT version patch..."
+                git apply --ignore-whitespace --ignore-space-change $BBR_DIR/ebbr/patches/standalone_ebbr_ver.patch
+            else
+                echo  "Error while applying EBBR SCT version patch..."
+                exit
+            fi
+        elif [ $BUILD_PLAT = SBBR ]; then
+            if git apply --check $BBR_DIR/sbbr/patches/standalone_sbbr_ver.patch; then
+                echo "Applying SBBR SCT version patch..."
+                git apply --ignore-whitespace --ignore-space-change $BBR_DIR/sbbr/patches/standalone_sbbr_ver.patch
+            else
+                echo  "Error while applying SBBR SCT version patch..."
+                exit
+            fi
+        fi
+    fi
 
     if git apply --check $BBR_DIR/common/patches/edk2-test-bbr-build.patch; then
         echo "Applying edk2-test BBR build patch..."
