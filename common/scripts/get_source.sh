@@ -18,14 +18,7 @@
 
 TOP_DIR=`pwd`
 
-. $TOP_DIR/../../common/config/bbr_common_config.cfg
-
-#Optional argument 'arm' shall be set when targeting a 32bit Arm device
-if [ "$1" == "arm" ]; then
-    TARGET_ARCH="arm"
-else
-    TARGET_ARCH="aarch64"
-fi
+. $TOP_DIR/../../common/config/bbr_source.cfg
 
 get_cross_compiler()
 {
@@ -36,11 +29,7 @@ get_cross_compiler()
         echo "=================================================================="
     else
         echo "Downloading cross compiler. Version : ${GCC_TOOLS_VERSION}"
-    if [ $TARGET_ARCH == "arm" ]; then
-        TAG=arm-linux-gnueabihf
-    else
         TAG=aarch64-none-linux-gnu
-    fi
         mkdir -p tools
         pushd $TOP_DIR/tools
         wget $CROSS_COMPILER_URL

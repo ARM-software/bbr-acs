@@ -1,41 +1,32 @@
-# Copyright (c) 2021, 2023 ARM Limited and Contributors. All rights reserved.
+#!/usr/bin/env bash
+
+# Copyright (c) 2021-2024, Arm Limited or its affiliates. All rights reserved.
+#  SPDX-License-Identifier : Apache-2.0
 #
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
 #
-# Redistributions of source code must retain the above copyright notice, this
-# list of conditions and the following disclaimer.
+#   http://www.apache.org/licenses/LICENSE-2.0
 #
-# Redistributions in binary form must reproduce the above copyright notice,
-# this list of conditions and the following disclaimer in the documentation
-# and/or other materials provided with the distribution.
-#
-# Neither the name of ARM nor the names of its contributors may be used
-# to endorse or promote products derived from this software without specific
-# prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+##
+
 
 echo -off
 
 for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
-  if exist FS%i:\EFI\BOOT\bbr\SCT then
+  if exist FS%i:\acs_tests\bbr\SCT then
     #
     # Found EFI SCT harness
     #
     FS%i:
-    cd FS%i:\EFI\BOOT\bbr\SCT
-    echo Press any key to stop the EFI SCT running
+    cd FS%i:\acs_tests\bbr\SCT
+    echo "Press any key to stop the EFI SCT running"
     stallforkey.efi 5
     if %lasterror% == 0 then
       goto Done
@@ -46,7 +37,9 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
 
                 #Check if SCT run has already completed
                 if  exist FS%j:\acs_results\sct_results\Overall\Summary.log then
-                    echo SCT has completed run. Press any key to start SCT execution from the beginning. WARNING: Ensure you have backed up the existing logs.
+                    echo "SCT has completed run."
+		    echo "Press any key to start SCT execution from the beginning."
+		    echo "WARNING: Ensure you have backed up the existing logs."
                     stallforkey.efi 5
                     if %lasterror% == 0 then
                         #Backup the existing logs
@@ -60,14 +53,14 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
                     endif
                 endif
 
-                if exist FS%i:\EFI\BOOT\bbr\SCT\.passive.mode then
-                    if exist FS%i:\EFI\BOOT\bbr\SCT\.verbose.mode then
+                if exist FS%i:\acs_tests\bbr\SCT\.passive.mode then
+                    if exist FS%i:\acs_tests\bbr\SCT\.verbose.mode then
                         Sct -c -p mnp -v
                     else
                         Sct -c -p mnp
                     endif
                     else
-                    if exist FS%i:\EFI\BOOT\bbr\SCT\.verbose.mode then
+                    if exist FS%i:\acs_tests\bbr\SCT\.verbose.mode then
                         Sct -c -v
                     else
                         Sct -c
@@ -75,18 +68,18 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
 
                     #SCT execution has finished. Copy the logs to acs_results
                     if  exist FS%j:\acs_results\sct_results\ then
-                        if  exist FS%i:\EFI\BOOT\bbr\SCT\Overall then
-                            cp -r FS%i:\EFI\BOOT\bbr\SCT\Overall FS%j:\acs_results\sct_results\
+                        if  exist FS%i:\acs_tests\bbr\SCT\Overall then
+                            cp -r FS%i:\acs_tests\bbr\SCT\Overall FS%j:\acs_results\sct_results\
                         endif
-                        if  exist FS%i:\EFI\BOOT\bbr\SCT\Dependency\EfiCompliantBBTest then
-                            cp -r FS%i:\EFI\BOOT\bbr\SCT\Dependency\EfiCompliantBBTest FS%j:\acs_results\sct_results\
+                        if  exist FS%i:\acs_tests\bbr\SCT\Dependency\EfiCompliantBBTest then
+                            cp -r FS%i:\acs_tests\bbr\SCT\Dependency\EfiCompliantBBTest FS%j:\acs_results\sct_results\
                         endif
-                        if  exist FS%i:\EFI\BOOT\bbr\SCT\Sequence then
-                            cp -r FS%i:\EFI\BOOT\bbr\SCT\Sequence FS%j:\acs_results\sct_results\
+                        if  exist FS%i:\acs_tests\bbr\SCT\Sequence then
+                            cp -r FS%i:\acs_tests\bbr\SCT\Sequence FS%j:\acs_results\sct_results\
                         endif
 
                         #Restart to avoid an impact of running SCT tests on rest of the suites
-                        echo Reset the system ...
+                        echo "Reset the system ..."
                         reset
                     endif
                     #goto Done
@@ -97,7 +90,7 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
             cd FS%j:\acs_results
             mkdir sct_results
             FS%i:
-            cd FS%i:\EFI\BOOT\bbr\SCT
+            cd FS%i:\acs_tests\bbr\SCT
             if %1 == sct_extd then
                echo "Starting extended run of SCT"
                Sct -s SBBR_extd_run.seq

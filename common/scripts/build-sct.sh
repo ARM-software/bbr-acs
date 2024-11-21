@@ -42,7 +42,7 @@ SCT_PATH=edk2-test
 UEFI_TOOLCHAIN=GCC5
 UEFI_BUILD_MODE=DEBUG
 TARGET_ARCH=AARCH64
-KEYS_DIR=$TOP_DIR/security-interface-extension-keys
+KEYS_DIR=$TOP_DIR/bbsr-keys
 TEST_DB1_KEY=$KEYS_DIR/TestDB1.key
 TEST_DB1_CRT=$KEYS_DIR/TestDB1.crt
 SCT_FRAMEWORK=$TOP_DIR/$SCT_PATH/uefi-sct/Build/bbrSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}/${TARGET_ARCH}
@@ -52,10 +52,10 @@ BUILD_TYPE=$2
 
 # if BBR standalone build
 if [[ $BUILD_TYPE = S ]]; then
-    . $TOP_DIR/../../common/config/bbr_common_config.cfg
+    . $TOP_DIR/../../common/config/bbr_source.cfg
 else
     # source common config if arm-systemready ACS build
-    . $TOP_DIR/../../common/config/sr_es_common_config.cfg
+    . $TOP_DIR/../common/config/systemready-band-source.cfg
 fi
 
 if [[ $arch != "aarch64" ]]; then
@@ -63,13 +63,9 @@ if [[ $arch != "aarch64" ]]; then
 fi
 
 
-if [ $BUILD_PLAT = SR ]; then
-   BUILD_PLAT=ES
-fi
-
-if ! [[ $BUILD_PLAT = IR ]] && ! [[ $BUILD_PLAT = ES ]]  ; then
+if ! [[ $BUILD_PLAT = EBBR ]] && ! [[ $BUILD_PLAT = SBBR ]]  ; then
     echo "Please provide a target."
-    echo "Usage build-sct.sh <IR/ES> <BUILD_TYPE>"
+    echo "Usage build-sct.sh <EBBR/SBBR> <BUILD_TYPE>"
     exit
 fi
 
@@ -104,10 +100,10 @@ fi
 do_build()
 {
     pushd $TOP_DIR/$SCT_PATH
-    export KEYS_DIR=$TOP_DIR/security-interface-extension-keys
+    export KEYS_DIR=$TOP_DIR/bbsr-keys
     export EDK2_TOOLCHAIN=$UEFI_TOOLCHAIN
 
-    # required for SIE keys generation
+    # required for BBSR keys generation
     export PATH="$PATH:$TOP_DIR/efitools"
 
     # export EDK2 enviromnent variables
@@ -126,7 +122,7 @@ do_build()
     cp $SBBR_TEST_DIR/BBR_SCT.dsc uefi-sct/SctPkg/UEFI/
     cp $SBBR_TEST_DIR/build_bbr.sh uefi-sct/SctPkg/
 
-    # copy SIE SCT tests to edk2-test
+    # copy BBSR SCT tests to edk2-test
     if [[ $BUILD_TYPE != S ]]; then
         cp -r $BBSR_TEST_DIR/BBSRVariableSizeTest uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices
         cp -r $BBSR_TEST_DIR/SecureBoot uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices
@@ -136,29 +132,58 @@ do_build()
 
     #Startup/runtime files.
     mkdir -p uefi-sct/SctPkg/BBR
-    if [ $BUILD_PLAT = IR ]; then
-    #EBBR
-    cp $BBR_DIR/ebbr/config/EBBRStartup.nsh uefi-sct/SctPkg/BBR/
-    cp $BBR_DIR/ebbr/config/EBBR.seq uefi-sct/SctPkg/BBR/
-    cp $BBR_DIR/ebbr/config/EBBR_manual.seq uefi-sct/SctPkg/BBR/
-    cp $BBR_DIR/ebbr/config/EBBR_extd_run.seq uefi-sct/SctPkg/BBR/
-    cp $BBR_DIR/ebbr/config/EfiCompliant_EBBR.ini uefi-sct/SctPkg/BBR/
-    elif [ $BUILD_PLAT = ES ]; then
-    #SBBR
-    cp $BBR_DIR/sbbr/config/SBBRStartup.nsh uefi-sct/SctPkg/BBR/
-    cp $BBR_DIR/sbbr/config/SBBR.seq uefi-sct/SctPkg/BBR/
-    cp $BBR_DIR/sbbr/config/SBBR_manual.seq uefi-sct/SctPkg/BBR/
-    cp $BBR_DIR/sbbr/config/SBBR_extd_run.seq uefi-sct/SctPkg/BBR/
-    cp $BBR_DIR/sbbr/config/EfiCompliant_SBBR.ini  uefi-sct/SctPkg/BBR/
-    fi
+    # undo any previously applied patches on edk2-test
+    git checkout .
 
+    if [ $BUILD_PLAT = EBBR ]; then
+        #EBBR
+        cp $BBR_DIR/ebbr/config/EBBRStartup.nsh uefi-sct/SctPkg/BBR/
+        cp $BBR_DIR/ebbr/config/EBBR.seq uefi-sct/SctPkg/BBR/
+        cp $BBR_DIR/ebbr/config/EBBR_manual.seq uefi-sct/SctPkg/BBR/
+        cp $BBR_DIR/ebbr/config/EBBR_extd_run.seq uefi-sct/SctPkg/BBR/
+        cp $BBR_DIR/ebbr/config/EfiCompliant_EBBR.ini uefi-sct/SctPkg/BBR/
+    elif [ $BUILD_PLAT = SBBR ]; then
+    #SBBR
+        cp $BBR_DIR/sbbr/config/SBBRStartup.nsh uefi-sct/SctPkg/BBR/
+        cp $BBR_DIR/sbbr/config/SBBR.seq uefi-sct/SctPkg/BBR/
+        cp $BBR_DIR/sbbr/config/SBBR_manual.seq uefi-sct/SctPkg/BBR/
+        cp $BBR_DIR/sbbr/config/SBBR_extd_run.seq uefi-sct/SctPkg/BBR/
+        cp $BBR_DIR/sbbr/config/EfiCompliant_SBBR.ini  uefi-sct/SctPkg/BBR/
+        if [[ $BUILD_TYPE != S ]]; then
+        if git apply --check $TOP_DIR/patches/sctversion.patch; then
+                echo "Applying edk2-test BBR sctversion patch..."
+                git apply --ignore-whitespace --ignore-space-change $TOP_DIR/patches/sctversion.patch
+            else
+                echo  "Error while applying edk2-test BBR sctversion patch..."
+                exit
+            fi
+        fi
+    fi
     #Common
     #SCRT
     cp $BBR_DIR/common/config/ScrtStartup.nsh uefi-sct/SctPkg/BBR/
     cp $BBR_DIR/common/config/SCRT.conf uefi-sct/SctPkg/BBR/
 
-    # undo any previously applied patches on edk2-test
-    git checkout .
+    # apply version patches for standalone BBR builds
+    if [[ $BUILD_TYPE = S ]]; then
+        if [ $BUILD_PLAT = EBBR ]; then
+            if git apply --check $BBR_DIR/ebbr/patches/standalone_ebbr_ver.patch; then
+                echo "Applying EBBR SCT version patch..."
+                git apply --ignore-whitespace --ignore-space-change $BBR_DIR/ebbr/patches/standalone_ebbr_ver.patch
+            else
+                echo  "Error while applying EBBR SCT version patch..."
+                exit
+            fi
+        elif [ $BUILD_PLAT = SBBR ]; then
+            if git apply --check $BBR_DIR/sbbr/patches/standalone_sbbr_ver.patch; then
+                echo "Applying SBBR SCT version patch..."
+                git apply --ignore-whitespace --ignore-space-change $BBR_DIR/sbbr/patches/standalone_sbbr_ver.patch
+            else
+                echo  "Error while applying SBBR SCT version patch..."
+                exit
+            fi
+        fi
+    fi
 
     if git apply --check $BBR_DIR/common/patches/edk2-test-bbr-build.patch; then
         echo "Applying edk2-test BBR build patch..."
@@ -175,11 +200,11 @@ do_build()
         exit
     fi
     if [[ $BUILD_TYPE != S ]]; then
-        if git apply --check $BBR_DIR/bbsr/patches/0001-SIE-Patch-for-UEFI-SCT-Build.patch; then
-            echo "Applying SIE SCT patch..."
-            git apply --ignore-whitespace --ignore-space-change $BBR_DIR/bbsr/patches/0001-SIE-Patch-for-UEFI-SCT-Build.patch
+        if git apply --check $BBR_DIR/bbsr/patches/0001-BBSR-Patch-for-UEFI-SCT-Build.patch; then
+            echo "Applying BBSR SCT patch..."
+            git apply --ignore-whitespace --ignore-space-change $BBR_DIR/bbsr/patches/0001-BBSR-Patch-for-UEFI-SCT-Build.patch
         else
-            echo  "Error while applying SIE SCT patch..."
+            echo  "Error while applying BBSR SCT patch..."
             exit
         fi
     fi
@@ -233,14 +258,14 @@ do_package ()
     mkdir -p ${TARGET_ARCH}_SCT/SCT/SCRT
     mkdir -p ${TARGET_ARCH}_SCT/SCT/Sequence
 
-    if [ $BUILD_PLAT = IR ]; then
+    if [ $BUILD_PLAT = EBBR ]; then
         #EBBR
         cp -r Build/bbrSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}/${TARGET_ARCH}/* ${TARGET_ARCH}_SCT/SCT/
         cp Build/bbrSct/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/SctPackage${TARGET_ARCH}/EBBRStartup.nsh ${TARGET_ARCH}_SCT/SctStartup.nsh
         cp SctPkg/BBR/EfiCompliant_EBBR.ini ${TARGET_ARCH}_SCT/SCT/Dependency/EfiCompliantBBTest/EfiCompliant.ini
         cp SctPkg/BBR/EBBR_manual.seq ${TARGET_ARCH}_SCT/SCT/Sequence/EBBR_manual.seq
 
-    elif [ $BUILD_PLAT = ES ]; then
+    elif [ $BUILD_PLAT = SBBR ]; then
         # Sign the SCT binaries
         if [ $BUILD_TYPE != S ]; then
             SecureBootSign $SCT_FRAMEWORK
@@ -256,7 +281,7 @@ do_package ()
             SecureBootSignDependency ConfigKeywordHandler
             SecureBootSignDependency PciIo
             #BBSR
-            cp $BBR_DIR/bbsr/config/sie_SctStartup.nsh ${TARGET_ARCH}_SCT/sie_SctStartup.nsh
+            cp $BBR_DIR/bbsr/config/BBSRStartup.nsh ${TARGET_ARCH}_SCT/bbsr_SctStartup.nsh
             cp $BBR_DIR/bbsr/config/BBSR.seq  ${TARGET_ARCH}_SCT/SCT/Sequence/
         fi
         #SBBR

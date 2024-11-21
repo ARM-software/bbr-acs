@@ -1,32 +1,20 @@
 #!/usr/bin/env bash
 
-# Copyright (c) 2021-2023, ARM Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2024, Arm Limited or its affiliates. All rights reserved.
+#  SPDX-License-Identifier : Apache-2.0
 #
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
 #
-# Redistributions of source code must retain the above copyright notice, this
-# list of conditions and the following disclaimer.
+#   http://www.apache.org/licenses/LICENSE-2.0
 #
-# Redistributions in binary form must reproduce the above copyright notice,
-# this list of conditions and the following disclaimer in the documentation
-# and/or other materials provided with the distribution.
-#
-# Neither the name of ARM nor the names of its contributors may be used
-# to endorse or promote products derived from this software without specific
-# prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+##
 
 #
 # This script uses the following environment variables from the variant
@@ -48,10 +36,6 @@ fi
 
 BUILD_PLAT=$1
 BUILD_TYPE=$2
-
-if [ $BUILD_PLAT = SR ]; then
-   BUILD_PLAT=ES
-fi
 
 if ! [[ $BUILD_TYPE = S ]] && ! [[  $BUILD_TYPE = F  ]] ; then
     echo "Please provide a Build type."
@@ -86,24 +70,30 @@ do_build()
 
     echo $BBR_DIR
 
-    if [ "$BUILD_PLAT" = "IR" ]; then
-        if ! patch -R -s -f --dry-run -p1 < $BBR_DIR/ebbr/config/IR_VER.patch ; then
-        echo "Applying FWTS Patch ..."
-        patch -p1 < $BBR_DIR/ebbr/config/IR_VER.patch
-        fi
-    fi
-    if [ "$BUILD_PLAT" = "ES" ]; then
-        if ! patch -R -s -f --dry-run -p1 < $BBR_DIR/sbbr/config/ES_VER.patch ; then
-        echo "Applying FWTS Patch ..."
-        patch -p1 < $BBR_DIR/sbbr/config/ES_VER.patch
+    if [ "$BUILD_PLAT" = "EBBR" ]; then
+        if ! git apply --check $BBR_DIR/ebbr/patches/ACS_VER_fwts.patch ; then
+            echo "FWTS Version patch apply failed"
+            exit 1
+        else
+            git apply $BBR_DIR/ebbr/patches/ACS_VER_fwts.patch
         fi
     fi
 
+    if [ "$BUILD_PLAT" = "SBBR" ]; then
+        if ! git apply --check $BBR_DIR/sbbr/patches/ACS_VER_fwts.patch ; then
+            echo "FWTS Version patch apply failed"
+            exit 1
+        else
+            git apply $BBR_DIR/sbbr/patches/ACS_VER_fwts.patch
+        fi
+    fi
     #The below patch is temporary and shall be removed once a permanent solution
     #in FWTS codebase is found
-    if ! patch -R -s -f --dry-run -p1 < $BBR_DIR/common/patches/0001-Fix-for-FWTS-build-issue.patch; then
-        echo "Applying FWTS build patch ..."
-        patch -p1 < $BBR_DIR/common/patches/0001-Fix-for-FWTS-build-issue.patch
+    if ! git apply --check $BBR_DIR/common/patches/0001-Fix-for-FWTS-build-issue.patch; then
+        echo "FWTS build patch apply failed"
+        exit 1
+    else
+        git apply $BBR_DIR/common/patches/0001-Fix-for-FWTS-build-issue.patch
     fi
 
     mkdir -p $FWTS_BINARY
@@ -158,7 +148,7 @@ do_package ()
     echo "Packaging FWTS... $VARIANT";
     if [[ $BUILD_TYPE = F ]]; then
         sed -i '/ir_bbr_fwts_tests.ini/d' $TOP_DIR/ramdisk/files.txt
-        if [ "$BUILD_PLAT" = "IR" ]; then
+        if [ "$BUILD_PLAT" = "EBBR" ]; then
           #Add the entry in file.txt of ramdisk
           echo "file /bin/ir_bbr_fwts_tests.ini         ./fwts_output/bin/ir_bbr_fwts_tests.ini                   766 0 0" >> $TOP_DIR/ramdisk/files.txt
           cp $BBR_DIR/ebbr/config/ir_bbr_fwts_tests.ini $TOP_DIR/$FWTS_PATH/$FWTS_BINARY/bin

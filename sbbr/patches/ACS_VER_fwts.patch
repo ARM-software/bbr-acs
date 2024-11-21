@@ -1,5 +1,5 @@
 diff --git a/src/lib/src/fwts_framework.c b/src/lib/src/fwts_framework.c
-index 1f139a7..421012d 100644
+index 1f139a7..458ba1b 100644
 --- a/src/lib/src/fwts_framework.c
 +++ b/src/lib/src/fwts_framework.c
 @@ -33,6 +33,9 @@
@@ -7,7 +7,7 @@ index 1f139a7..421012d 100644
  #include "fwts_pm_method.h"
  
 +
-+#define ACS_VERSION "v1.3.0"
++#define ACS_VERSION "v2.1.0"
 +
  typedef struct {
  	const char *title;		/* Test category */
