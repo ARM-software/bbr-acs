@@ -142,19 +142,23 @@ VariableUpdatesTest(
 
   Status = VariableUpdatesTestCheckpoint1 (RT, StandardLib, LoggingLib, ProfileLib);
   if (EFI_ERROR(Status)) {
+    SecureBootVariableCleanup (RT, StandardLib, LoggingLib, ProfileLib);
     return Status;
   }
   Status = VariableUpdatesTestCheckpoint2 (RT, StandardLib, LoggingLib, ProfileLib);
   if (EFI_ERROR(Status)) {
+    SecureBootVariableCleanup (RT, StandardLib, LoggingLib, ProfileLib);
     return Status;
   }
   Status = VariableUpdatesTestCheckpoint3 (RT, StandardLib, LoggingLib, ProfileLib);
   if (EFI_ERROR(Status)) {
+    SecureBootVariableCleanup (RT, StandardLib, LoggingLib, ProfileLib);
     return Status;
   }
 
   VariableUpdatesTestCheckpoint4 (RT, StandardLib, LoggingLib, ProfileLib);
   if (EFI_ERROR(Status)) {
+    SecureBootVariableCleanup (RT, StandardLib, LoggingLib, ProfileLib);
     return Status;
   }
 
