@@ -109,7 +109,7 @@ BBSRVariableSizeTestSub1 (
   )
 {
   EFI_STATUS            QueryVarStatus;
-  UINT32                ValidAttributes = EFI_VARIABLE_NON_VOLATILE|EFI_VARIABLE_BOOTSERVICE_ACCESS|EFI_VARIABLE_RUNTIME_ACCESS;
+  UINT32                ValidAttributes = EFI_VARIABLE_NON_VOLATILE|EFI_VARIABLE_BOOTSERVICE_ACCESS|EFI_VARIABLE_RUNTIME_ACCESS|EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
   UINT64                MaximumVariableStorageSize;
   UINT64                RemainingVariableStorageSize;
   UINT64                MaximumVariableSize;
