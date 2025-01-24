@@ -119,6 +119,9 @@ do_build()
 
     cp -r $SBBR_TEST_DIR/SbbrBootServices uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/
     cp -r $SBBR_TEST_DIR/SbbrEfiSpecVerLvl $SBBR_TEST_DIR/SbbrRequiredUefiProtocols $SBBR_TEST_DIR/SbbrSysEnvConfig uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/
+    cp -r $SBBR_TEST_DIR/SbbrEfiFgtFeaturesTest uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/
+    cp -r $BBR_DIR/ebbr/sct-tests/EFIHighestNonsecurePrivilegeLevelTest uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/
+    cp -r $BBR_DIR/ebbr/sct-tests/EbbrProfileTableTest uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/
     cp $SBBR_TEST_DIR/BBR_SCT.dsc uefi-sct/SctPkg/UEFI/
     cp $SBBR_TEST_DIR/build_bbr.sh uefi-sct/SctPkg/
 
@@ -184,6 +187,16 @@ do_build()
             fi
         fi
     fi
+
+    pushd $TOP_DIR/$UEFI_PATH
+    if git apply --check $BBR_DIR/common/patches/0001-EFI-Conformance-and-EBBR-Profile-table-guid.patch; then
+        echo "Applying edk2 BBR build patch..."
+        git apply --ignore-whitespace --ignore-space-change $BBR_DIR/common/patches/0001-EFI-Conformance-and-EBBR-Profile-table-guid.patch
+    else
+        echo  "Error while applying edk2 BBR build patch..."
+        exit
+    fi
+    popd
 
     if git apply --check $BBR_DIR/common/patches/edk2-test-bbr-build.patch; then
         echo "Applying edk2-test BBR build patch..."

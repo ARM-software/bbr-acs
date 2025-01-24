@@ -1,0 +1,60 @@
+## @file
+#
+#  Copyright 2006 - 2012 Unified EFI, Inc.<BR>
+#  Copyright (c) 2021-2024, Arm Inc. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# 
+##
+#/*++
+#
+# Module Name:
+#
+#   EFIHighestNonsecurePrivilegeLevelTest.inf
+#
+# Abstract:
+#
+#   Component description file for EFI Highest Nonsecure Privilege Level Black-Box Test.
+#
+#--*/
+
+[Defines]
+  INF_VERSION          = 0x00010005
+  BASE_NAME            = EFIHighestNonsecurePrivilegeLevelTest
+  FILE_GUID            = aa0fee21-7e1c-473d-bcca-b712ef37b4f8
+  MODULE_TYPE          = UEFI_DRIVER
+  VERSION_STRING       = 1.0
+  ENTRY_POINT          = InitializeEFIHighestNonsecurePrivilegeLevelBbTest
+
+[Sources.AARCH64]
+  AArch64/PeSysReg.S
+  AArch64/PeSysReg.h
+
+[Sources.common]
+  EFIHighestNonsecurePrivilegeLevelTestMain.h
+  EFIHighestNonsecurePrivilegeLevelTestMain.c
+  EFIHighestNonsecurePrivilegeLevelTestFunction.c
+  Guid.h
+  Guid.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SctPkg/SctPkg.dec
+  SctPkg/UEFI/UEFI.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  SctLib
+  EfiTestLib
+  UefiLib
+
+[Protocols]
+  gEfiTestRecoveryLibraryGuid
+  gEfiTestLoggingLibraryGuid

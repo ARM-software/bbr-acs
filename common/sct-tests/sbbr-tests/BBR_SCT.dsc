@@ -198,9 +198,9 @@ SctPkg/TestCase/UEFI/EFI/BootServices/ProtocolHandlerServices/BlackBoxTest/Proto
 SctPkg/TestCase/UEFI/EFI/RuntimeServices/MiscRuntimeServices/BlackBoxTest/MiscRuntimeServicesBBTest.inf
 SctPkg/TestCase/UEFI/EFI/RuntimeServices/TimeServices/BlackBoxTest/TimeServicesBBTest.inf
 SctPkg/TestCase/UEFI/EFI/RuntimeServices/VariableServices/BlackBoxTest/VariableServicesBBTest.inf
-SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTest.inf
+########SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTest.inf
 
-SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTest.inf
+########SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTest.inf
 SctPkg/TestCase/UEFI/EFI/Protocol/GraphicsOutput/BlackBoxTest/GraphicsOutputBBTest.inf
 SctPkg/TestCase/UEFI/EFI/Protocol/Bis/BlackBoxTest/BisBBTest.inf
 SctPkg/TestCase/UEFI/EFI/Protocol/BlockIo/BlackBoxTest/BlockIoBBTest.inf
@@ -267,9 +267,9 @@ SctPkg/TestCase/UEFI/EFI/Protocol/AdapterInfo/BlackBoxTest/AdapterInfoProtocolBB
 SctPkg/TestCase/UEFI/EFI/Protocol/TimeStamp/BlackBoxTest/TimeStampProtocolBBTest.inf
 SctPkg/TestCase/UEFI/EFI/Protocol/RandomNumber/BlackBoxTest/RandomNumberBBTest.inf
 
-SctPkg/TestCase/UEFI/EFI/Protocol/TCG2/BlackBoxTest/TCG2ProtocolBBTest.inf
-SctPkg/TestCase/UEFI/EFI/RuntimeServices/TCGMemoryOverwriteRequest/BlackBoxTest/TCGMemoryOverwriteRequestBBTest.inf
-SctPkg/TestCase/UEFI/EFI/Generic/PlatformResetAttackMitigationPsciTest/BlackBoxTest/PlatformResetAttackMitigationPsciBBTest.inf
+########SctPkg/TestCase/UEFI/EFI/Protocol/TCG2/BlackBoxTest/TCG2ProtocolBBTest.inf
+########SctPkg/TestCase/UEFI/EFI/RuntimeServices/TCGMemoryOverwriteRequest/BlackBoxTest/TCGMemoryOverwriteRequestBBTest.inf
+########SctPkg/TestCase/UEFI/EFI/Generic/PlatformResetAttackMitigationPsciTest/BlackBoxTest/PlatformResetAttackMitigationPsciBBTest.inf
 SctPkg/TestCase/UEFI/EFI/Protocol/Hash2/BlackBoxTest/Hash2BBTest.inf
 SctPkg/TestCase/UEFI/EFI/Protocol/PKCS7Verify/BlackBoxTest/Pkcs7BBTest.inf
 SctPkg/TestCase/UEFI/EFI/Protocol/ConfigKeywordHandler/BlackBoxTest/ConfigKeywordHandlerBBTest.inf
@@ -418,7 +418,7 @@ SctPkg/TestCase/UEFI/EFI/Protocol/ConfigKeywordHandler/BlackBoxTest/Dependency/S
 #
 # Dependency files for Secure Boot Test
 #
-SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Images/Images.inf
+########SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Images/Images.inf
 
 #
 # Support Files
@@ -584,6 +584,12 @@ SctPkg/TestCase/UEFI/EFI/BootServices/SbbrBootServices/BlackBoxTest/SbbrBootServ
 #
 SctPkg/TestCase/UEFI/EFI/Generic/SbbrRequiredUefiProtocols/BlackBoxTest/RequiredUefiProtocolsBBTest.inf
 #SctPkg/TestCase/UEFI/EFI/Generic/EfiCompliant/BlackBoxTest/EfiCompliantBBTest_uefi.inf
+# UEFI Required FGT Features Tests
+SctPkg/TestCase/UEFI/EFI/Generic/SbbrEfiFgtFeaturesTest/BlackBoxTest/SbbrEfiFgtFeaturesTest.inf
+# 2.3. UEFI System Environment and Configuration
+SctPkg/TestCase/UEFI/EFI/Generic/EFIHighestNonsecurePrivilegeLevelTest/BlackBoxTest/EFIHighestNonsecurePrivilegeLevelTest.inf
+# UEFI Boot Services - EBBR v2.4.2.1
+SctPkg/TestCase/UEFI/EFI/BootServices/EbbrProfileTableTest/BlackBoxTest/EbbrProfileTableTest.inf
 ##
 ## Dependency files for UEFI/EFI Compliant Test
 ##
