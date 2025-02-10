@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (c) 2021-2024, Arm Limited or its affiliates. All rights reserved.
+# Copyright (c) 2021-2025, Arm Limited or its affiliates. All rights reserved.
 #  SPDX-License-Identifier : Apache-2.0
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
@@ -65,15 +65,15 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
                         Sct -c
                     endif
 
-                    #SCT execution has finished. Copy the logs to acs_results
-                    if  exist FS%j:\acs_results\sct_results\ then
+                    # BBSR SCT execution has finished. Copy the logs to acs_results
+                    if  exist FS%j:\acs_results\BBSR\sct_results\ then
                         if  exist FS%i:\acs_tests\bbr\SCT\Overall then
                             cp -r FS%i:\acs_tests\bbr\SCT\Overall FS%j:\acs_results\BBSR\sct_results\
                         endif
                         if  exist FS%i:\acs_tests\bbr\SCT\Sequence then
-                            cp -r FS%i:\acs_tests\bbr\SCT\Sequence\BBSR.seq FS%j:\acs_results\BBSR\sct_results\
+                            cp -r FS%i:\acs_tests\bbr\SCT\Sequence FS%j:\acs_results\BBSR\sct_results\
                         endif
-                        #Restart to avoid an impact of running SCT tests on rest of the suites
+                        # Restart to avoid an impact of running SCT tests on rest of the suites
                         echo "Reset the system ..."
                         reset
                     endif
