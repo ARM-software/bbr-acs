@@ -42,7 +42,7 @@
 #
 # Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 #
-# Copyright (c) 2016-2024, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2016-2025, ARM Ltd. All rights reserved.<BR>
 #
 #
 #/*++
@@ -78,8 +78,8 @@
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
-  DEFINE GCC_VER_MACRO           = -D EFI_SPECIFICATION_VERSION=0x00020028 -D TIANO_RELEASE_VERSION=0x00080006
-  DEFINE MSFT_VER_MACRO          = /D EFI_SPECIFICATION_VERSION=0x00020028 /D TIANO_RELEASE_VERSION=0x00080006
+  DEFINE GCC_VER_MACRO           =
+  DEFINE MSFT_VER_MACRO          =
 
 
 ################################################################################
@@ -92,7 +92,7 @@
   0|DEFAULT              # The entry: 0|DEFAULT is reserved and always required.
 
 [BuildOptions]
-  *_*_AARCH64_CC_FLAGS         = -D EFIAARCH64 -I$(WORKSPACE)/MdePkg/Include/AArch64 $(GCC_VER_MACRO)
+  *_*_AARCH64_CC_FLAGS         = -D EFIAARCH64 $(GCC_VER_MACRO)
   GCC:*_*_AARCH64_CC_FLAGS     = -D EFIAARCH64 $(GCC_VER_MACRO) -ffreestanding -nostdinc -nostdlib -Wno-error=unused-function -Wno-error=unused-but-set-variable -Wno-error
   *_*_AARCH64_VFRPP_FLAGS      = -D EFIAARCH64 $(GCC_VER_MACRO)
   *_*_AARCH64_APP_FLAGS        = -D EFIAARCH64 $(GCC_VER_MACRO)
@@ -104,18 +104,13 @@
 
 [Libraries]
   SctPkg/Library/SctLib/SctLib.inf
-  SctPkg/Library/SctGuidLib/SctGuidLib.inf
   SctPkg/Library/EfiTestLib/EfiTestLib.inf
 
   SctPkg/TestInfrastructure/SCT/Framework/ENTS/EasLib/EntsLib.inf
 
   MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
 
-[Libraries.ARM]
-  ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
-
-[Libraries.AARCH64]
-  ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
+!include MdePkg/MdeLibs.dsc.inc
 
 [LibraryClasses.common]
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
@@ -139,11 +134,7 @@
   EasLib|SctPkg/TestInfrastructure/SCT/Framework/ENTS/EasDispatcher/Eas.inf
   EfiTestLib|SctPkg/Library/EfiTestLib/EfiTestLib.inf
 
-[LibraryClasses.ARM]
-  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
-
 [LibraryClasses.AARCH64]
-  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
   ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
 
@@ -198,9 +189,8 @@ SctPkg/TestCase/UEFI/EFI/BootServices/ProtocolHandlerServices/BlackBoxTest/Proto
 SctPkg/TestCase/UEFI/EFI/RuntimeServices/MiscRuntimeServices/BlackBoxTest/MiscRuntimeServicesBBTest.inf
 SctPkg/TestCase/UEFI/EFI/RuntimeServices/TimeServices/BlackBoxTest/TimeServicesBBTest.inf
 SctPkg/TestCase/UEFI/EFI/RuntimeServices/VariableServices/BlackBoxTest/VariableServicesBBTest.inf
-SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTest.inf
+SctPkg/TestCase/UEFI/EFI/RuntimeServices/TCGMemoryOverwriteRequest/BlackBoxTest/TCGMemoryOverwriteRequestBBTest.inf
 
-SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTest.inf
 SctPkg/TestCase/UEFI/EFI/Protocol/GraphicsOutput/BlackBoxTest/GraphicsOutputBBTest.inf
 SctPkg/TestCase/UEFI/EFI/Protocol/Bis/BlackBoxTest/BisBBTest.inf
 SctPkg/TestCase/UEFI/EFI/Protocol/BlockIo/BlackBoxTest/BlockIoBBTest.inf
@@ -266,10 +256,12 @@ SctPkg/TestCase/UEFI/EFI/Protocol/StorageSecurityCommand/BlackBoxTest/StorageSec
 SctPkg/TestCase/UEFI/EFI/Protocol/AdapterInfo/BlackBoxTest/AdapterInfoProtocolBBTest.inf
 SctPkg/TestCase/UEFI/EFI/Protocol/TimeStamp/BlackBoxTest/TimeStampProtocolBBTest.inf
 SctPkg/TestCase/UEFI/EFI/Protocol/RandomNumber/BlackBoxTest/RandomNumberBBTest.inf
-
 SctPkg/TestCase/UEFI/EFI/Protocol/TCG2/BlackBoxTest/TCG2ProtocolBBTest.inf
-SctPkg/TestCase/UEFI/EFI/RuntimeServices/TCGMemoryOverwriteRequest/BlackBoxTest/TCGMemoryOverwriteRequestBBTest.inf
 SctPkg/TestCase/UEFI/EFI/Generic/PlatformResetAttackMitigationPsciTest/BlackBoxTest/PlatformResetAttackMitigationPsciBBTest.inf
+SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTest.inf
+
+SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTest.inf
+
 SctPkg/TestCase/UEFI/EFI/Protocol/Hash2/BlackBoxTest/Hash2BBTest.inf
 SctPkg/TestCase/UEFI/EFI/Protocol/PKCS7Verify/BlackBoxTest/Pkcs7BBTest.inf
 SctPkg/TestCase/UEFI/EFI/Protocol/ConfigKeywordHandler/BlackBoxTest/ConfigKeywordHandlerBBTest.inf

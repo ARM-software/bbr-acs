@@ -55,7 +55,7 @@ Abstract:
 
 --*/
 
-#include <Chipset/AArch64.h>
+#include <AArch64/AArch64.h>
 #include "Guid.h"
 #include <Library/ArmLib.h>
 #include "SctLib.h"
