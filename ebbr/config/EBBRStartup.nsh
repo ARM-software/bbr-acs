@@ -32,21 +32,21 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
       goto Done
     endif
     for %j in 0 1 2 3 4 5 6 7 8 9 A B C D E F then
-        if exists FS%j:\acs_results\ then
-            if exists FS%j:\acs_results\sct_results then
+        if exists FS%j:\acs_results_template\acs_results then
+            if exists FS%j:\acs_results_template\acs_results\sct_results then
 
                 #Check if SCT run has already completed
-                if  exist FS%j:\acs_results\sct_results\Overall\Summary.log then
+                if  exist FS%j:\acs_results_template\acs_results\sct_results\Overall\Summary.log then
                     echo "SCT has completed run."
 		    echo "Press any key to start SCT execution from the beginning."
 		    echo "WARNING: Ensure you have backed up the existing logs."
                     stallforkey.efi 5
                     if %lasterror% == 0 then
                         #Backup the existing logs
-                        rm -q FS%j:\acs_results\sct_results_previous_run
-                        mkdir FS%j:\acs_results\sct_results_previous_run
-                        cp -r FS%j:\acs_results\sct_results FS%j:\acs_results\sct_results_previous_run
-                        rm -q FS%j:\acs_results\sct_results
+                        rm -q FS%j:\acs_results_template\acs_results\sct_results_previous_run
+                        mkdir FS%j:\acs_results_template\acs_results\sct_results_previous_run
+                        cp -r FS%j:\acs_results_template\acs_results\sct_results FS%j:\acs_results_template\acs_results\sct_results_previous_run
+                        rm -q FS%j:\acs_results_template\acs_results\sct_results
                         goto StartSCT
                     else
                         goto Done
@@ -67,15 +67,15 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
                     endif
 
                     #SCT execution has finished. Copy the logs to acs_results
-                    if  exist FS%j:\acs_results\sct_results\ then
+                    if  exist FS%j:\acs_results_template\acs_results\sct_results\ then
                         if  exist FS%i:\acs_tests\bbr\SCT\Overall then
-                            cp -r FS%i:\acs_tests\bbr\SCT\Overall FS%j:\acs_results\sct_results\
+                            cp -r FS%i:\acs_tests\bbr\SCT\Overall FS%j:\acs_results_template\acs_results\sct_results\
                         endif
                         if  exist FS%i:\acs_tests\bbr\SCT\Dependency\EfiCompliantBBTest then
-                            cp -r FS%i:\acs_tests\bbr\SCT\Dependency\EfiCompliantBBTest FS%j:\acs_results\sct_results\
+                            cp -r FS%i:\acs_tests\bbr\SCT\Dependency\EfiCompliantBBTest FS%j:\acs_results_template\acs_results\sct_results\
                         endif
                         if  exist FS%i:\acs_tests\bbr\SCT\Sequence then
-                            cp -r FS%i:\acs_tests\bbr\SCT\Sequence FS%j:\acs_results\sct_results\
+                            cp -r FS%i:\acs_tests\bbr\SCT\Sequence FS%j:\acs_results_template\acs_results\sct_results\
                         endif
 
                         #Restart to avoid an impact of running SCT tests on rest of the suites
@@ -87,7 +87,7 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
             else
 :StartSCT
             FS%j:
-            cd FS%j:\acs_results
+            cd FS%j:\acs_results_template\acs_results
             mkdir sct_results
             FS%i:
             cd FS%i:\acs_tests\bbr\SCT
