@@ -37,7 +37,11 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
 
         #Save the logs in acs_results
         mkdir FS%i:\acs_results\scrt_results
-        mv SCRT.log  FS%i:\acs_results\scrt_results\SCRT.log
+        if exist SCRT.log then
+            mv SCRT.log  FS%i:\acs_results\scrt_results\SCRT.log
+        else
+           echo "SCRT run failed" > FS%i:\acs_results\scrt_results\SCRT.log
+        fi
         cp SCRT.conf FS%i:\acs_results\scrt_results\SCRT.conf
         goto Done
     endif
