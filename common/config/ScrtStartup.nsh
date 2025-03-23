@@ -36,35 +36,28 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
         SCRTAPP.efi -g SCRT.log
 
         #Save the logs in acs_results
-        for %j in 0 1 2 3 4 5 6 7 8 9 A B C D E F then
-            if exists FS%j:\acs_results\ then
-                mkdir FS%j:\acs_results\scrt_results
-                mkdir FS%j:\acs_results\scrt_results
-                cp SCRT.log  FS%j:\acs_results\scrt_results\SCRT.log
-                cp SCRT.conf FS%j:\acs_results\scrt_results\SCRT.conf
-            endif
-        endfor
-
+        mkdir FS%i:\acs_results\scrt_results
+        mv SCRT.log  FS%i:\acs_results\scrt_results\SCRT.log
+        cp SCRT.conf FS%i:\acs_results\scrt_results\SCRT.conf
         goto Done
     endif
 
-    echo SCRT run. Press any key to stop the EFI SCRT running
+    echo "Press any key to stop the EFI SCRT running"
     FS%i:\acs_tests\bbr\SCT\stallforkey.efi 5
     if %lasterror% == 0 then
       goto Done
     endif
 
     echo "Note: The System will automatically reset as part of SCRT testing"
-
-    if  exist SCRT.log then
+    if  exist FS%i:\acs_results\scrt_results\SCRT.log then
         echo "SCRT is already run."
         echo "Press any key to run SCRT again."
         echo "WARNING: Ensure you have backed up the existing logs."
         FS%i:\acs_tests\bbr\SCT\stallforkey.efi 5
         if %lasterror% == 0 then
             #Backup the existing logs
-            cp SCRT.log SCRT.log_previous_run
-            rm -q SCRT.log
+            cp FS%i:\acs_results\scrt_results\SCRT.log FS%i:\acs_results\scrt_results\SCRT.log_previous_run
+            rm -q FS%i:\acs_results\scrt_results\SCRT.log
             goto StartSCRT
         else
             goto Done
@@ -73,13 +66,11 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
         goto StartSCRT
     endif
 
-
 :StartSCRT
     cp SCRT.conf SCRT_run_progress.flag
     Load SCRTDRIVER.efi
     SCRTAPP -f SCRT.conf
-
- endif
+  endif
 endfor
 
 :Done
