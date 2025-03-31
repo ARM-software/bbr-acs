@@ -24,6 +24,13 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
         #
         # Found EFI SCT harness
         #
+        if %1 == "true" then
+            FS%i:\acs_tests\parser\Parser.efi -sct
+            if %automation_sct_run% == "false" then
+                echo "************ SCT is disabled in config file(acs_run_config.ini) ************"
+                goto Done
+            endif
+        endif
         FS%i:
         cd FS%i:\acs_tests\bbr\SCT
         echo "Press any key to stop the EFI SCT running"
@@ -91,7 +98,13 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
                     echo "Starting extended run of SCT"
                     Sct -s SBBR_extd_run.seq
                 else
-                    Sct -s SBBR.seq
+                    if "%1" == "false" then
+                        echo "SCT Command: Sct -s SBBR.seq"
+                        Sct -s SBBR.seq
+                    else
+                        echo "SCT Command: %SctCommand%"
+                        %SctCommand%
+                    endif
                 endif
             endif
         endif
