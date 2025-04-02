@@ -25,7 +25,8 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
         # Found EFI SCT harness
         #
         if %1 == "true" then
-            FS%i:\acs_tests\parser\Parser.efi -sct
+            FS%i:
+            acs_tests\parser\Parser.efi -sct
             if %automation_sct_run% == "false" then
                 echo "************ SCT is disabled in config file(acs_run_config.ini) ************"
                 goto Done
