@@ -27,10 +27,10 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
         if %1 == "true" then
             FS%i:
             acs_tests\parser\Parser.efi -sct
-            if %automation_sct_run% == "" then
+            if "%automation_sct_run%" == "" then
                 echo "automation_sct_run variable does not exist"
             else
-                if %automation_sct_run% == "false" then
+                if "%automation_sct_run%" == "false" then
                     echo "************ SCT is disabled in config file(acs_run_config.ini) ************"
                     goto Done
                 endif
@@ -99,7 +99,7 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
                 cd FS%i:\acs_results
                 mkdir sct_results
                 cd FS%i:\acs_tests\bbr\SCT
-                if %1 == sct_extd then
+                if "%1" == sct_extd then
                     echo "Starting extended run of SCT"
                     Sct -s SBBR_extd_run.seq
                 else
@@ -108,7 +108,7 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
                         Sct -s SBBR.seq
                     else
                         echo "SCT Command: %SctCommand%"
-                        if %SctCommand% == "" then
+                        if "%SctCommand%" == "" then
                             echo "SctCommand variable does not exist"
                         else
                             %SctCommand%
