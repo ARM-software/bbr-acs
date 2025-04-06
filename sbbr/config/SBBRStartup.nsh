@@ -107,10 +107,10 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
                         echo "SCT Command: Sct -s SBBR.seq"
                         Sct -s SBBR.seq
                     else
-                        echo "SCT Command: %SctCommand%"
                         if "%SctCommand%" == "" then
                             echo "SctCommand variable does not exist"
                         else
+                            echo "SCT Command: %SctCommand%"
                             %SctCommand%
                         endif
                     endif
