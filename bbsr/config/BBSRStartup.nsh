@@ -157,11 +157,11 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
                     echo "SCT Command: Sct -s BBSR.seq"
                     Sct -s BBSR.seq
                 else
-                    if "%SctCommand%" == "" then
-                        echo "SctCommand variable does not exist"
+                    if "%BbsrSctCommand%" == "" then
+                        echo "BbsrSctCommand variable does not exist"
                     else
-                        echo "SCT Command: %SctCommand%"
-                        %SctCommand%
+                        echo "BBSR_SCT Command: %BbsrSctCommand%"
+                        %BbsrSctCommand%
                     endif
                 endif
                 goto Done
