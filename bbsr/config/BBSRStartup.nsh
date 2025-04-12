@@ -23,7 +23,7 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
         #
         # Found EFI SCT harness
         #
-        if %1 == "true" then
+        if "%1" == "true" then
             FS%i:
             acs_tests\parser\Parser.efi -bbsr_sct
             if "%automation_bbsr_sct_run%" == "" then
@@ -153,14 +153,19 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
                 cd FS%i:\acs_results\bbsr
                 mkdir sct_results
                 cd FS%i:\acs_tests\bbr\SCT
-                if "%1" == "false" then
-                    echo "SCT Command: Sct -s BBSR.seq"
+                if "%1" == "" then
+                    acs_tests\parser\Parser.efi -bbsr_sct
+                    echo "UEFI EE BBSR SCT Command: %BbsrSctCommand%"
+                    %BbsrSctCommand%
+                else if "%1" == "false"
+                    echo "BBSR SCT Command: Sct -s BBSR.seq"
                     Sct -s BBSR.seq
                 else
                     if "%BbsrSctCommand%" == "" then
-                        echo "BbsrSctCommand variable does not exist"
+                        echo "BbsrSctCommand variable does not exist, running default BBSR sct command"
+                        Sct -s BBSR.seq
                     else
-                        echo "BBSR_SCT Command: %BbsrSctCommand%"
+                        echo "BBSR SCT Command: %BbsrSctCommand%"
                         %BbsrSctCommand%
                     endif
                 endif
