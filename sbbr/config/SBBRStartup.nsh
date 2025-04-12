@@ -24,7 +24,7 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
         #
         # Found EFI SCT harness
         #
-        if %1 == "true" then
+        if "%1" == "true" then
             FS%i:
             acs_tests\parser\Parser.efi -sct
             if "%automation_sct_run%" == "" then
@@ -99,20 +99,20 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
                 cd FS%i:\acs_results
                 mkdir sct_results
                 cd FS%i:\acs_tests\bbr\SCT
-                if "%1" == sct_extd then
-                    echo "Starting extended run of SCT"
-                    Sct -s SBBR_extd_run.seq
+                if "%1" == "" then
+                    acs_tests\parser\Parser.efi -sct
+                    echo "UEFI EE SCT command: %SctCommand%"
+                    %SctCommand%
+                else if "%1" == "false" then
+                    echo "SCT Command: Sct -s SBBR.seq"
+                    Sct -s SBBR.seq
                 else
-                    if "%1" == "false" then
-                        echo "SCT Command: Sct -s SBBR.seq"
+                    if "%SctCommand%" == "" then
+                        echo "SctCommand variable does not exist, running default command Sct -s SBBR.seq"
                         Sct -s SBBR.seq
                     else
-                        if "%SctCommand%" == "" then
-                            echo "SctCommand variable does not exist"
-                        else
-                            echo "SCT Command: %SctCommand%"
-                            %SctCommand%
-                        endif
+                        echo "SCT Command: %SctCommand%"
+                        %SctCommand%
                     endif
                 endif
             endif
