@@ -378,7 +378,7 @@ Disabled:❌ <br>
 <td rowspan=1 colspan=1>✅ LoadedImageProtocolTest2</td>
 </tr>
 <tr>
-<td rowspan=27 colspan=1>✅ DevicePathProcotols</td>
+<td rowspan=27 colspan=1>🔲 DevicePathProcotols</td>
 <td rowspan=1 colspan=1>✅ DevicePathProcotolTest</td>
 <td rowspan=1 colspan=1>✅ PathNode_Conf</td>
 </tr>
