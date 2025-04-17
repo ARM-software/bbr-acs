@@ -5,6 +5,8 @@ Enabled:✅ <br>
 Partially Enabled:🔲 <br>
 Disabled:❌ <br>
 
+Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readthedocs.io/en/latest/) for detailed information for each assertion in the UEFI SCT fundamental service and protocol tests. <br>
+
 <table border="1">
 <tr>
 <th rowspan=1 colspan=1>Test Suite</th>
