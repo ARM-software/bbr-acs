@@ -12,8 +12,8 @@ The BBR test suites check for compliance against the SBBR and EBBR specification
 
 ## Release details
 - Code Quality: v1.0.5
-- The SBBR tests are written for version 1.0 of the BBR specification.
-- The EBBR tests are written for version 2.0 of the BBR specification.
+- The SBBR tests are written for version 2.1 of the BBR specification.
+- The EBBR tests are written for version 2.1 of the BBR specification.
 - The compliance suite is not a substitute for design verification.
 - To review the ACS logs, Arm licensees can contact Arm directly through their partner managers.
 
@@ -44,7 +44,7 @@ You can also select and run tests individually. For more information on running 
 
 #### Note:
 
-> For BBR ACS UEFI-SCT testlists for SBBR, EBBR and BBSR recipes, see the [Documentaion directory](./docs/).
+> For BBR ACS UEFI-SCT testlists for SBBR, EBBR and BBSR recipes, see the [Documentation directory](./docs/).
 
 ### Manual intervention tests
 Some SCT tests for the ACS require manual intervention or interaction.
