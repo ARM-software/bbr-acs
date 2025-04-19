@@ -25,9 +25,6 @@ Disabled:❌ <br>
 <td rowspan=1 colspan=1>✅ SbbrEfiSpecVerLvl</td>
 <td rowspan=1 colspan=1>✅ TestEfiSpecVerLvl</td>
 </tr>
-<td rowspan=1 colspan=1>❌ SbbrSmbios</td>
-<td rowspan=1 colspan=1>❌ UefiSmbios</td>
-</tr>
 <td rowspan=1 colspan=1>✅ SbbrSysEnvConfig</td>
 <td rowspan=1 colspan=1>✅ BootExcLevel</td>
 </tr>
