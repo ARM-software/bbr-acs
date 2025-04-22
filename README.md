@@ -11,6 +11,7 @@ The BBR test suites check for compliance against the SBBR, EBBR and BBSR specifi
   - Firmware Test Suite (FWTS)
 
 ## Release details
+
 - SBBR test component
   - Version: v2.1.1
   - Code Quality: BET
@@ -59,7 +60,7 @@ You can also select and run tests individually. For more information on running 
 
 #### Note:
 
-> For BBR ACS UEFI-SCT testlists for SBBR, EBBR and BBSR recipes, see the [Documentaion directory](./docs/).
+> For BBR ACS UEFI-SCT testlists for SBBR, EBBR and BBSR recipes, see the [Documentation directory](./docs/).
 
 ### Manual intervention tests
 Some SCT tests for the ACS require manual intervention or interaction.
