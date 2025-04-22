@@ -6,16 +6,31 @@ market differentiation.
 
 For more information, see the [BBR specification](https://developer.arm.com/documentation/den0044/g/?lang=en).
 
-The BBR test suites check for compliance against the SBBR and EBBR specifications. These tests are also delivered through two runtime executable environments:
+The BBR test suites check for compliance against the SBBR, EBBR and BBSR specifications. These tests are also delivered through two runtime executable environments:
   - UEFI Self Certification Tests (SCT)
   - Firmware Test Suite (FWTS)
 
 ## Release details
-- Code Quality: v1.0.5
-- The SBBR tests are written for version 1.0 of the BBR specification.
-- The EBBR tests are written for version 2.0 of the BBR specification.
+- SBBR test component
+  - Version: v2.1.1
+  - Code Quality: BET
+  - The SBBR tests are written for the SBBR recipe of the BBR v2.1 specification.
+ 
+- EBBR test component
+  - Version: v2.2.1
+  - Code Quality: BET
+  - The EBBR tests are written for the EBBR recipe of the BBR v2.1 specification.
+ 
+- BBSR test component
+  - Version: v1.3.0
+  - Code Quality: EAC
+  - The BBSR tests are written for the BBSR v1.3 specification.
+
 - The compliance suite is not a substitute for design verification.
 - To review the ACS logs, Arm licensees can contact Arm directly through their partner managers.
+
+  NOTE: [SystemReady ACS](https://github.com/ARM-software/arm-systemready) depends on the bbr acs for packaging the SCT tests in the SystemReady ACS.
+  Mapping of BBR ACS tags with SystemReady Release version are captured [here](bbr_acs_tag_mapping_to_systemready_acs_releases)
 
 ## UEFI Self Certification Tests
 UEFI SCT tests the UEFI implementation requirements defined by SBBR/EBBR.
@@ -120,6 +135,13 @@ NOTE: SBBR and EBBR build scripts also supports bulding fwts and sct individuall
       To build only FWTS, pass the fwts option to build script
       - `./build-scripts/build_<ebbr/sbbr>.sh` fwts
 
+## BBR ACS Tag mapping to SystemReady ACS Releases
+---------------------------------------------------------------------
+|    BBR ACS TAG        |     BBR Recipe      | SystemReady Release |
+|-----------------------|:-------------------:|:-------------------:|
+|   v25.04_SR_3.0.1     |       SBBR          |  v25.04_SR_REL3.1.0 |
+---------------------------------------------------------------------
+
 ## License
  
 Arm BBR ACS is distributed under Apache v2.0 License.
@@ -134,4 +156,4 @@ Arm BBR ACS is distributed under Apache v2.0 License.
 
 --------------
 
-*Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.*
+*Copyright (c) 2021-2025, Arm Limited and Contributors. All rights reserved.*
