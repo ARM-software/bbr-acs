@@ -30,7 +30,7 @@ The BBR test suites check for compliance against the SBBR, EBBR and BBSR specifi
 - To review the ACS logs, Arm licensees can contact Arm directly through their partner managers.
 
   NOTE: [SystemReady ACS](https://github.com/ARM-software/arm-systemready) depends on the bbr acs for packaging the SCT tests in the SystemReady ACS.
-  Mapping of BBR ACS tags with SystemReady Release version are captured [here](bbr_acs_tag_mapping_to_systemready_acs_releases)
+  Mapping of BBR ACS tags with SystemReady Release version are captured [here](#bbr-acs-tag-mapping-to-systemready-acs-releases)
 
 ## UEFI Self Certification Tests
 UEFI SCT tests the UEFI implementation requirements defined by SBBR/EBBR.
@@ -139,7 +139,7 @@ NOTE: SBBR and EBBR build scripts also supports bulding fwts and sct individuall
 ---------------------------------------------------------------------
 |    BBR ACS TAG        |     BBR Recipe      | SystemReady Release |
 |-----------------------|:-------------------:|:-------------------:|
-|   v25.04_SR_3.0.1     |       SBBR          |  v25.04_SR_REL3.1.0 |
+|   v25.04_SR_3.0.1     |       SBBR          |  v25.04_SR_3.1.0    |
 ---------------------------------------------------------------------
 
 ## License
