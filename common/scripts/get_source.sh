@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#  Copyright (c) 2021, 2023-2024,  Arm Limited or its affiliates. All rights reserved.
+#  Copyright (c) 2021, 2023-2025,  Arm Limited or its affiliates. All rights reserved.
 #  SPDX-License-Identifier : Apache-2.0
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,9 +32,10 @@ get_cross_compiler()
         TAG=aarch64-none-linux-gnu
         mkdir -p tools
         pushd $TOP_DIR/tools
-        wget $CROSS_COMPILER_URL
-        tar -xf gcc-arm-${GCC_TOOLS_VERSION}-x86_64-${TAG}.tar.xz
-        rm gcc-arm-${GCC_TOOLS_VERSION}-x86_64-${TAG}.tar.xz
+        wget $CROSS_COMPILER_URL --no-check-certificate
+        tar -xf arm-gnu-toolchain-${GCC_TOOLS_VERSION}-x86_64-${TAG}.tar.xz
+        mv arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-linux-gnu arm-gnu-toolchain-13.2.rel1-x86_64-aarch64-none-linux-gnu
+        rm arm-gnu-toolchain-${GCC_TOOLS_VERSION}-x86_64-${TAG}.tar.xz
         popd
     fi
 }
@@ -47,6 +48,7 @@ get_fwts_src()
     git submodule update --init
     popd
 }
+
 get_sct_src()
 {
     git clone --single-branch https://github.com/tianocore/edk2-test
@@ -63,7 +65,6 @@ get_uefi_src()
     git submodule update --init
     popd
 }
-
 
 sudo apt install git curl mtools gdisk gcc\
  openssl automake autotools-dev libtool bison flex\

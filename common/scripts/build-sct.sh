@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#  Copyright (c) 2021-2024, Arm Limited or its affiliates. All rights reserved.
+#  Copyright (c) 2021-2025, Arm Limited or its affiliates. All rights reserved.
 #  SPDX-License-Identifier : Apache-2.0
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
@@ -87,36 +87,40 @@ echo "Build type: $BUILD_TYPE"
 
 SBBR_TEST_DIR=$BBR_DIR/common/sct-tests/sbbr-tests
 BBSR_TEST_DIR=$BBR_DIR/bbsr/sct-tests
+
 if [[ $BUILD_TYPE = S ]]; then
+    ## These tests are hosted locally in BBSR folder
     sed -i 's|SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTest.inf|#SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTest.inf|g' $BBR_DIR/common/sct-tests/sbbr-tests/BBR_SCT.dsc
     sed -i 's|SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTest.inf|#SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTest.inf|g' $BBR_DIR/common/sct-tests/sbbr-tests/BBR_SCT.dsc
+    sed -i \
+'s|SctPkg/TestCase/UEFI/EFI/Generic/PlatformResetAttackMitigationPsciTest/BlackBoxTest/PlatformResetAttackMitigationPsciBBTest.inf|#SctPkg/TestCase/UEFI/EFI/Generic/PlatformResetAttackMitigationPsciTest/BlackBoxTest/PlatformResetAttackMitigationPsciBBTest.inf|g' $BBR_DIR/common/sct-tests/sbbr-tests/BBR_SCT.dsc
+    sed -i 's|SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Images/Images.inf|#SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Images/Images.inf|g' $BBR_DIR/common/sct-tests/sbbr-tests/BBR_SCT.dsc
+
+    ## These tests are in edk2-test repo
     sed -i 's|SctPkg/TestCase/UEFI/EFI/Protocol/TCG2/BlackBoxTest/TCG2ProtocolBBTest.inf|#SctPkg/TestCase/UEFI/EFI/Protocol/TCG2/BlackBoxTest/TCG2ProtocolBBTest.inf|g' $BBR_DIR/common/sct-tests/sbbr-tests/BBR_SCT.dsc
     sed -i 's|SctPkg/TestCase/UEFI/EFI/RuntimeServices/TCGMemoryOverwriteRequest/BlackBoxTest/TCGMemoryOverwriteRequestBBTest.inf|#SctPkg/TestCase/UEFI/EFI/RuntimeServices/TCGMemoryOverwriteRequest/BlackBoxTest/TCGMemoryOverwriteRequestBBTest.inf|g' $BBR_DIR/common/sct-tests/sbbr-tests/BBR_SCT.dsc
-    sed -i 's|SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Images/Images.inf|#SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Images/Images.inf|g' $BBR_DIR/common/sct-tests/sbbr-tests/BBR_SCT.dsc
-sed -i \
-'s|SctPkg/TestCase/UEFI/EFI/Generic/PlatformResetAttackMitigationPsciTest/BlackBoxTest/PlatformResetAttackMitigationPsciBBTest.inf|#SctPkg/TestCase/UEFI/EFI/Generic/PlatformResetAttackMitigationPsciTest/BlackBoxTest/PlatformResetAttackMitigationPsciBBTest.inf|g' $BBR_DIR/common/sct-tests/sbbr-tests/BBR_SCT.dsc
 fi
 
 do_build()
 {
-    pushd $TOP_DIR/$SCT_PATH
-    export KEYS_DIR=$TOP_DIR/bbsr-keys
-    export EDK2_TOOLCHAIN=$UEFI_TOOLCHAIN
-
-    # required for BBSR keys generation
-    export PATH="$PATH:$TOP_DIR/efitools"
-
-    # export EDK2 enviromnent variables
     export PACKAGES_PATH=$TOP_DIR/$UEFI_PATH
     export PYTHON_COMMAND=/usr/bin/python3
     export WORKSPACE=$TOP_DIR/$SCT_PATH/uefi-sct
-    #export HOST_ARCH = `uname -m`
-    #MACHINE=`uname -m`
+    export EDK2_TOOLCHAIN=$UEFI_TOOLCHAIN
+
+    # required for BBSR keys generation
+    if [[ $BUILD_TYPE != S ]]; then
+        export KEYS_DIR=$TOP_DIR/bbsr-keys
+        export PATH="$PATH:$TOP_DIR/efitools"
+    fi
+
+    pushd $TOP_DIR/$SCT_PATH
+
     #Build base tools
     source $TOP_DIR/$UEFI_PATH/edksetup.sh
     make -C $TOP_DIR/$UEFI_PATH/BaseTools
+    
     #Copy over extra files needed for SBBR tests
-
     cp -r $SBBR_TEST_DIR/SbbrBootServices uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/
     cp -r $SBBR_TEST_DIR/SbbrEfiSpecVerLvl $SBBR_TEST_DIR/SbbrRequiredUefiProtocols $SBBR_TEST_DIR/SbbrSysEnvConfig uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/
     cp $SBBR_TEST_DIR/BBR_SCT.dsc uefi-sct/SctPkg/UEFI/
@@ -126,8 +130,7 @@ do_build()
     if [[ $BUILD_TYPE != S ]]; then
         cp -r $BBSR_TEST_DIR/BBSRVariableSizeTest uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices
         cp -r $BBSR_TEST_DIR/SecureBoot uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices
-        cp -r $BBSR_TEST_DIR/PlatformResetAttackMitigationPsciTest \
-        uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/
+        cp -r $BBSR_TEST_DIR/PlatformResetAttackMitigationPsciTest uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/
     fi
 
     #Startup/runtime files.
@@ -136,14 +139,12 @@ do_build()
     git checkout .
 
     if [ $BUILD_PLAT = EBBR ]; then
-        #EBBR
         cp $BBR_DIR/ebbr/config/EBBRStartup.nsh uefi-sct/SctPkg/BBR/
         cp $BBR_DIR/ebbr/config/EBBR.seq uefi-sct/SctPkg/BBR/
         cp $BBR_DIR/ebbr/config/EBBR_manual.seq uefi-sct/SctPkg/BBR/
         cp $BBR_DIR/ebbr/config/EBBR_extd_run.seq uefi-sct/SctPkg/BBR/
         cp $BBR_DIR/ebbr/config/EfiCompliant_EBBR.ini uefi-sct/SctPkg/BBR/
     elif [ $BUILD_PLAT = SBBR ]; then
-    #SBBR
         cp $BBR_DIR/sbbr/config/SBBRStartup.nsh uefi-sct/SctPkg/BBR/
         cp $BBR_DIR/sbbr/config/SBBR.seq uefi-sct/SctPkg/BBR/
         cp $BBR_DIR/sbbr/config/SBBR_manual.seq uefi-sct/SctPkg/BBR/
@@ -159,12 +160,12 @@ do_build()
             fi
         fi
     fi
-    #Common
-    #SCRT
+
+    #Common - SCRT
     cp $BBR_DIR/common/config/ScrtStartup.nsh uefi-sct/SctPkg/BBR/
     cp $BBR_DIR/common/config/SCRT.conf uefi-sct/SctPkg/BBR/
 
-    # apply version patches for standalone BBR builds
+    # Apply version patches for standalone BBR builds
     if [[ $BUILD_TYPE = S ]]; then
         if [ $BUILD_PLAT = EBBR ]; then
             if git apply --check $BBR_DIR/ebbr/patches/standalone_ebbr_ver.patch; then
@@ -185,6 +186,7 @@ do_build()
         fi
     fi
 
+    # Apply edk2-test-bbr-build patch
     if git apply --check $BBR_DIR/common/patches/edk2-test-bbr-build.patch; then
         echo "Applying edk2-test BBR build patch..."
         git apply --ignore-whitespace --ignore-space-change $BBR_DIR/common/patches/edk2-test-bbr-build.patch
@@ -192,6 +194,8 @@ do_build()
         echo  "Error while applying edk2-test BBR build patch..."
         exit
     fi
+
+    # Apply edk2-test-bbr patch
     if git apply --check $BBR_DIR/common/patches/edk2-test-bbr.patch; then
         echo "Applying edk2-test BBR patch..."
         git apply --ignore-whitespace --ignore-space-change $BBR_DIR/common/patches/edk2-test-bbr.patch
@@ -199,6 +203,8 @@ do_build()
         echo  "Error while applying edk2-test BBR patch..."
         exit
     fi
+
+    # Apply BBSR patch for Systemready
     if [[ $BUILD_TYPE != S ]]; then
         if git apply --check $BBR_DIR/bbsr/patches/0001-BBSR-Patch-for-UEFI-SCT-Build.patch; then
             echo "Applying BBSR SCT patch..."
@@ -217,6 +223,11 @@ do_build()
 do_clean()
 {
     pushd $TOP_DIR/$SCT_PATH/uefi-sct
+    export PACKAGES_PATH=$TOP_DIR/$UEFI_PATH
+    export PYTHON_COMMAND=/usr/bin/python3
+    export WORKSPACE=$TOP_DIR/$SCT_PATH/uefi-sct
+
+
     source $TOP_DIR/$UEFI_PATH/edksetup.sh
     make -C $TOP_DIR/$UEFI_PATH/BaseTools clean
     rm -rf Build
