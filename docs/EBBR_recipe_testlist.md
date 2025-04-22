@@ -14,7 +14,7 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <th rowspan=1 colspan=1>Testcase</th>
 </tr>
 <tr>
-<td rowspan=6 colspan=1>🔲 GenericTest</td>
+<td rowspan=5 colspan=1>🔲 GenericTest</td>
 <td rowspan=2 colspan=1>✅ EFICompliantTest</td>
 <td rowspan=1 colspan=1>✅ PlatformSpecificElements</td>
 </tr>
