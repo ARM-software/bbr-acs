@@ -72,15 +72,17 @@ To run the tests, follow these steps.
 	- `FS(Y):> cd \acs_results\`
 	- `FS(Y):\acs_results\> mv sct_results sct_results_orginal`
 
+2. To run manual tests for ebbr, use the ebbr_manual.seq file.
 
-
-2. Run manual tests.
-
-	- `FS(X):acs_tests\bbr\SCT>SCT -s <ebbr_manual.seq/sbbr_manual.seq>`
+	- `FS(X):acs_tests\bbr\SCT>SCT -s ebbr_manual.seq
  
 3. While the system runs the reset tests, you may have to manually reset the system if it hangs.
 
-**Note:** The logs for the manual tests will overwrite the logs for the original test run which is the reason to have a copy of the original test. This new folder contains the logs from the new tests run in the manual sequence file. You may to concatenate some of the logs to view together.
+	**Note:** The logs for the manual tests will overwrite the logs for the original test run which is the reason to have a copy of the original test. This new folder contains the logs from the new tests run in the manual sequence file. You may to concatenate some 	of the logs to view together.
+
+4. To run additional SCT tests (e.g., Simple Filesystems, Block I/O, etc.), use the EBBR_extd_run.seq or SBBR_extd_run.seq file.
+   
+	- `FS(X):acs_tests\bbr\SCT>SCT -s <EBBR_extd_run.seq/SBBR_extd_run.seq>`
 
 
 
