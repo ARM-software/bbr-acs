@@ -14,257 +14,257 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <th rowspan=1 colspan=1>Testcase</th>
 </tr>
 <tr>
-<td rowspan=5 colspan=1>🔲 GenericTest</td>
-<td rowspan=2 colspan=1>✅ EFICompliantTest</td>
-<td rowspan=1 colspan=1>✅ PlatformSpecificElements</td>
+<td rowspan=5 colspan=1>❌ GenericTest</td>
+<td rowspan=2 colspan=1>❌ EFICompliantTest</td>
+<td rowspan=1 colspan=1>❌ PlatformSpecificElements</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ RequiredElements</td>
+<td rowspan=1 colspan=1>❌ RequiredElements</td>
 </tr>
 <td rowspan=1 colspan=1>❌ SbbrRequiredUefiProtocols</td>
 <td rowspan=1 colspan=1>❌ MediaIoProtocols</td>
 </tr>
-<td rowspan=1 colspan=1>✅ SbbrEfiSpecVerLvl</td>
-<td rowspan=1 colspan=1>✅ TestEfiSpecVerLvl</td>
+<td rowspan=1 colspan=1>❌ SbbrEfiSpecVerLvl</td>
+<td rowspan=1 colspan=1>❌ TestEfiSpecVerLvl</td>
 </tr>
-<td rowspan=1 colspan=1>✅ SbbrSysEnvConfig</td>
-<td rowspan=1 colspan=1>✅ BootExcLevel</td>
+<td rowspan=1 colspan=1>❌ SbbrSysEnvConfig</td>
+<td rowspan=1 colspan=1>❌ BootExcLevel</td>
 </tr>
 <tr>
-<td rowspan=81 colspan=1>🔲 BootServicesTest</td>
-<td rowspan=14 colspan=1>✅ EventTimerandPriorityServicesTest</td>
-<td rowspan=1 colspan=1>✅ CheckEvent_Conf</td>
+<td rowspan=81 colspan=1>❌ BootServicesTest</td>
+<td rowspan=14 colspan=1>❌ EventTimerandPriorityServicesTest</td>
+<td rowspan=1 colspan=1>❌ CheckEvent_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ CheckEvent_Func</td>
+<td rowspan=1 colspan=1>❌ CheckEvent_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ CloseEvent_Func</td>
+<td rowspan=1 colspan=1>❌ CloseEvent_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ CreateEventEx_Conf</td>
+<td rowspan=1 colspan=1>❌ CreateEventEx_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ CreateEventEx_Func</td>
+<td rowspan=1 colspan=1>❌ CreateEventEx_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ CreateEvent_Conf</td>
+<td rowspan=1 colspan=1>❌ CreateEvent_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ CreateEvent_Func</td>
+<td rowspan=1 colspan=1>❌ CreateEvent_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ RaiseTPL_Func</td>
+<td rowspan=1 colspan=1>❌ RaiseTPL_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ RestoreTPL_Func</td>
+<td rowspan=1 colspan=1>❌ RestoreTPL_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ SetTimer_Conf</td>
+<td rowspan=1 colspan=1>❌ SetTimer_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ SetTimer_Func</td>
+<td rowspan=1 colspan=1>❌ SetTimer_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ SignalEvent_Func</td>
+<td rowspan=1 colspan=1>❌ SignalEvent_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ WaitForEvent_Conf</td>
+<td rowspan=1 colspan=1>❌ WaitForEvent_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ WaitForEvent_Func</td>
+<td rowspan=1 colspan=1>❌ WaitForEvent_Func</td>
 </tr>
-<td rowspan=8 colspan=1>✅ MemoryAllocationServicesTest</td>
-<td rowspan=1 colspan=1>✅ AllocatePages_Conf</td>
+<td rowspan=8 colspan=1>❌ MemoryAllocationServicesTest</td>
+<td rowspan=1 colspan=1>❌ AllocatePages_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ AllocatePages_Func</td>
+<td rowspan=1 colspan=1>❌ AllocatePages_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ AllocatePool_Conf</td>
+<td rowspan=1 colspan=1>❌ AllocatePool_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ AllocatePool_Func</td>
+<td rowspan=1 colspan=1>❌ AllocatePool_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ FreePages_Conf</td>
+<td rowspan=1 colspan=1>❌ FreePages_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ FreePages_Func</td>
+<td rowspan=1 colspan=1>❌ FreePages_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetMemoryMap_Conf</td>
+<td rowspan=1 colspan=1>❌ GetMemoryMap_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetMemoryMap_Func</td>
+<td rowspan=1 colspan=1>❌ GetMemoryMap_Func</td>
 </tr>
-<td rowspan=36 colspan=1>✅ ProtocolHandlerServicesTest</td>
-<td rowspan=1 colspan=1>✅ CloseProtocol_Conf</td>
+<td rowspan=36 colspan=1>❌ ProtocolHandlerServicesTest</td>
+<td rowspan=1 colspan=1>❌ CloseProtocol_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ CloseProtocol_Func</td>
+<td rowspan=1 colspan=1>❌ CloseProtocol_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ ConnectController_Conf</td>
+<td rowspan=1 colspan=1>❌ ConnectController_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ ConnectController_Func</td>
+<td rowspan=1 colspan=1>❌ ConnectController_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ DisconnectController_Conf</td>
+<td rowspan=1 colspan=1>❌ DisconnectController_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ DisconnectController_Func</td>
+<td rowspan=1 colspan=1>❌ DisconnectController_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ HandleProtocol_Conf</td>
+<td rowspan=1 colspan=1>❌ HandleProtocol_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ HandleProtocol_Func</td>
+<td rowspan=1 colspan=1>❌ HandleProtocol_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ InstallMultipleProtocolInterfaces_Conf</td>
+<td rowspan=1 colspan=1>❌ InstallMultipleProtocolInterfaces_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ InstallMultipleProtocolInterfaces_Func</td>
+<td rowspan=1 colspan=1>❌ InstallMultipleProtocolInterfaces_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ InstallProtocolInterface_Conf</td>
+<td rowspan=1 colspan=1>❌ InstallProtocolInterface_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ InstallProtocolInterface_Func</td>
+<td rowspan=1 colspan=1>❌ InstallProtocolInterface_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ LocateDevicePath_Conf</td>
+<td rowspan=1 colspan=1>❌ LocateDevicePath_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ LocateDevicePath_Func</td>
+<td rowspan=1 colspan=1>❌ LocateDevicePath_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ LocateHandleBuffer_Conf</td>
+<td rowspan=1 colspan=1>❌ LocateHandleBuffer_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ LocateHandleBuffer_Func</td>
+<td rowspan=1 colspan=1>❌ LocateHandleBuffer_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ LocateHandle_Conf</td>
+<td rowspan=1 colspan=1>❌ LocateHandle_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ LocateHandle_Func</td>
+<td rowspan=1 colspan=1>❌ LocateHandle_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ LocateProtocol_Conf</td>
+<td rowspan=1 colspan=1>❌ LocateProtocol_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ LocateProtocol_Func</td>
+<td rowspan=1 colspan=1>❌ LocateProtocol_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ OpenProtocolInformation_Conf</td>
+<td rowspan=1 colspan=1>❌ OpenProtocolInformation_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ OpenProtocolInformation_Func</td>
+<td rowspan=1 colspan=1>❌ OpenProtocolInformation_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ OpenProtocol_Conf</td>
+<td rowspan=1 colspan=1>❌ OpenProtocol_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ OpenProtocol_Func_1</td>
+<td rowspan=1 colspan=1>❌ OpenProtocol_Func_1</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ OpenProtocol_Func_2</td>
+<td rowspan=1 colspan=1>❌ OpenProtocol_Func_2</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ OpenProtocol_Func_3</td>
+<td rowspan=1 colspan=1>❌ OpenProtocol_Func_3</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ ProtocolsPerHandle_Conf</td>
+<td rowspan=1 colspan=1>❌ ProtocolsPerHandle_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ ProtocolsPerHandle_Func</td>
+<td rowspan=1 colspan=1>❌ ProtocolsPerHandle_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ RegisterProtocolNotify_Conf</td>
+<td rowspan=1 colspan=1>❌ RegisterProtocolNotify_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ RegisterProtocolNotify_Func</td>
+<td rowspan=1 colspan=1>❌ RegisterProtocolNotify_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ ReinstallProtocolInterface_Conf</td>
+<td rowspan=1 colspan=1>❌ ReinstallProtocolInterface_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ ReinstallProtocolInterface_Func</td>
+<td rowspan=1 colspan=1>❌ ReinstallProtocolInterface_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ UninstallMultipleProtocolInterfaces_Conf</td>
+<td rowspan=1 colspan=1>❌ UninstallMultipleProtocolInterfaces_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ UninstallMultipleProtocolInterfaces_Func</td>
+<td rowspan=1 colspan=1>❌ UninstallMultipleProtocolInterfaces_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ UninstallProtocolInterface_Conf</td>
+<td rowspan=1 colspan=1>❌ UninstallProtocolInterface_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ UninstallProtocolInterface_Func</td>
+<td rowspan=1 colspan=1>❌ UninstallProtocolInterface_Func</td>
 </tr>
-<td rowspan=9 colspan=1>✅ ImageServicesTest</td>
-<td rowspan=1 colspan=1>✅ ExitBootServices_Conf</td>
+<td rowspan=9 colspan=1>❌ ImageServicesTest</td>
+<td rowspan=1 colspan=1>❌ ExitBootServices_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ Exit_Conf</td>
+<td rowspan=1 colspan=1>❌ Exit_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ Exit_Func</td>
+<td rowspan=1 colspan=1>❌ Exit_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ LoadImage_Conf</td>
+<td rowspan=1 colspan=1>❌ LoadImage_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ LoadImage_Func</td>
+<td rowspan=1 colspan=1>❌ LoadImage_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ StartImage_Conf</td>
+<td rowspan=1 colspan=1>❌ StartImage_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ StartImage_Func</td>
+<td rowspan=1 colspan=1>❌ StartImage_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ UnloadImage_Conf</td>
+<td rowspan=1 colspan=1>❌ UnloadImage_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ UnloadImage_Func</td>
+<td rowspan=1 colspan=1>❌ UnloadImage_Func</td>
 </tr>
-<td rowspan=11 colspan=1>✅ MiscBootServicesTest</td>
-<td rowspan=1 colspan=1>✅ CalculateCrc32_Conf</td>
+<td rowspan=11 colspan=1>❌ MiscBootServicesTest</td>
+<td rowspan=1 colspan=1>❌ CalculateCrc32_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ CalculateCrc32_Func</td>
+<td rowspan=1 colspan=1>❌ CalculateCrc32_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ CopyMem_Func</td>
+<td rowspan=1 colspan=1>❌ CopyMem_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetNextMonotonicCount_Conf</td>
+<td rowspan=1 colspan=1>❌ GetNextMonotonicCount_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetNextMonotonicCount_Func</td>
+<td rowspan=1 colspan=1>❌ GetNextMonotonicCount_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ InstallConfigurationTable_Conf</td>
+<td rowspan=1 colspan=1>❌ InstallConfigurationTable_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ InstallConfigurationTable_Func</td>
+<td rowspan=1 colspan=1>❌ InstallConfigurationTable_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ SetMem_Func</td>
+<td rowspan=1 colspan=1>❌ SetMem_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ SetWatchdogTimer_Conf</td>
+<td rowspan=1 colspan=1>❌ SetWatchdogTimer_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ SetWatchdogTimer_Func</td>
+<td rowspan=1 colspan=1>❌ SetWatchdogTimer_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ Stall_Func</td>
+<td rowspan=1 colspan=1>❌ Stall_Func</td>
 </tr>
 <td rowspan=3 colspan=1>❌ SbbrBootServices</td>
 <td rowspan=1 colspan=1>❌ AcpiTable</td>
@@ -286,148 +286,148 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <tr>
 <td rowspan=1 colspan=1>❌ VariableUpdates</td>
 </tr>
-<td rowspan=12 colspan=1>🔲 VariableServicesTest</td>
+<td rowspan=12 colspan=1>❌ VariableServicesTest</td>
 <td rowspan=1 colspan=1>❌ AuthVar_Conf</td>
 </tr>
 <tr>
 <td rowspan=1 colspan=1>❌ AuthVar_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetNextVariableName_Conf</td>
+<td rowspan=1 colspan=1>❌ GetNextVariableName_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetNextVariableName_Func</td>
+<td rowspan=1 colspan=1>❌ GetNextVariableName_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetVariable_Conf</td>
+<td rowspan=1 colspan=1>❌ GetVariable_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetVariable_Func</td>
+<td rowspan=1 colspan=1>❌ GetVariable_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ HardwareErrorRecord_Conf</td>
+<td rowspan=1 colspan=1>❌ HardwareErrorRecord_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ HardwareErrorRecord_Func</td>
+<td rowspan=1 colspan=1>❌ HardwareErrorRecord_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ QueryVariableInfo_Conf</td>
+<td rowspan=1 colspan=1>❌ QueryVariableInfo_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ QueryVariableInfo_Func</td>
+<td rowspan=1 colspan=1>❌ QueryVariableInfo_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ SetVariable_Conf</td>
+<td rowspan=1 colspan=1>❌ SetVariable_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ SetVariable_Func</td>
+<td rowspan=1 colspan=1>❌ SetVariable_Func</td>
 </tr>
 <td rowspan=1 colspan=1>❌ BBSRVariableSizeTest</td>
 <td rowspan=1 colspan=1>❌ BBSRVariableSizeTest_func</td>
 </tr>
-<td rowspan=8 colspan=1>✅ TimeServicesTest</td>
-<td rowspan=1 colspan=1>✅ GetTime_Conf</td>
+<td rowspan=8 colspan=1>❌ TimeServicesTest</td>
+<td rowspan=1 colspan=1>❌ GetTime_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetTime_Func</td>
+<td rowspan=1 colspan=1>❌ GetTime_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetWakeupTime_Conf</td>
+<td rowspan=1 colspan=1>❌ GetWakeupTime_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetWakeupTime_Func</td>
+<td rowspan=1 colspan=1>❌ GetWakeupTime_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ SetTime_Conf</td>
+<td rowspan=1 colspan=1>❌ SetTime_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ SetTime_Func</td>
+<td rowspan=1 colspan=1>❌ SetTime_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ SetWakeupTime_Conf</td>
+<td rowspan=1 colspan=1>❌ SetWakeupTime_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ SetWakeupTime_Func</td>
+<td rowspan=1 colspan=1>❌ SetWakeupTime_Func</td>
 </tr>
 <td rowspan=4 colspan=1>🔲 MiscRuntimeServicesTest</td>
-<td rowspan=1 colspan=1>✅ QueryCapsuleCapabilities_Conf</td>
+<td rowspan=1 colspan=1>❌ QueryCapsuleCapabilities_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ QueryCapsuleCapabilities_Func</td>
+<td rowspan=1 colspan=1>❌ QueryCapsuleCapabilities_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ ResetSystem_Func</td>
+<td rowspan=1 colspan=1>✅ ResetSystem_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ UpdateCapsule_Conf</td>
+<td rowspan=1 colspan=1>❌ UpdateCapsule_Conf</td>
 </tr>
-<td rowspan=3 colspan=1>🔲 SBBRRuntimeServicesTest</td>
-<td rowspan=1 colspan=1>✅ Non-volatile Variable Reset Test</td>
+<td rowspan=3 colspan=1>❌ SBBRRuntimeServicesTest</td>
+<td rowspan=1 colspan=1>❌ Non-volatile Variable Reset Test</td>
 </tr>
 <tr>
 <td rowspan=1 colspan=1>❌ ResetSystem Shutdown Test</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ Runtime Services Test</td>
+<td rowspan=1 colspan=1>❌ Runtime Services Test</td>
 </tr>
 <tr>
-<td rowspan=2 colspan=1>✅ LoadedImageProtocolTest</td>
-<td rowspan=1 colspan=1>✅ LoadedImageProtocolTest1</td>
-<td rowspan=1 colspan=1>✅ LoadedImageProtocolTest1</td>
+<td rowspan=2 colspan=1>❌ LoadedImageProtocolTest</td>
+<td rowspan=1 colspan=1>❌ LoadedImageProtocolTest1</td>
+<td rowspan=1 colspan=1>❌ LoadedImageProtocolTest1</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ LoadedImageProtocolTest2</td>
-<td rowspan=1 colspan=1>✅ LoadedImageProtocolTest2</td>
+<td rowspan=1 colspan=1>❌ LoadedImageProtocolTest2</td>
+<td rowspan=1 colspan=1>❌ LoadedImageProtocolTest2</td>
 </tr>
 <tr>
-<td rowspan=27 colspan=1>🔲 DevicePathProcotols</td>
-<td rowspan=1 colspan=1>✅ DevicePathProcotolTest</td>
-<td rowspan=1 colspan=1>✅ PathNode_Conf</td>
+<td rowspan=27 colspan=1>❌ DevicePathProcotols</td>
+<td rowspan=1 colspan=1>❌ DevicePathProcotolTest</td>
+<td rowspan=1 colspan=1>❌ PathNode_Conf</td>
 </tr>
-<td rowspan=15 colspan=1>✅ DevicePathUtilitiesProcotolTest</td>
-<td rowspan=1 colspan=1>✅ AppendDeviceNode_Conformance</td>
-</tr>
-<tr>
-<td rowspan=1 colspan=1>✅ AppendDeviceNode_Functionality</td>
+<td rowspan=15 colspan=1>❌ DevicePathUtilitiesProcotolTest</td>
+<td rowspan=1 colspan=1>❌ AppendDeviceNode_Conformance</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ AppendDevicePathInstance_Conformance</td>
+<td rowspan=1 colspan=1>❌ AppendDeviceNode_Functionality</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ AppendDevicePathInstance_Functionality</td>
+<td rowspan=1 colspan=1>❌ AppendDevicePathInstance_Conformance</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ AppendDevicePath_Conformance</td>
+<td rowspan=1 colspan=1>❌ AppendDevicePathInstance_Functionality</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ AppendDevicePath_Functionality</td>
+<td rowspan=1 colspan=1>❌ AppendDevicePath_Conformance</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ CreatDeviceNode_Functionality</td>
+<td rowspan=1 colspan=1>❌ AppendDevicePath_Functionality</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ CreateDeviceNode_Conformance</td>
+<td rowspan=1 colspan=1>❌ CreatDeviceNode_Functionality</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ DuplicateDevicePath_Conformance</td>
+<td rowspan=1 colspan=1>❌ CreateDeviceNode_Conformance</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ DuplicateDevicePath_Functionality</td>
+<td rowspan=1 colspan=1>❌ DuplicateDevicePath_Conformance</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetDevicePathSize_Conformance</td>
+<td rowspan=1 colspan=1>❌ DuplicateDevicePath_Functionality</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetDevicePathSize_Functionality</td>
+<td rowspan=1 colspan=1>❌ GetDevicePathSize_Conformance</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetNextDevicePathInstance_Conformance</td>
+<td rowspan=1 colspan=1>❌ GetDevicePathSize_Functionality</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetNextDevicePathInstance_Functionality</td>
+<td rowspan=1 colspan=1>❌ GetNextDevicePathInstance_Conformance</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ IsDevicePathMultiInstance_Functionality</td>
+<td rowspan=1 colspan=1>❌ GetNextDevicePathInstance_Functionality</td>
+</tr>
+<tr>
+<td rowspan=1 colspan=1>❌ IsDevicePathMultiInstance_Functionality</td>
 </tr>
 <td rowspan=5 colspan=1>❌ DevicePathToTextProcotolTest</td>
 <td rowspan=1 colspan=1>❌ ConvertDeviceNodeToText_Conformance</td>
@@ -873,66 +873,66 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <td rowspan=1 colspan=1>❌ MatchString_Func</td>
 </tr>
 <tr>
-<td rowspan=90 colspan=1>🔲 HIITest</td>
-<td rowspan=20 colspan=1>✅ HIIDatabaseProtocolTest</td>
-<td rowspan=1 colspan=1>✅ ExportPackageListsConformance</td>
+<td rowspan=90 colspan=1>❌ HIITest</td>
+<td rowspan=20 colspan=1>❌ HIIDatabaseProtocolTest</td>
+<td rowspan=1 colspan=1>❌ ExportPackageListsConformance</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ ExportPackageListsFunction</td>
+<td rowspan=1 colspan=1>❌ ExportPackageListsFunction</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ FindKeyboardLayoutsConformance</td>
+<td rowspan=1 colspan=1>❌ FindKeyboardLayoutsConformance</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ FindKeyboardLayoutsFunction</td>
+<td rowspan=1 colspan=1>❌ FindKeyboardLayoutsFunction</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetKeyboardLayoutConformance</td>
+<td rowspan=1 colspan=1>❌ GetKeyboardLayoutConformance</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetKeyboardLayoutFunction</td>
+<td rowspan=1 colspan=1>❌ GetKeyboardLayoutFunction</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetPackageListHandleConformance</td>
+<td rowspan=1 colspan=1>❌ GetPackageListHandleConformance</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetPackageListHandleFunction</td>
+<td rowspan=1 colspan=1>❌ GetPackageListHandleFunction</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ ListPackageListsConformance</td>
+<td rowspan=1 colspan=1>❌ ListPackageListsConformance</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ ListPackageListsFunction</td>
+<td rowspan=1 colspan=1>❌ ListPackageListsFunction</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ NewPackageListConformance</td>
+<td rowspan=1 colspan=1>❌ NewPackageListConformance</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ NewPackageListFunction</td>
+<td rowspan=1 colspan=1>❌ NewPackageListFunction</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ RegisterPackageNotifyConformance</td>
+<td rowspan=1 colspan=1>❌ RegisterPackageNotifyConformance</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ RemovePackageListConformance</td>
+<td rowspan=1 colspan=1>❌ RemovePackageListConformance</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ RemovePackageListFunction</td>
+<td rowspan=1 colspan=1>❌ RemovePackageListFunction</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ SetKeyboardLayoutConformance</td>
+<td rowspan=1 colspan=1>❌ SetKeyboardLayoutConformance</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ SetKeyboardLayoutFunction</td>
+<td rowspan=1 colspan=1>❌ SetKeyboardLayoutFunction</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ UnregisterPackageNotifyConformance</td>
+<td rowspan=1 colspan=1>❌ UnregisterPackageNotifyConformance</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ UpdatePackageListConformance</td>
+<td rowspan=1 colspan=1>❌ UpdatePackageListConformance</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ UpdatePackageListFunction</td>
+<td rowspan=1 colspan=1>❌ UpdatePackageListFunction</td>
 </tr>
 <td rowspan=10 colspan=1>❌ HIIStringProtocolTest</td>
 <td rowspan=1 colspan=1>❌ GetLanguagesConformance</td>
@@ -1477,24 +1477,24 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <td rowspan=1 colspan=1>❌ UsbSyncInterruptTransfer_Conf</td>
 </tr>
 <tr>
-<td rowspan=48 colspan=1>🔲 NetworkSupportTest</td>
-<td rowspan=24 colspan=1>🔲 SimpleNetworkProtocolTest</td>
-<td rowspan=1 colspan=1>✅ GetStatus_Conf</td>
+<td rowspan=48 colspan=1>❌ NetworkSupportTest</td>
+<td rowspan=24 colspan=1>❌ SimpleNetworkProtocolTest</td>
+<td rowspan=1 colspan=1>❌ GetStatus_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetStatus_Func</td>
+<td rowspan=1 colspan=1>❌ GetStatus_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ Initialize_Conf</td>
+<td rowspan=1 colspan=1>❌ Initialize_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ Initialize_Func</td>
+<td rowspan=1 colspan=1>❌ Initialize_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ MCastIpToMac_Conf</td>
+<td rowspan=1 colspan=1>❌ MCastIpToMac_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ MCastIpToMac_Func</td>
+<td rowspan=1 colspan=1>❌ MCastIpToMac_Func</td>
 </tr>
 <tr>
 <td rowspan=1 colspan=1>❌ NVData_Conf</td>
@@ -1509,25 +1509,25 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <td rowspan=1 colspan=1>❌ ReceiveFilter_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ Receive_Conf</td>
+<td rowspan=1 colspan=1>❌ Receive_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ Reset_Conf</td>
+<td rowspan=1 colspan=1>❌ Reset_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ Reset_Func</td>
+<td rowspan=1 colspan=1>❌ Reset_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ Shutdown_Conf</td>
+<td rowspan=1 colspan=1>❌ Shutdown_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ Shutdown_Func</td>
+<td rowspan=1 colspan=1>❌ Shutdown_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ Start_Conf</td>
+<td rowspan=1 colspan=1>❌ Start_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ Start_Func</td>
+<td rowspan=1 colspan=1>❌ Start_Func</td>
 </tr>
 <tr>
 <td rowspan=1 colspan=1>❌ StationAddress_Conf</td>
@@ -1542,13 +1542,13 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <td rowspan=1 colspan=1>❌ Statistics_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ Stop_Conf</td>
+<td rowspan=1 colspan=1>❌ Stop_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ Stop_Func</td>
+<td rowspan=1 colspan=1>❌ Stop_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ Transmit_Conf</td>
+<td rowspan=1 colspan=1>❌ Transmit_Conf</td>
 </tr>
 <td rowspan=6 colspan=1>❌ PXEBaseCodeProtocolTest</td>
 <td rowspan=1 colspan=1>❌ Arp_Conf</td>
@@ -1692,18 +1692,18 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <td rowspan=1 colspan=1>❌ UnregisterResetNotifyFunction</td>
 </tr>
 <tr>
-<td rowspan=16 colspan=1>🔲 SecureTechTest</td>
-<td rowspan=4 colspan=1>✅ RNGProtocolTest</td>
-<td rowspan=1 colspan=1>✅ GetInfo_Conf</td>
+<td rowspan=16 colspan=1>❌ SecureTechTest</td>
+<td rowspan=4 colspan=1>❌ RNGProtocolTest</td>
+<td rowspan=1 colspan=1>❌ GetInfo_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetInfo_Func</td>
+<td rowspan=1 colspan=1>❌ GetInfo_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetRNG_Conf</td>
+<td rowspan=1 colspan=1>❌ GetRNG_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ GetRNG_Func</td>
+<td rowspan=1 colspan=1>❌ GetRNG_Func</td>
 </tr>
 <td rowspan=8 colspan=1>❌ Hash2Test</td>
 <td rowspan=1 colspan=1>❌ GetHashSizeConformance</td>
@@ -1742,63 +1742,63 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <td rowspan=1 colspan=1>❌ VerifySignatureFunction</td>
 </tr>
 <tr>
-<td rowspan=41 colspan=1>🔲 ConsoleSupportTest</td>
-<td rowspan=6 colspan=1>✅ SimpleTextInputExProtocolTest</td>
-<td rowspan=1 colspan=1>✅ ReadKeyStrokeExConformance</td>
+<td rowspan=41 colspan=1>❌ ConsoleSupportTest</td>
+<td rowspan=6 colspan=1>❌ SimpleTextInputExProtocolTest</td>
+<td rowspan=1 colspan=1>❌ ReadKeyStrokeExConformance</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ ReadKeyStrokeExFunctionAuto</td>
+<td rowspan=1 colspan=1>❌ ReadKeyStrokeExFunctionAuto</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ RegisterKeyNotifyConformance</td>
+<td rowspan=1 colspan=1>❌ RegisterKeyNotifyConformance</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ ResetFunctionAuto</td>
+<td rowspan=1 colspan=1>❌ ResetFunctionAuto</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ SetStateConformance</td>
+<td rowspan=1 colspan=1>❌ SetStateConformance</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ UnregisterKeyNotifyConformance</td>
+<td rowspan=1 colspan=1>❌ UnregisterKeyNotifyConformance</td>
 </tr>
-<td rowspan=1 colspan=1>✅ SimpleInputProtocolTest</td>
-<td rowspan=1 colspan=1>✅ Reset_Func</td>
+<td rowspan=1 colspan=1>❌ SimpleInputProtocolTest</td>
+<td rowspan=1 colspan=1>❌ Reset_Func</td>
 </tr>
-<td rowspan=12 colspan=1>✅ SimpleOutputProtocolTest</td>
-<td rowspan=1 colspan=1>✅ ClearScreen_Func</td>
-</tr>
-<tr>
-<td rowspan=1 colspan=1>✅ EnableCursor_Func</td>
+<td rowspan=12 colspan=1>❌ SimpleOutputProtocolTest</td>
+<td rowspan=1 colspan=1>❌ ClearScreen_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ OutputString_Func</td>
+<td rowspan=1 colspan=1>❌ EnableCursor_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ QueryMode_Conf</td>
+<td rowspan=1 colspan=1>❌ OutputString_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ QueryMode_Func</td>
+<td rowspan=1 colspan=1>❌ QueryMode_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ Reset_Func</td>
+<td rowspan=1 colspan=1>❌ QueryMode_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ SetAttribute_Func</td>
+<td rowspan=1 colspan=1>❌ Reset_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ SetCursorPosition_Conf</td>
+<td rowspan=1 colspan=1>❌ SetAttribute_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ SetCursorPosition_Func</td>
+<td rowspan=1 colspan=1>❌ SetCursorPosition_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ SetMode_Conf</td>
+<td rowspan=1 colspan=1>❌ SetCursorPosition_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ SetMode_Func</td>
+<td rowspan=1 colspan=1>❌ SetMode_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ TestString_Func</td>
+<td rowspan=1 colspan=1>❌ SetMode_Func</td>
+</tr>
+<tr>
+<td rowspan=1 colspan=1>❌ TestString_Func</td>
 </tr>
 <td rowspan=2 colspan=1>❌ SimplePointerProtocolTest</td>
 <td rowspan=1 colspan=1>❌ GetState_Func</td>
