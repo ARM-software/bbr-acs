@@ -80,7 +80,7 @@ To run the tests, follow these steps.
 
 	**Note:** The logs for the manual tests will overwrite the logs for the original test run which is the reason to have a copy of the original test. This new folder contains the logs from the new tests run in the manual sequence file. You may to concatenate some 	of the logs to view together.
 
-4. To run additional SCT tests (e.g., Simple Filesystems, Block I/O, etc.), use the EBBR_extd_run.seq or SBBR_extd_run.seq file.
+4. To run additional SCT tests (e.g., Simple Filesystems, Block I/O, etc.) to improve more Compliances, use the EBBR_extd_run.seq or SBBR_extd_run.seq file.
    
 	- `FS(X):acs_tests\bbr\SCT>SCT -s <EBBR_extd_run.seq/SBBR_extd_run.seq>`
 
