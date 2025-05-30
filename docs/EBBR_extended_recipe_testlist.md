@@ -373,6 +373,7 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <tr>
 <td rowspan=1 colspan=1>✅ Runtime Services Test</td>
 </tr>
+</tr>
 <td rowspan=1 colspan=1>❌ TCGMemoryOverwriteRequestTest</td>
 <td rowspan=1 colspan=1>❌ Test MOR and MORLOCK</td>
 </tr>
@@ -572,60 +573,60 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <td rowspan=1 colspan=1>❌ Response_Func</td>
 </tr>
 <tr>
-<td rowspan=91 colspan=1>❌ MediaAccessTest</td>
-<td rowspan=18 colspan=1>❌ SimpleFileSystemProtocolTest</td>
-<td rowspan=1 colspan=1>❌ GetPosition_Conf</td>
+<td rowspan=91 colspan=1>🔲 MediaAccessTest</td>
+<td rowspan=18 colspan=1>✅ SimpleFileSystemProtocolTest</td>
+<td rowspan=1 colspan=1>✅ GetPosition_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ GetPosition_Func</td>
+<td rowspan=1 colspan=1>✅ GetPosition_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ OpenEx_Conf</td>
+<td rowspan=1 colspan=1>✅ OpenEx_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ OpenEx_Func</td>
+<td rowspan=1 colspan=1>✅ OpenEx_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ OpenVolume_Func</td>
+<td rowspan=1 colspan=1>✅ OpenVolume_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ Open_Conf</td>
+<td rowspan=1 colspan=1>✅ Open_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ Open_Func</td>
+<td rowspan=1 colspan=1>✅ Open_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ ReadEx_Conf</td>
+<td rowspan=1 colspan=1>✅ ReadEx_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ ReadEx_Func</td>
+<td rowspan=1 colspan=1>✅ ReadEx_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ Read_Func</td>
+<td rowspan=1 colspan=1>✅ Read_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ SetInfo_Conf</td>
+<td rowspan=1 colspan=1>✅ SetInfo_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ SetInfo_Func</td>
+<td rowspan=1 colspan=1>✅ SetInfo_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ SetPosition_Conf</td>
+<td rowspan=1 colspan=1>✅ SetPosition_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ SetPosition_Func</td>
+<td rowspan=1 colspan=1>✅ SetPosition_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ WriteEx_Conf</td>
+<td rowspan=1 colspan=1>✅ WriteEx_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ WriteEx_Func</td>
+<td rowspan=1 colspan=1>✅ WriteEx_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ Write_Conf</td>
+<td rowspan=1 colspan=1>✅ Write_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ Write_Func</td>
+<td rowspan=1 colspan=1>✅ Write_Func</td>
 </tr>
 <td rowspan=2 colspan=1>❌ DiskIOProtocolTest</td>
 <td rowspan=1 colspan=1>❌ ReadDisk_Conf</td>
@@ -654,23 +655,23 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <tr>
 <td rowspan=1 colspan=1>❌ WriteDiskEx_Func</td>
 </tr>
-<td rowspan=6 colspan=1>❌ BlockIOProtocolTest</td>
-<td rowspan=1 colspan=1>❌ FlushBlocks_Conf</td>
+<td rowspan=6 colspan=1>✅ BlockIOProtocolTest</td>
+<td rowspan=1 colspan=1>✅ FlushBlocks_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ FlushBlocks_Func</td>
+<td rowspan=1 colspan=1>✅ FlushBlocks_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ MediaInfo_Integrity</td>
+<td rowspan=1 colspan=1>✅ MediaInfo_Integrity</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ ReadBlocks_Conf</td>
+<td rowspan=1 colspan=1>✅ ReadBlocks_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ ReadBlocks_Func</td>
+<td rowspan=1 colspan=1>✅ ReadBlocks_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ Reset_Func</td>
+<td rowspan=1 colspan=1>✅ Reset_Func</td>
 </tr>
 <td rowspan=8 colspan=1>❌ BlockIO2ProtocolTest</td>
 <td rowspan=1 colspan=1>❌ FlushBlocksEx_Conf</td>
