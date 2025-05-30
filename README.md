@@ -72,9 +72,9 @@ To run the tests, follow these steps.
 	- `FS(Y):> cd \acs_results\`
 	- `FS(Y):\acs_results\> mv sct_results sct_results_orginal`
 
-2. To run manual tests for ebbr, use the ebbr_manual.seq file.
+2. Run manual tests.
 
-	- `FS(X):acs_tests\bbr\SCT>SCT -s ebbr_manual.seq
+	- `FS(X):acs_tests\bbr\SCT>SCT -s <ebbr_manual.seq/sbbr_manual.seq>`
  
 3. While the system runs the reset tests, you may have to manually reset the system if it hangs.
 
