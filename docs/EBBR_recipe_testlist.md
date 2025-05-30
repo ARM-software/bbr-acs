@@ -364,14 +364,14 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <tr>
 <td rowspan=1 colspan=1>✅ UpdateCapsule_Conf</td>
 </tr>
-<td rowspan=3 colspan=1>❌ SBBRRuntimeServicesTest</td>
-<td rowspan=1 colspan=1>❌ Non-volatile Variable Reset Test</td>
+<td rowspan=3 colspan=1>🔲 SBBRRuntimeServicesTest</td>
+<td rowspan=1 colspan=1>✅ Non-volatile Variable Reset Test</td>
 </tr>
 <tr>
 <td rowspan=1 colspan=1>❌ ResetSystem Shutdown Test</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ Runtime Services Test</td>
+<td rowspan=1 colspan=1>✅ Runtime Services Test</td>
 </tr>
 <td rowspan=1 colspan=1>❌ TCGMemoryOverwriteRequestTest</td>
 <td rowspan=1 colspan=1>❌ Test MOR and MORLOCK</td>
