@@ -14,7 +14,7 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <th rowspan=1 colspan=1>Testcase</th>
 </tr>
 <tr>
-<td rowspan=5 colspan=1>✅ GenericTest</td>
+<td rowspan=6 colspan=1>✅ GenericTest</td>
 <td rowspan=2 colspan=1>✅ EFICompliantTest</td>
 <td rowspan=1 colspan=1>✅ PlatformSpecificElements</td>
 </tr>
@@ -30,6 +30,9 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <td rowspan=1 colspan=1>✅ SbbrSysEnvConfig</td>
 <td rowspan=1 colspan=1>✅ BootExcLevel</td>
 </tr>
+<td rowspan=1 colspan=1>❌ PlatformResetAttackMitigationPsciTest</td>
+<td rowspan=1 colspan=1>❌ PlatformResetAttackMitigationPsciTest_</td>
+<tr>
 <tr>
 <td rowspan=81 colspan=1>✅ BootServicesTest</td>
 <td rowspan=14 colspan=1>✅ EventTimerandPriorityServicesTest</td>
@@ -276,7 +279,7 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <td rowspan=1 colspan=1>✅ SmbiosTable</td>
 </tr>
 <tr>
-<td rowspan=31 colspan=1>🔲 RuntimeServicesTest</td>
+<td rowspan=32 colspan=1>🔲 RuntimeServicesTest</td>
 <td rowspan=3 colspan=1>❌ SecureBootTest</td>
 <td rowspan=1 colspan=1>❌ ImageLoading</td>
 </tr>
@@ -369,6 +372,10 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 </tr>
 <tr>
 <td rowspan=1 colspan=1>✅ Runtime Services Test</td>
+</tr>
+</tr>
+<td rowspan=1 colspan=1>❌ TCGMemoryOverwriteRequestTest</td>
+<td rowspan=1 colspan=1>❌ Test MOR and MORLOCK</td>
 </tr>
 <tr>
 <td rowspan=2 colspan=1>✅ LoadedImageProtocolTest</td>
