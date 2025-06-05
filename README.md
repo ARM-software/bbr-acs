@@ -147,6 +147,23 @@ The FWTS binaries and dependencies can be found here
 -	`fwts_workspace/buildroot/output/target/usr/lib/fwts/`
 -	`fwts_workspace/buildroot/output/target/usr/share/fwts/`
 
+### Notes
+- **To build a specific FWTS version**, modify:
+  - `buildroot/package/fwts/fwts.mk`
+    ```makefile
+    FWTS_VERSION = 25.03.00
+    ```
+  - `buildroot/package/fwts/fwts.hash`
+    ```plaintext
+    # SHA256 hash from: https://fwts.ubuntu.com/release/SHA256SUMS
+    sha256  6e4f795a7b5c7e549515901e197fedba200ee9fd06c8a62f9f49db24301f280b  fwts-V25.03.00.tar.gz
+    ```
+
+- **To apply patches**, place them in:
+  ```plaintext
+  buildroot/package/fwts/
+  ```
+
 ## BBR ACS Tag mapping to SystemReady ACS Releases
 ---------------------------------------------------------------------
 |    BBR ACS TAG        |     BBR Recipe      | SystemReady Release |
