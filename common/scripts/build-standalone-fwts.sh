@@ -17,7 +17,7 @@
 ##
 
 # FWTS Build Script for AArch64 using Buildroot on both Ubuntu x86_64 and AArch64 Native Systems
-# Usage: ./build_fwts.sh
+
 set -e
 
 TOP_DIR="$(pwd)"
