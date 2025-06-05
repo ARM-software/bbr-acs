@@ -86,30 +86,30 @@ To run the tests, follow these steps.
 
 
 
-## SBBR based on Firmware Test Suite
+## Firmware Test Suite
 FWTS is a package hosted by Canonical. FWTS provides tests for ACPI, SMBIOS and UEFI.
-Several SBBR assertions are tested through FWTS.
+Several SBBR/EBBR assertions are tested through FWTS.
 
 ### Run FWTS Binary
 
 1.  Boot to Target OS
 
 2.  Create fwts workspace on Target OS
-    `mkdir -p ~/fwts_workspace/bin`
-    `mkdir -p ~/fwts_workspace/lib`
+    -	`mkdir -p ~/fwts_workspace/bin`
+    -	`mkdir -p ~/fwts_workspace/lib`
 
 3.  Copy FWTS Binary and Dependencies to fwts workspace
     -   Copy the fwts binary to ~/fwts_workspace/bin
     -   Copy all required shared libraries (e.g., libfwts.so, etc.) to ~/fwts_workspace/lib
 
 4.  Set Library Path
-    `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/fwts_workspace/lib`
+    -	`export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/fwts_workspace/lib`
 
 5.  Run fwts to check version
-    `~/fwts_workspace/bin/fwts --version`
+    -	`~/fwts_workspace/bin/fwts --version`
 
 6.  Run full FWTS tests
-    `~/fwts_workspace/bin/fwts`
+    -	`~/fwts_workspace/bin/fwts`
 
 ## Building BBR
 BBR is automatically built and packaged into ACS, but it can also be built independently.
@@ -137,17 +137,15 @@ The binaries of SCT are generated here
 
 NOTE: The UEFI application, CapsuleApp.efi is also built and can be found at the location bbr-acs/<ebbr/sbbr>/scripts/edk2/Build/MdeModule/DEBUG_GCC5/AARCH64 <br />
 
-#### 4. Building Standalone FWTS
- Run
-`./common/scripts/build-standlone-fwts.sh`
-to build standalone FWTS
+## Building Standalone FWTS
+Run	`./common/scripts/build-standlone-fwts.sh` to build FWTS component
 
 The FWTS binaries and dependencies can be found here
-    `fwts_workspace/buildroot/output/target/usr/bin/fwts`
-    `fwts_workspace/buildroot/output/target/usr/bin/kernelscan`
-    `fwts_workspace/buildroot/output/target/usr/lib64/fwts/`
-    `fwts_workspace/buildroot/output/target/usr/lib/fwts/`
-    `fwts_workspace/buildroot/output/target/usr/share/fwts/`
+-	`fwts_workspace/buildroot/output/target/usr/bin/fwts`
+-	`fwts_workspace/buildroot/output/target/usr/bin/kernelscan`
+-	`fwts_workspace/buildroot/output/target/usr/lib64/fwts/`
+-	`fwts_workspace/buildroot/output/target/usr/lib/fwts/`
+-	`fwts_workspace/buildroot/output/target/usr/share/fwts/`
 
 ## BBR ACS Tag mapping to SystemReady ACS Releases
 ---------------------------------------------------------------------
