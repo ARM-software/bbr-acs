@@ -90,16 +90,26 @@ To run the tests, follow these steps.
 FWTS is a package hosted by Canonical. FWTS provides tests for ACPI, SMBIOS and UEFI.
 Several SBBR assertions are tested through FWTS.
 
-### Running FWTS tests
+### Run FWTS Binary
 
-From the UEFI shell, you can choose to boot Linux OS by entering the command:
+1.  Boot to Target OS
 
-`Shell>exit`
+2.  Create fwts workspace on Target OS
+    `mkdir -p ~/fwts_workspace/bin`
+    `mkdir -p ~/fwts_workspace/lib`
 
-This command loads the grub menu. Press enter to choose the option 'Linux BusyBox' that boots the OS and runs FWTS tests and OS context BSA tests automatically. <br />
+3.  Copy FWTS Binary and Dependencies to fwts workspace
+    -   Copy the fwts binary to ~/fwts_workspace/bin
+    -   Copy all required shared libraries (e.g., libfwts.so, etc.) to ~/fwts_workspace/lib
 
-Logs are stored in the results partition, which can be viewed on any machine after the tests are run.
+4.  Set Library Path
+    `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/fwts_workspace/lib`
 
+5.  Run fwts to check version
+    `~/fwts_workspace/bin/fwts --version`
+
+6.  Run full FWTS tests
+    `~/fwts_workspace/bin/fwts`
 
 ## Building BBR
 BBR is automatically built and packaged into ACS, but it can also be built independently.
@@ -113,30 +123,31 @@ Navigate to the `bbr-acs/<ebbr/sbbr>/scripts` directory
 Get source by running the
 `./build-scripts/get_<ebbr/sbbr>_source.sh`
 
-This will download `edk2-test, edk2, fwts and tools`
+This will download `edk2-test, edk2 and tools`
 
 #### 3. Building SBBR & EBBR
  Run
 `./build-scripts/build_<ebbr/sbbr>.sh`
-to build BBR components, SCT and FWTS.
+to build BBR components and SCT
 
-The script applies patches to create an "EBBR or SBBR" build recipe in the SCT and FWTS build system.
+The script applies patches to create an "EBBR or SBBR" build recipe in the SCT build system.
 
 The binaries of SCT are generated here
     `bbr-acs/<ebbr/sbbr>/scripts/edk2-test/uefi-sct/<ARCH>_SCT #(i.e. AARCH64_SCT)`
 
-The binaries of FWTS are generated here
-    `bbr-acs/<ebbr/sbbr>/scripts/fwts/fwts_output`
-
 NOTE: The UEFI application, CapsuleApp.efi is also built and can be found at the location bbr-acs/<ebbr/sbbr>/scripts/edk2/Build/MdeModule/DEBUG_GCC5/AARCH64 <br />
 
-NOTE: SBBR and EBBR build scripts also supports bulding fwts and sct individually.
+#### 4. Building Standalone FWTS
+ Run
+`./common/scripts/build-standlone-fwts.sh`
+to build standalone FWTS
 
-      To build only SCT, pass the sct option to build script
-      - `./build-scripts/build_<ebbr/sbbr>.sh` sct
-      
-      To build only FWTS, pass the fwts option to build script
-      - `./build-scripts/build_<ebbr/sbbr>.sh` fwts
+The FWTS binaries and dependencies can be found here
+    `fwts_workspace/buildroot/output/target/usr/bin/fwts`
+    `fwts_workspace/buildroot/output/target/usr/bin/kernelscan`
+    `fwts_workspace/buildroot/output/target/usr/lib64/fwts/`
+    `fwts_workspace/buildroot/output/target/usr/lib/fwts/`
+    `fwts_workspace/buildroot/output/target/usr/share/fwts/`
 
 ## BBR ACS Tag mapping to SystemReady ACS Releases
 ---------------------------------------------------------------------
