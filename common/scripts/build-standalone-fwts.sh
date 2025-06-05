@@ -94,11 +94,11 @@ fi
 
 echo "==> Build complete."
 echo "FWTS binaries and dependencies can be found in:"
-echo "  buildroot/output/target/usr/bin/fwts"
-echo "  buildroot/output/target/usr/bin/kernelscan"
-echo "  buildroot/output/target/usr/lib64/fwts/"
-echo "  buildroot/output/target/usr/lib/fwts/"
-echo "  buildroot/output/target/usr/share/fwts/"
+echo "  fwts_workspace/buildroot/output/target/usr/bin/fwts"
+echo "  fwts_workspace/buildroot/output/target/usr/bin/kernelscan"
+echo "  fwts_workspace/buildroot/output/target/usr/lib64/fwts/"
+echo "  fwts_workspace/buildroot/output/target/usr/lib/fwts/"
+echo "  fwts_workspace/buildroot/output/target/usr/share/fwts/"
 
 # Optional clean steps:
 # echo "==> Cleaning FWTS package only..."
