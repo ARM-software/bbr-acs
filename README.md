@@ -138,7 +138,7 @@ The binaries of SCT are generated here
 NOTE: The UEFI application, CapsuleApp.efi is also built and can be found at the location bbr-acs/<ebbr/sbbr>/scripts/edk2/Build/MdeModule/DEBUG_GCC5/AARCH64 <br />
 
 ## Building Standalone FWTS
-Run	`./common/scripts/build-standlone-fwts.sh` to build FWTS component
+Run	`./common/scripts/build-standalone-fwts.sh` to build FWTS component
 
 The FWTS binaries and dependencies can be found here
 -	`fwts_workspace/buildroot/output/target/usr/bin/fwts`
