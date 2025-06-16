@@ -146,9 +146,9 @@ The FWTS binaries and dependencies can be found here
     -	`~/fwts_workspace/bin/fwts`
 
 ### Notes
-- **By default, build-standalone-fwts.sh script builds the latest FWTS version supprted by ARM SystemReady, as defined in the upstream configuration.
+- By default, build-standalone-fwts.sh script builds the latest FWTS version supprted by ARM SystemReady, as defined in the upstream configuration.
 
-- **To build a specific version of FWTS supported by Arm SystemReady, you can set the USER_DEFINED_FWTS_VERSION variable in the build-standalone-fwts.sh script.
+- To build a specific version of FWTS supported by Arm SystemReady, you can set the USER_DEFINED_FWTS_VERSION variable in the build-standalone-fwts.sh script.
     The currently supported versions are:
     - 25.10.00
     - 24.09.00
@@ -157,7 +157,7 @@ The FWTS binaries and dependencies can be found here
     - 23.07.00
     - 22.11.00
 
-- **To apply custom patches to FWTS, place your patch files in the following directory:
+- To apply custom patches to FWTS, place your patch files in the following directory:
   ```plaintext
   buildroot/package/fwts/
   ```
