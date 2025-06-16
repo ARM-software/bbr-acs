@@ -40,15 +40,6 @@ get_cross_compiler()
     fi
 }
 
-get_fwts_src()
-{
-    git clone --single-branch https://github.com/fwts/fwts
-    pushd $TOP_DIR/fwts
-    git checkout $FWTS_SRC_TAG
-    git submodule update --init
-    popd
-}
-
 get_sct_src()
 {
     git clone --single-branch https://github.com/tianocore/edk2-test
@@ -74,4 +65,3 @@ sudo apt install git curl mtools gdisk gcc\
 get_uefi_src
 get_sct_src
 get_cross_compiler
-get_fwts_src
