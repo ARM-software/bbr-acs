@@ -23,7 +23,6 @@ set -e
 TOP_DIR="$(pwd)"
 FWTS_WORKSPACE="$TOP_DIR/fwts_workspace"
 BUILDROOT_DIR="$FWTS_WORKSPACE/buildroot"
-BUILDROOT_SRC_VERSION="2022.08.1"
 BUILDROOT_CONFIG_FILE="buildroot_defconfig"
 BUILDROOT_CONFIG_URL="https://raw.githubusercontent.com/ARM-software/arm-systemready/main/common/config/buildroot_defconfig"
 CONFIG_URL="https://raw.githubusercontent.com/ARM-software/arm-systemready/refs/heads/main/common/config/systemready-band-source.cfg"

@@ -38,7 +38,7 @@ UEFI SCT tests the UEFI implementation requirements defined by SBBR/EBBR.
 
 **Prerequisite**: Ensure that the system time is correct before starting SCT tests.
 
-## Building BBR
+## Building SCT
 BBR is automatically built and packaged into ACS, but it can also be built independently.
 
 #### 1.  Get BBR repository
