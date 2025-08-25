@@ -4,9 +4,21 @@ required for out-of-box support of any BSA compatible operating system or hyperv
 to enable booting multi-core Arm platforms while remaining minimal enough to allow for OEM and ODM innovation, and
 market differentiation.
 
-For more information, see the [BBR specification](https://developer.arm.com/documentation/den0044/g/?lang=en).
+For more information, see the [BBR specification](https://developer.arm.com/documentation/den0044/latest).
 
-The BBR test suites check for compliance against the SBBR, EBBR and BBSR specifications. These tests are also delivered through two runtime executable environments:
+## Base Boot Security Requirements
+The Base Boot Security Requirements (BBSR) specification describes the security requirements for a device to comply with industry-standard security interfaces and covers the following areas:
+
+- UEFI authenticated variables
+- UEFI secure boot
+- UEFI capsule updates
+- TPM 2.0 and measured boot
+However, interface compliance does not provide assurance that the underlying platform is secure. When architecting a system, system-level threat modeling should be performed to evaluate threats, risks, and mitigations.
+
+For more information, see the [BBSR specification](https://developer.arm.com/documentation/den0107/latest/).
+
+
+The BBR ACS test suites check for compliance against the SBBR, EBBR and BBSR specifications. These tests are also delivered through two runtime executable environments:
   - UEFI Self Certification Tests (SCT)
   - Firmware Test Suite (FWTS)
 
@@ -18,7 +30,7 @@ The BBR test suites check for compliance against the SBBR, EBBR and BBSR specifi
   - The SBBR tests are written for the SBBR recipe of the BBR v2.1 specification.
  
 - EBBR test component
-  - Version: v2.2.1
+  - Version: v2.1.1
   - Code Quality: BET
   - The EBBR tests are written for the EBBR recipe of the BBR v2.1 specification.
  
@@ -34,14 +46,14 @@ The BBR test suites check for compliance against the SBBR, EBBR and BBSR specifi
   Mapping of BBR ACS tags with SystemReady Release version are captured [here](#bbr-acs-tag-mapping-to-systemready-acs-releases)
 
 ## UEFI Self Certification Tests
-UEFI SCT tests the UEFI implementation requirements defined by SBBR/EBBR.
+UEFI SCT tests the UEFI implementation requirements defined by SBBR/EBBR recipes in the BBR specifcations and also the rules in BBSR Specifications.
 
 **Prerequisite**: Ensure that the system time is correct before starting SCT tests.
 
 ## Building SCT
-BBR is automatically built and packaged into ACS, but it can also be built independently.
+BBR ACS is automatically built and packaged into the SystemReady ACS, but it can also be built independently.
 
-#### 1.  Get BBR repository
+#### 1.  Get BBR ACS repository
 `git clone https://github.com/ARM-software/bbr-acs.git`
 
 #### 2. Getting the required Source codes and Tools
@@ -55,37 +67,45 @@ This will download `edk2-test, edk2 and tools`
 #### 3. Building SBBR & EBBR
  Run
 `./build-scripts/build_<ebbr/sbbr>.sh`
-to build BBR components and SCT
+to build BBR ACS components and SCT
 
 The script applies patches to create an "EBBR or SBBR" build recipe in the SCT build system.
 
 The binaries of SCT are generated here
     `bbr-acs/<ebbr/sbbr>/scripts/edk2-test/uefi-sct/<ARCH>_SCT #(i.e. AARCH64_SCT)`
 
-NOTE: The UEFI application, CapsuleApp.efi is also built and can be found at the location bbr-acs/<ebbr/sbbr>/scripts/edk2/Build/MdeModule/DEBUG_GCC5/AARCH64 <br />
+NOTE:
+- The UEFI application, CapsuleApp.efi is also built and can be found at the location bbr-acs/<ebbr/sbbr>/scripts/edk2/Build/MdeModule/DEBUG_GCC5/AARCH64 <br />
+- The same BBSR SCT suite is built in both the `ebbr` or `sbbr` build options
 
 ### Running SCT
 BBR SCT tests are built as part of the test suite. <br />
+The BBR SCT can be run in three different test suite selections for SBBR, EBBR and BBSR respectively.
+This is done by passing the related sequence file following the `-s` command-line argument to the SCT.efi.
 
-Running BBR SCT tests is now automated. You can choose to skip the automated SCT tests by pressing any key when the UEFI shell prompts.
-
-- Shell>Press any key to stop the EFI SCT running
-
-To run SCT manually, follow these steps:
+#### Note:
+> For BBR ACS UEFI-SCT testlists for SBBR, EBBR and BBSR recipes, see the [Documentation directory](./docs/).
 
 
-1. `Shell>FS(X):`
-- `FS(X):>cd acs_tests\bbr\SCT`
+- Move the BBR SCT to an UEFI accessible disk and boot the system-under-test to the UEFI shell prompt
+
+- `Shell>FS(X):`
+- `FS(X):>cd \path\to\SCT`
 - To run EBBR or SBBR tests
- `FS(X):acs_tests\bbr\SCT>SCT -s <ebbr.seq/sbbr.seq>`
+ `FS(X):\path\to\SCT>SCT -s <ebbr.seq/sbbr.seq/bbsr.seq>`
+
+ #### Other commands
  - To run all tests
- `FS(X):acs_tests\bbr\SCT>SCT -a -v`
+ `FS(X):\path\to\SCT>SCT -a -v`
+ - To continue the tests
+ `FS(X):\path\to\SCT>SCT -c`
  
-You can also select and run tests individually. For more information on running the tests, see the [SCT User Guide](http://www.uefi.org/testtools).
+You can also select and run tests individually. For more information on running the tests, see the [SCT User Guide](https://github.com/tianocore/edk2-test/blob/master/uefi-sct/Doc/UserGuide/UEFI_SCT_II_UserGuide_2_6_A.pdf).
 
 #### Note:
 
-> For BBR ACS UEFI-SCT testlists for SBBR, EBBR and BBSR recipes, see the [Documentation directory](./docs/).
+> The system may reboot multiple times during the execution of the SCT suite. The tests will continue execution automatically after each reboot.
+> It is important to ensure that the system is configured to reboot to the disk that contains the BBR SCT
 
 ### Manual intervention tests
 Some SCT tests for the ACS require manual intervention or interaction.
@@ -93,9 +113,8 @@ To run the tests, follow these steps.
 
 1. Move or copy the SCT logs into the result partition so they do not get overwritten.
 
-	- `Shell>FS(Y):`
-	- `FS(Y):> cd \acs_results\`
-	- `FS(Y):\acs_results\> mv sct_results sct_results_orginal`
+	- `Shell>FS(X):`
+	- `FS(X):\acs_results\> mv sct_results sct_results_orginal`
 
 2. To run manual tests for ebbr, use the ebbr_manual.seq file.
 
@@ -107,7 +126,7 @@ To run the tests, follow these steps.
 
 4. To run additional SCT tests (e.g., Simple Filesystems, Block I/O, etc.) to improve more Compliances, use the EBBR_extd_run.seq or SBBR_extd_run.seq file.
    
-	- `FS(X):acs_tests\bbr\SCT>SCT -s <EBBR_extd_run.seq/SBBR_extd_run.seq>`
+	- `FS(X):\path\to\SCT>SCT -s <EBBR_extd_run.seq/SBBR_extd_run.seq>`
 
 
 ## Firmware Test Suite
@@ -150,7 +169,7 @@ The FWTS binaries and dependencies can be found here
 
 - To build a specific version of FWTS supported by Arm SystemReady, you can set the USER_DEFINED_FWTS_VERSION variable in the build-standalone-fwts.sh script.
     The currently supported versions are:
-    - 25.10.00
+    - 25.01.00
     - 24.09.00
     - 24.03.00
     - 24.01.00
