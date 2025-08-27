@@ -45,7 +45,17 @@ jobs:
         if [ ! -e "bbr-acs/ebbr/scripts/edk2-test/uefi-sct/AARCH64_SCT" ]; then
           echo "AARCH64_SCT not found for EBBR, raising an error."
           exit 1
+        else
+          cd edk2-test/uefi-sct/AARCH64_SCT
+          zip EBBR.zip *
+          cd -
         fi
+    - name: Save EBBR.zip as an artifact
+      uses: actions/upload-artifact@v4
+        with:
+          name: EBBR.zip
+          path: edk2-test/uefi-sct/AARCH64_SCT/EBBR.zip
+          if-no-files-found: error   
     - name: Check for CapsuleApp.efi (EBBR)
       run: |
         if [ ! -e "bbr-acs/ebbr/scripts/edk2/Build/MdeModule/DEBUG_GCC5/AARCH64/CapsuleApp.efi" ]; then
@@ -66,7 +76,17 @@ jobs:
         if [ ! -e "bbr-acs/sbbr/scripts/edk2-test/uefi-sct/AARCH64_SCT" ]; then
           echo "AARCH64_SCT not found for SBBR, raising an error."
           exit 1
+        else
+          cd edk2-test/uefi-sct/AARCH64_SCT
+          zip SBBR.zip *
+          cd -
         fi
+    - name: Save SBBR.zip as an artifact
+      uses: actions/upload-artifact@v4
+        with:
+          name: SBBR.zip
+          path: edk2-test/uefi-sct/AARCH64_SCT/SBBR.zip
+          if-no-files-found: error   
     - name: Check for CapsuleApp.efi (SBBR)
       run: |
         if [ ! -e "bbr-acs/sbbr/scripts/edk2/Build/MdeModule/DEBUG_GCC5/AARCH64/CapsuleApp.efi" ]; then
