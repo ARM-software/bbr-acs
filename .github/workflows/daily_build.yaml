@@ -1,0 +1,111 @@
+name: EBBR and SBBR Daily build
+
+on:
+  schedule:
+    - cron: '30 17 * * *'
+  workflow_dispatch:
+
+jobs:
+  build_image:
+    name: Build EBBR and SBBR images
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        env:
+        - ARCH: x86_64
+    steps:
+    - name: Maximize build space
+      uses: easimon/maximize-build-space@master
+      with:
+        remove-dotnet: 'true'
+        remove-android: 'true'
+        remove-haskell: 'true'
+        remove-codeql: 'true'
+        remove-docker-images: 'true'
+    - name: Checkout BBR repository
+      uses: actions/checkout@v4
+      with:
+        path: 'bbr-acs'
+    - name: Get required source codes and tools for EBBR
+      run: |
+        cd bbr-acs/ebbr/scripts  
+        ./build-scripts/get_ebbr_source.sh  
+    - name: Build EBBR
+      run: |
+        cd bbr-acs/ebbr/scripts 
+        ./build-scripts/build_ebbr.sh 
+    - name: Check for AARCH64_SCT (EBBR)
+      run: |
+        if [ ! -e "bbr-acs/ebbr/scripts/edk2-test/uefi-sct/AARCH64_SCT" ]; then
+          echo "AARCH64_SCT not found for EBBR, raising an error."
+          exit 1
+        fi
+    - name: Save EBBR-SCT.zip as an artifact
+      uses: actions/upload-artifact@v4
+      with:
+          name: EBBR-SCT.zip
+          path: bbr-acs/ebbr/scripts/edk2-test/uefi-sct/AARCH64_SCT/*
+          if-no-files-found: error   
+    - name: Check for CapsuleApp.efi (EBBR)
+      run: |
+        if [ ! -e "bbr-acs/ebbr/scripts/edk2/Build/MdeModule/DEBUG_GCC5/AARCH64/CapsuleApp.efi" ]; then
+          echo "CapsuleApp.efi not found for EBBR, raising an error."
+          exit 1
+        fi
+    - name: Get required source codes and tools for SBBR
+      run: |
+        cd $GITHUB_WORKSPACE  # Go back to the root directory of the repository
+        cd bbr-acs/sbbr/scripts
+        ./build-scripts/get_sbbr_source.sh
+    - name: Build SBBR
+      run: |
+        cd bbr-acs/sbbr/scripts
+        ./build-scripts/build_sbbr.sh
+    - name: Check for AARCH64_SCT (SBBR)
+      run: |
+        if [ ! -e "bbr-acs/sbbr/scripts/edk2-test/uefi-sct/AARCH64_SCT" ]; then
+          echo "AARCH64_SCT not found for SBBR, raising an error."
+          exit 1
+        fi
+    - name: Save SBBR-SCT.zip as an artifact
+      uses: actions/upload-artifact@v4
+      with:
+          name: SBBR-SCT.zip
+          path: bbr-acs/sbbr/scripts/edk2-test/uefi-sct/AARCH64_SCT/*
+          if-no-files-found: error   
+    - name: Check for CapsuleApp.efi (SBBR)
+      run: |
+        if [ ! -e "bbr-acs/sbbr/scripts/edk2/Build/MdeModule/DEBUG_GCC5/AARCH64/CapsuleApp.efi" ]; then
+          echo "CapsuleApp.efi not found for SBBR, raising an error."
+          exit 1
+        fi
+    - name: Get required source codes and tools for Standalone FWTS
+      run: |
+        cd $GITHUB_WORKSPACE  # Go back to the root directory of the repository
+    - name: Build FWTS
+      run: |
+        cd bbr-acs
+        ./common/scripts/build-standalone-fwts.sh
+    - name: Check for FWTS outout
+      run: |
+        if [ ! -e "bbr-acs/fwts_workspace/buildroot/output/target/usr/bin/fwts" ]; then
+          echo "FWTS bin not found, raising an error."
+          exit 1
+        else
+          cd bbr-acs/fwts_workspace/
+          mkdir -p fwts/bin
+          cp buildroot/output/target/usr/bin/fwts fwts/bin
+          mkdir -p fwts/lib
+          mkdir -p fwts/lib64
+          mkdir -p fwts/share
+          cp -r buildroot/output/target/usr/lib64/fwts/* fwts/lib64
+          cp -r buildroot/output/target/usr/lib/fwts/* fwts/lib
+          cp -r buildroot/output/target/usr/share/fwts/* fwts/share   
+          cd -
+        fi
+    - name: Save FWTS.zip as an artifact
+      uses: actions/upload-artifact@v4
+      with:
+          name: FWTS.zip
+          path: bbr-acs/fwts_workspace/fwts/
+          if-no-files-found: error
