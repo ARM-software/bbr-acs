@@ -1,4 +1,4 @@
-name: Build EBBR and SBBR images
+name: EBBR and SBBR (SCT) build checker
 
 on:
   push:
@@ -7,8 +7,6 @@ on:
   pull_request:
     branches:
       - main
-  schedule:
-    - cron: '30 17 * * *'
   workflow_dispatch:
 
 jobs:
@@ -45,16 +43,12 @@ jobs:
         if [ ! -e "bbr-acs/ebbr/scripts/edk2-test/uefi-sct/AARCH64_SCT" ]; then
           echo "AARCH64_SCT not found for EBBR, raising an error."
           exit 1
-        else
-          cd edk2-test/uefi-sct/AARCH64_SCT
-          zip EBBR.zip *
-          cd -
         fi
-    - name: Save EBBR.zip as an artifact
+    - name: Save EBBR-SCT.zip as an artifact
       uses: actions/upload-artifact@v4
-        with:
-          name: EBBR.zip
-          path: edk2-test/uefi-sct/AARCH64_SCT/EBBR.zip
+      with:
+          name: EBBR-SCT
+          path: bbr-acs/ebbr/scripts/edk2-test/uefi-sct/AARCH64_SCT/*
           if-no-files-found: error   
     - name: Check for CapsuleApp.efi (EBBR)
       run: |
@@ -76,16 +70,12 @@ jobs:
         if [ ! -e "bbr-acs/sbbr/scripts/edk2-test/uefi-sct/AARCH64_SCT" ]; then
           echo "AARCH64_SCT not found for SBBR, raising an error."
           exit 1
-        else
-          cd edk2-test/uefi-sct/AARCH64_SCT
-          zip SBBR.zip *
-          cd -
         fi
-    - name: Save SBBR.zip as an artifact
+    - name: Save SBBR-SCT.zip as an artifact
       uses: actions/upload-artifact@v4
-        with:
-          name: SBBR.zip
-          path: edk2-test/uefi-sct/AARCH64_SCT/SBBR.zip
+      with:
+          name: SBBR-SCT
+          path: bbr-acs/sbbr/scripts/edk2-test/uefi-sct/AARCH64_SCT/*
           if-no-files-found: error   
     - name: Check for CapsuleApp.efi (SBBR)
       run: |
