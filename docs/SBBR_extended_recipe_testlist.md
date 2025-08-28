@@ -5,6 +5,10 @@ Enabled:✅ <br>
 Partially Enabled:🔲 <br>
 Disabled:❌ <br>
 
+> **Note**: X<sup>[arm]</sup> Represents *Arm-specific Tests* with Arm-specific checks and assertions, integrated on top of the standard UEFI-SCT and built into the BBR-ACS SCT. The code for these tests resides in the Arm BBR-ACS repository.
+
+This document corresponds to the SCT sequence file [`SBBR_extd_run.seq`](../sbbr/config/SBBR_extd_run.seq), which determines what tests will be run during compliance testing.
+
 <table border="1">
 <tr>
 <th rowspan=1 colspan=1>Test Suite</th>
@@ -19,17 +23,17 @@ Disabled:❌ <br>
 <tr>
 <td rowspan=1 colspan=1>✅ RequiredElements</td>
 </tr>
-<td rowspan=1 colspan=1>✅ SbbrRequiredUefiProtocols</td>
-<td rowspan=1 colspan=1>✅ MediaIoProtocols</td>
+<td rowspan=1 colspan=1>✅ SbbrRequiredUefiProtocols<sup>[arm]</sup></td>
+<td rowspan=1 colspan=1>✅ MediaIoProtocols<sup>[arm]</sup></td>
 </tr>
-<td rowspan=1 colspan=1>✅ SbbrEfiSpecVerLvl</td>
-<td rowspan=1 colspan=1>✅ TestEfiSpecVerLvl</td>
+<td rowspan=1 colspan=1>✅ SbbrEfiSpecVerLvl<sup>[arm]</sup></td>
+<td rowspan=1 colspan=1>✅ TestEfiSpecVerLvl<sup>[arm]</sup></td>
 </tr>
-<td rowspan=1 colspan=1>✅ SbbrSysEnvConfig</td>
-<td rowspan=1 colspan=1>✅ BootExcLevel</td>
+<td rowspan=1 colspan=1>✅ SbbrSysEnvConfig<sup>[arm]</sup></td>
+<td rowspan=1 colspan=1>✅ BootExcLevel<sup>[arm]</sup></td>
 </tr>
-<td rowspan=1 colspan=1>❌ PlatformResetAttackMitigationPsciTest</td>
-<td rowspan=1 colspan=1>❌ PlatformResetAttackMitigationPsciTest_</td>
+<td rowspan=1 colspan=1>❌ PlatformResetAttackMitigationPsciTest<sup>[arm]</sup></td>
+<td rowspan=1 colspan=1>❌ PlatformResetAttackMitigationPsciTest_<sup>[arm]</sup></td>
 <tr>
 <tr>
 <td rowspan=81 colspan=1>✅ BootServicesTest</td>
@@ -267,14 +271,14 @@ Disabled:❌ <br>
 <tr>
 <td rowspan=1 colspan=1>✅ Stall_Func</td>
 </tr>
-<td rowspan=3 colspan=1>✅ SbbrBootServices</td>
-<td rowspan=1 colspan=1>✅ AcpiTable</td>
+<td rowspan=3 colspan=1>✅ SbbrBootServices<sup>[arm]</sup></td>
+<td rowspan=1 colspan=1>✅ AcpiTable<sup>[arm]</sup></td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ MemoryMap</td>
+<td rowspan=1 colspan=1>✅ MemoryMap<sup>[arm]</sup></td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ SmbiosTable</td>
+<td rowspan=1 colspan=1>✅ SmbiosTable<sup>[arm]</sup></td>
 </tr>
 <tr>
 <td rowspan=32 colspan=1>🔲 RuntimeServicesTest</td>
@@ -323,8 +327,8 @@ Disabled:❌ <br>
 <tr>
 <td rowspan=1 colspan=1>✅ SetVariable_Func</td>
 </tr>
-<td rowspan=1 colspan=1>❌ BBSRVariableSizeTest</td>
-<td rowspan=1 colspan=1>❌ BBSRVariableSizeTest_func</td>
+<td rowspan=1 colspan=1>❌ BBSRVariableSizeTest<sup>[arm]</sup></td>
+<td rowspan=1 colspan=1>❌ BBSRVariableSizeTest_func<sup>[arm]</sup></td>
 </tr>
 <td rowspan=8 colspan=1>✅ TimeServicesTest</td>
 <td rowspan=1 colspan=1>✅ GetTime_Conf</td>
