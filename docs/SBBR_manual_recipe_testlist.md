@@ -5,6 +5,8 @@ Enabled:✅ <br>
 Partially Enabled:🔲 <br>
 Disabled:❌ <br>
 
+> **Note**: X<sup>[arm]</sup> Represents *Arm-specific Tests* with Arm-specific checks and assertions, integrated on top of the standard UEFI-SCT and built into the BBR-ACS SCT. The code for these tests resides in the Arm BBR-ACS repository.
+
 Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readthedocs.io/en/latest/) for detailed information for each assertion in the UEFI SCT fundamental service and protocol tests. <br>
 
 <table border="1">
@@ -60,8 +62,8 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <tr>
 <td rowspan=1 colspan=1>❌ SetVariable_Func</td>
 </tr>
-<td rowspan=1 colspan=1>❌ BBSRVariableSizeTest</td>
-<td rowspan=1 colspan=1>❌ BBSRVariableSizeTest_func</td>
+<td rowspan=1 colspan=1>❌ BBSRVariableSizeTest<sup>[arm]</sup></td>
+<td rowspan=1 colspan=1>❌ BBSRVariableSizeTest_func<sup>[arm]</sup></td>
 </tr>
 <td rowspan=8 colspan=1>❌ TimeServicesTest</td>
 <td rowspan=1 colspan=1>❌ GetTime_Conf</td>
@@ -109,5 +111,3 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <td rowspan=1 colspan=1>❌ Runtime Services Test</td>
 </tr>
 </tr>
-
-
