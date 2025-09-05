@@ -1,9 +1,9 @@
-From 8d24275aab1743c92ec97e1c28b9a17dcf2fe8d3 Mon Sep 17 00:00:00 2001
-From: Amrathesh <amrathesh@arm.com>
-Date: Mon, 25 Mar 2024 11:28:29 +0530
-Subject: [PATCH] edk2-test-bbr.patch
+From b3b6e6ba90326d66c2b1f9e3d9ddf41c0a32138f Mon Sep 17 00:00:00 2001
+From: Sathisha S <sathisha.shivaramappa@arm.com>
+Date: Wed, 3 Sep 2025 09:22:08 +0000
+Subject: [PATCH] edk2-test-bbr
 
- - changes to sct tests in edk2-test
+- changes to sct tests in edk2-test
 ---
  .../BlackBoxTest/ImageBBTestConformance.c     | 149 +++++-------------
  .../BlackBoxTest/ImageBBTestFunction.c        |   4 +-
@@ -12,9 +12,8 @@ Subject: [PATCH] edk2-test-bbr.patch
  .../MemoryAllocationServicesBBTestFunction.c  | 115 --------------
  .../MemoryAllocationServicesBBTestMain.c      |  19 ---
  .../Dependency/Config/EfiCompliant.ini        |  60 +++----
- .../AuthVariableServicesBBTestConformance.c   |   2 +-
  .../SCT/Drivers/StandardTest/StandardTest.c   |   5 +-
- 9 files changed, 81 insertions(+), 354 deletions(-)
+ 8 files changed, 80 insertions(+), 353 deletions(-)
 
 diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/ImageBBTestConformance.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/ImageServices/BlackBoxTest/ImageBBTestConformance.c
 index 90081f04..b902c6d9 100644
@@ -573,19 +572,6 @@ index 4deaae3b..c5b9460b 100644
 +BlueToothLESupport        = no
 +IPSecSupport              = no
  
-diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/VariableServices/BlackBoxTest/AuthVariableServicesBBTestConformance.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/VariableServices/BlackBoxTest/AuthVariableServicesBBTestConformance.c
-index 03d50066..9aa7fb0c 100644
---- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/VariableServices/BlackBoxTest/AuthVariableServicesBBTestConformance.c
-+++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/VariableServices/BlackBoxTest/AuthVariableServicesBBTestConformance.c
-@@ -292,7 +292,7 @@ AuthVariableDERConfTest (
-                    &MaximumVariableSize
-                    );
- 
--    if (Status == EFI_SUCCESS || Status == EFI_UNSUPPORTED) {
-+    if (Status == EFI_UNSUPPORTED) {
-       Result = EFI_TEST_ASSERTION_PASSED;
-     } else {
-       Result = EFI_TEST_ASSERTION_FAILED;
 diff --git a/uefi-sct/SctPkg/TestInfrastructure/SCT/Drivers/StandardTest/StandardTest.c b/uefi-sct/SctPkg/TestInfrastructure/SCT/Drivers/StandardTest/StandardTest.c
 index 94cae289..cf9d64f8 100644
 --- a/uefi-sct/SctPkg/TestInfrastructure/SCT/Drivers/StandardTest/StandardTest.c
@@ -603,5 +589,5 @@ index 94cae289..cf9d64f8 100644
      StslWriteLogFile (Private, Buffer);
      SctSPrint (Buffer, EFI_MAX_PRINT_BUFFER, L"Revision 0x%08x\n", Private->TestRevision);
 -- 
-2.25.1
+2.43.0
 
