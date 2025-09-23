@@ -150,7 +150,7 @@ do_build()
         cp $BBR_DIR/sbbr/config/SBBR_extd_run.seq uefi-sct/SctPkg/BBR/
         cp $BBR_DIR/sbbr/config/EfiCompliant_SBBR.ini  uefi-sct/SctPkg/BBR/
         if [[ $BUILD_TYPE != S ]]; then
-        if git apply --check $TOP_DIR/patches/sctversion.patch; then
+            if git apply --check $TOP_DIR/patches/sctversion.patch; then
                 echo "Applying edk2-test BBR sctversion patch..."
                 git apply --ignore-whitespace --ignore-space-change $TOP_DIR/patches/sctversion.patch
             else
@@ -201,6 +201,16 @@ do_build()
     else
         echo  "Error while applying edk2-test BBR patch..."
         exit
+    fi
+
+    if [ $BUILD_PLAT = SBBR ]; then
+        if git apply --check $BBR_DIR/sbbr/patches/0001-Disable-BBTestGetImageInfoConformanceTestCheckpoint4.patch; then
+            echo "Applying edk2-test BBTestGetImageInfoConformanceTestCheckpoint4 patch..."
+            git apply --ignore-whitespace --ignore-space-change $BBR_DIR/sbbr/patches/0001-Disable-BBTestGetImageInfoConformanceTestCheckpoint4.patch
+        else
+            echo  "Error while applying edk2-test BBTestGetImageInfoConformanceTestCheckpoint4 patch..."
+            exit
+        fi
     fi
 
     # Apply BBSR patch for Systemready
