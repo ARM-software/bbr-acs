@@ -252,6 +252,9 @@ do_clean()
     make -C $TOP_DIR/$UEFI_PATH/BaseTools clean
     rm -rf Build
     rm -rf ${TARGET_ARCH}_SCT
+    if [[ $BUILD_TYPE = S ]]; then
+        rm -rf ${BUILD_PLAT}-SCT
+    fi
 
     popd
 
@@ -329,6 +332,16 @@ do_package ()
     #SCRT
     cp SctPkg/BBR/ScrtStartup.nsh ${TARGET_ARCH}_SCT/ScrtStartup.nsh
     cp SctPkg/BBR/SCRT.conf ${TARGET_ARCH}_SCT/SCT/SCRT/SCRT.conf
+
+    if [[ $BUILD_TYPE = S ]]; then
+        #Create Standalone folder
+        mkdir -p ${BUILD_PLAT}-SCT
+        mkdir -p ${BUILD_PLAT}-SCT/EFI/BOOT
+        mkdir -p ${BUILD_PLAT}-SCT/SCT
+        cp -r ${TARGET_ARCH}_SCT/SCT/* ${BUILD_PLAT}-SCT/SCT/
+        cp $BBR_DIR/common/scripts/StandaloneSctStartup.nsh ${BUILD_PLAT}-SCT/StandaloneSctStartup.nsh
+        cp $BBR_DIR/common/scripts/SampleStartup.nsh ${BUILD_PLAT}-SCT/startup.nsh
+    fi
 
     pushd $TOP_DIR
 

@@ -38,17 +38,17 @@ jobs:
       run: |
         cd bbr-acs/ebbr/scripts 
         ./build-scripts/build_ebbr.sh 
-    - name: Check for AARCH64_SCT (EBBR)
+    - name: Check for EBBR-SCT (EBBR)
       run: |
-        if [ ! -e "bbr-acs/ebbr/scripts/edk2-test/uefi-sct/AARCH64_SCT" ]; then
-          echo "AARCH64_SCT not found for EBBR, raising an error."
+        if [ ! -e "bbr-acs/ebbr/scripts/edk2-test/uefi-sct/EBBR-SCT" ]; then
+          echo "EBBR-SCT not found for EBBR, raising an error."
           exit 1
         fi
     - name: Save EBBR-SCT.zip as an artifact
       uses: actions/upload-artifact@v4
       with:
           name: EBBR-SCT
-          path: bbr-acs/ebbr/scripts/edk2-test/uefi-sct/AARCH64_SCT/*
+          path: bbr-acs/ebbr/scripts/edk2-test/uefi-sct/EBBR-SCT/*
           if-no-files-found: error   
     - name: Check for CapsuleApp.efi (EBBR)
       run: |
@@ -65,17 +65,17 @@ jobs:
       run: |
         cd bbr-acs/sbbr/scripts
         ./build-scripts/build_sbbr.sh
-    - name: Check for AARCH64_SCT (SBBR)
+    - name: Check for SBBR-SCT (SBBR)
       run: |
-        if [ ! -e "bbr-acs/sbbr/scripts/edk2-test/uefi-sct/AARCH64_SCT" ]; then
-          echo "AARCH64_SCT not found for SBBR, raising an error."
+        if [ ! -e "bbr-acs/sbbr/scripts/edk2-test/uefi-sct/SBBR-SCT" ]; then
+          echo "SBBR-SCT not found for SBBR, raising an error."
           exit 1
         fi
     - name: Save SBBR-SCT.zip as an artifact
       uses: actions/upload-artifact@v4
       with:
           name: SBBR-SCT
-          path: bbr-acs/sbbr/scripts/edk2-test/uefi-sct/AARCH64_SCT/*
+          path: bbr-acs/sbbr/scripts/edk2-test/uefi-sct/SBBR-SCT/*
           if-no-files-found: error   
     - name: Check for CapsuleApp.efi (SBBR)
       run: |

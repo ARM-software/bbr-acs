@@ -33,18 +33,22 @@ jobs:
     - name: Build EBBR
       run: |
         cd bbr-acs/ebbr/scripts 
-        ./build-scripts/build_ebbr.sh 
-    - name: Check for AARCH64_SCT (EBBR)
+        ./build-scripts/build_ebbr.sh
+    - name: Create EBBR-SCT.zip
       run: |
-        if [ ! -e "bbr-acs/ebbr/scripts/edk2-test/uefi-sct/AARCH64_SCT" ]; then
-          echo "AARCH64_SCT not found for EBBR, raising an error."
+        cd bbr-acs/ebbr/scripts/edk2-test/uefi-sct/EBBR-SCT
+        zip -r ../EBBR-SCT.zip .
+    - name: Validate EBBR-SCT.zip exists
+      run: |
+        if [ ! -f "bbr-acs/ebbr/scripts/edk2-test/uefi-sct/EBBR-SCT.zip" ]; then
+          echo "ERROR: EBBR-SCT.zip missing!"
           exit 1
         fi
-    - name: Save EBBR-SCT.zip as an artifact
+    - name: Upload EBBR-SCT.zip as an artifact
       uses: actions/upload-artifact@v4
       with:
-          name: EBBR-SCT.zip
-          path: bbr-acs/ebbr/scripts/edk2-test/uefi-sct/AARCH64_SCT/*
+          name: EBBR-SCT
+          path: bbr-acs/ebbr/scripts/edk2-test/uefi-sct/EBBR-SCT.zip
           if-no-files-found: error   
     - name: Check for CapsuleApp.efi (EBBR)
       run: |
@@ -61,17 +65,21 @@ jobs:
       run: |
         cd bbr-acs/sbbr/scripts
         ./build-scripts/build_sbbr.sh
-    - name: Check for AARCH64_SCT (SBBR)
+    - name: Create SBBR-SCT.zip
       run: |
-        if [ ! -e "bbr-acs/sbbr/scripts/edk2-test/uefi-sct/AARCH64_SCT" ]; then
-          echo "AARCH64_SCT not found for SBBR, raising an error."
+        cd bbr-acs/sbbr/scripts/edk2-test/uefi-sct/SBBR-SCT
+        zip -r ../SBBR-SCT.zip .
+    - name: Validate SBBR-SCT.zip exists
+      run: |
+        if [ ! -f "bbr-acs/sbbr/scripts/edk2-test/uefi-sct/SBBR-SCT.zip" ]; then
+          echo "ERROR: SBBR-SCT.zip missing!"
           exit 1
         fi
-    - name: Save SBBR-SCT.zip as an artifact
+    - name: Upload SBBR-SCT.zip as an artifact
       uses: actions/upload-artifact@v4
       with:
-          name: SBBR-SCT.zip
-          path: bbr-acs/sbbr/scripts/edk2-test/uefi-sct/AARCH64_SCT/*
+          name: SBBR-SCT
+          path: bbr-acs/sbbr/scripts/edk2-test/uefi-sct/SBBR-SCT.zip
           if-no-files-found: error   
     - name: Check for CapsuleApp.efi (SBBR)
       run: |
@@ -106,6 +114,6 @@ jobs:
     - name: Save FWTS.zip as an artifact
       uses: actions/upload-artifact@v4
       with:
-          name: FWTS.zip
+          name: FWTS
           path: bbr-acs/fwts_workspace/fwts/
           if-no-files-found: error
