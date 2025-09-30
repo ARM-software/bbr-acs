@@ -93,6 +93,11 @@ do_build()
     make -C $TOP_DIR/$UEFI_PATH/BaseTools
 
     build -a AARCH64 -t GCC5 -p MdeModulePkg/MdeModulePkg.dsc
+    if [[ $BUILD_TYPE = S ]]; then
+        # Shell.efi is required to run the standalone SCT. Copy it into the SBBR/EBBR-SCT
+        # package and place it as EFI/BOOT/bootaa64.efi for UEFI boot.
+        build -a AARCH64 -t GCC5 -p ShellPkg/ShellPkg.dsc
+    fi
     popd
 }
 
@@ -120,6 +125,12 @@ do_package ()
      echo "CapsuleApp.efi successfully generated at $TOP_DIR/$UEFI_PATH/Build/MdeModule/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/CapsuleApp.efi"
     else
      echo "Error: CapsuleApp.efi could not be generated. Please check the logs"
+    fi
+
+    if [ $BUILD_TYPE = S ]; then
+     # Shell.efi is required to run the standalone SCT. Copy it into the SBBR/EBBR-SCT
+     # package and place it as EFI/BOOT/bootaa64.efi for UEFI boot.
+     cp $TOP_DIR/$UEFI_PATH/Build/Shell/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/ShellPkg/Application/Shell/Shell/$UEFI_BUILD_MODE/Shell.efi $TOP_DIR/edk2-test/uefi-sct/${BUILD_PLAT}-SCT/EFI/BOOT/bootaa64.efi
     fi
 }
 
