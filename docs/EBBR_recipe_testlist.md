@@ -280,7 +280,7 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <td rowspan=1 colspan=1>❌ MemoryMap<sup>[arm]</sup></td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ SmbiosTable<sup>[arm]</sup></td>
+<td rowspan=1 colspan=1>✅ SmbiosTable<sup>[arm]</sup></td>
 </tr>
 <tr>
 <td rowspan=32 colspan=1>🔲 RuntimeServicesTest</td>
