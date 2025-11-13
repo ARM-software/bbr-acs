@@ -203,16 +203,6 @@ do_build()
         exit
     fi
 
-    if [ $BUILD_PLAT = SBBR ]; then
-        if git apply --check $BBR_DIR/sbbr/patches/0001-Disable-BBTestGetImageInfoConformanceTestCheckpoint4.patch; then
-            echo "Applying edk2-test BBTestGetImageInfoConformanceTestCheckpoint4 patch..."
-            git apply --ignore-whitespace --ignore-space-change $BBR_DIR/sbbr/patches/0001-Disable-BBTestGetImageInfoConformanceTestCheckpoint4.patch
-        else
-            echo  "Error while applying edk2-test BBTestGetImageInfoConformanceTestCheckpoint4 patch..."
-            exit
-        fi
-    fi
-
     # Apply BBSR patch for Systemready
     if [[ $BUILD_TYPE != S ]]; then
         if git apply --check $BBR_DIR/bbsr/patches/0001-BBSR-Patch-for-UEFI-SCT-Build.patch; then
