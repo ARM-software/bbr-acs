@@ -40,10 +40,33 @@
 # matters included within this Test Suite, to which United
 # EFI, Inc. makes no claim of right.
 #
-# Copyright (c) 2011, 2015-2020 ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2011, 2015-2020, 2025 ARM Ltd. All rights reserved.<BR>
 #
 
 SctpackageDependencyList=(SctPkg BaseTools)
+
+#Check SecureBoot Commandline Option and also parse extra flags
+SECUREBOOT_ENABLE=0
+EXTRA_BUILD_ARGS=()
+need_threads_arg=0
+for arg in "$@"; do
+    if [[ "$arg" == "ENABLE_SECUREBOOT_TESTS" ]]; then
+        SECUREBOOT_ENABLE=1
+        echo "✅ Secure Boot Tests Enabled"
+        continue
+    fi
+    if (( need_threads_arg )); then
+        EXTRA_BUILD_ARGS+=("$arg")
+        need_threads_arg=0
+        continue
+    fi
+    if [[ "$arg" == "-n" ]]; then
+        EXTRA_BUILD_ARGS+=("$arg")
+        need_threads_arg=1
+        continue
+    fi
+    # Ignore anything else at this layer by default
+done
 
 function get_build_arch
 {
@@ -277,7 +300,20 @@ cp $EDK_TOOLS_PATH/Source/C/bin/GenBin $DEST_DIR/GenBin
 #
 # Build the SCT package
 #
-build -p SctPkg/UEFI/BBR_SCT.dsc -a $SCT_TARGET_ARCH -t $TARGET_TOOLS -b $SCT_BUILD $3 $4 $5 $6 $7 $8 $9
+if [ $SECUREBOOT_ENABLE -eq 1 ]
+then
+  echo "Building Dependency Packages for Secure Boot.."
+  SOURCE_TARGET=SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Images
+  SECURE_APP1=$SOURCE_TARGET/SampleAppForSecureBootTest1/SampleAppForSecureBootTest1.inf
+  SECURE_APP2=$SOURCE_TARGET/SampleAppForSecureBootTest2/SampleAppForSecureBootTest2.inf
+  SECURE_APP3=$SOURCE_TARGET/SampleAppForSecureBootTest3/SampleAppForSecureBootTest3.inf
+  build -p SctPkg/UEFI/BBR_SCT.dsc -m $SECURE_APP1 -D ENABLE_SECUREBOOT_TESTS=TRUE -a $SCT_TARGET_ARCH -t $TARGET_TOOLS -b $SCT_BUILD ${EXTRA_BUILD_ARGS[@]}
+  build -p SctPkg/UEFI/BBR_SCT.dsc -m $SECURE_APP2 -D ENABLE_SECUREBOOT_TESTS=TRUE -a $SCT_TARGET_ARCH -t $TARGET_TOOLS -b $SCT_BUILD ${EXTRA_BUILD_ARGS[@]}
+  build -p SctPkg/UEFI/BBR_SCT.dsc -m $SECURE_APP3 -D ENABLE_SECUREBOOT_TESTS=TRUE -a $SCT_TARGET_ARCH -t $TARGET_TOOLS -b $SCT_BUILD ${EXTRA_BUILD_ARGS[@]}
+  build -p SctPkg/UEFI/BBR_SCT.dsc -D ENABLE_SECUREBOOT_TESTS=TRUE -a $SCT_TARGET_ARCH -t $TARGET_TOOLS -b $SCT_BUILD ${EXTRA_BUILD_ARGS[@]}
+else
+  build -p SctPkg/UEFI/BBR_SCT.dsc -a $SCT_TARGET_ARCH -t $TARGET_TOOLS -b $SCT_BUILD $3 $4 $5 $6 $7 $8 $9
+fi
 
 # Check if there is any error
 status=$?
@@ -308,7 +344,12 @@ pwd
 #
 # Run a script to generate Sct binary for the target architecture
 #
-../../../SctPkg/CommonGenFramework.sh bbr_sct $SCT_TARGET_ARCH Install$SCT_TARGET_ARCH.efi
+if [ $SECUREBOOT_ENABLE -eq 1 ]
+then
+  ../../../SctPkg/CommonGenFramework.sh bbr_sct $SCT_TARGET_ARCH Install$SCT_TARGET_ARCH.efi ENABLE_SECUREBOOT_TESTS
+else
+  ../../../SctPkg/CommonGenFramework.sh bbr_sct $SCT_TARGET_ARCH Install$SCT_TARGET_ARCH.efi
+fi
 
 status=$?
 if test $status -ne 0
