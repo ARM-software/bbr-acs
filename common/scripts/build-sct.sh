@@ -129,7 +129,6 @@ do_build()
     # copy BBSR SCT tests to edk2-test
     if [[ $BUILD_TYPE != S ]]; then
         cp -r $BBSR_TEST_DIR/BBSRVariableSizeTest uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices
-        cp -r $BBSR_TEST_DIR/SecureBoot uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices
         cp -r $BBSR_TEST_DIR/PlatformResetAttackMitigationPsciTest uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/
     fi
 
@@ -215,7 +214,11 @@ do_build()
     fi
 
     pushd uefi-sct
-    ./SctPkg/build_bbr.sh $TARGET_ARCH GCC $UEFI_BUILD_MODE  -n $PARALLELISM
+    if [[ $BUILD_TYPE != S ]]; then
+        ./SctPkg/build_bbr.sh $TARGET_ARCH GCC $UEFI_BUILD_MODE  ENABLE_SECUREBOOT_TESTS -n $PARALLELISM
+    else
+        ./SctPkg/build_bbr.sh $TARGET_ARCH GCC $UEFI_BUILD_MODE  -n $PARALLELISM
+    fi
     popd
 }
 

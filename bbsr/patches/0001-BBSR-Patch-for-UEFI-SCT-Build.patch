@@ -1,18 +1,8 @@
 diff --git a/uefi-sct/SctPkg/CommonGenFramework.sh b/uefi-sct/SctPkg/CommonGenFramework.sh
-index e319d4cd..ff3b327f 100755
+index e7b7ac72..70083fd9 100755
 --- a/uefi-sct/SctPkg/CommonGenFramework.sh
 +++ b/uefi-sct/SctPkg/CommonGenFramework.sh
-@@ -92,6 +92,9 @@ CopyDependency()
-     ls -h $ProcessorType/$1_Invalid*       > temp.txt 2>NUL
-     ls -h $ProcessorType/$1_*.efi   >> temp.txt 2>NUL
-     ls -h $ProcessorType/$1_*.ini   >> temp.txt 2>NUL
-+    ls -h $ProcessorType/$1_*.bin  >> temp.txt 2>NUL
-+    ls -h $ProcessorType/$1_*.der  >> temp.txt 2>NUL
-+    ls -h $ProcessorType/$1_*.auth  >> temp.txt 2>NUL
-     ls -h $ProcessorType/$1_*.cmp   >> temp.txt 2>NUL
-     ls -h $ProcessorType/$1_*.ucmp  >> temp.txt 2>NUL
- 
-@@ -379,6 +382,13 @@ then
+@@ -379,6 +379,15 @@ then
      cp $ProcessorType/ImageServicesBBTest.efi                  $Framework/Test/ > NUL
      cp $ProcessorType/MiscBootServicesBBTest.efi               $Framework/Test/ > NUL
  
@@ -20,25 +10,29 @@ index e319d4cd..ff3b327f 100755
 +    cp $ProcessorType/BBSRVariableSizeTest.efi                 $Framework/Test/ > NUL
 +    cp $ProcessorType/TCGMemoryOverwriteRequestBBTest.efi      $Framework/Test/ > NUL
 +    cp $ProcessorType/TCG2ProtocolBBTest.efi                   $Framework/Test/ > NUL
++  if [ $SECUREBOOT_ENABLE -eq 1 ]; then
 +    cp $ProcessorType/SecureBootBBTest.efi                     $Framework/Test/ > NUL
++  fi
 +    cp $ProcessorType/PlatformResetAttackMitigationPsciTest.efi $Framework/Test/ > NUL
 +
      cp $ProcessorType/VariableServicesBBTest.efi               $Framework/Test/ > NUL
      cp $ProcessorType/TimeServicesBBTest.efi                   $Framework/Test/ > NUL
      cp $ProcessorType/MiscRuntimeServicesBBTest.efi            $Framework/Test/ > NUL
-@@ -534,4 +544,5 @@ then
+@@ -534,4 +543,7 @@ then
      CopyDependency PciRootBridgeIo
      CopyDependency PxeBaseCode
      CopyDependency ConfigKeywordHandler
 -fi
 \ No newline at end of file
++  if [ $SECUREBOOT_ENABLE -eq 1 ]; then
 +    CopyDependency SecureBoot
++  fi
 +fi
 diff --git a/uefi-sct/SctPkg/Config/Data/Category.ini b/uefi-sct/SctPkg/Config/Data/Category.ini
-index 1e88a593..62645552 100644
+index 1e88a593..5237dd47 100644
 --- a/uefi-sct/SctPkg/Config/Data/Category.ini
 +++ b/uefi-sct/SctPkg/Config/Data/Category.ini
-@@ -172,6 +172,20 @@ InterfaceGuid = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
+@@ -172,6 +172,13 @@ InterfaceGuid = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
  Name          = RuntimeServicesTest\VariableServicesTest
  Description   =
  
@@ -49,17 +43,10 @@ index 1e88a593..62645552 100644
 +Name          = RuntimeServicesTest\BBSRVariableSizeTest
 +Description   =
 +
-+[Category Data]
-+Revision      = 0x00010000
-+CategoryGuid  = CBADA58E-A1AA-45DF-BDDF-F9BA1292F887
-+InterfaceGuid = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
-+Name          = RuntimeServicesTest\SecureBootTest
-+Description   =
-+
  [Category Data]
  Revision      = 0x00010000
  CategoryGuid  = 0C1D662C-EA60-48F5-9D77-22F853499C4A
-@@ -193,13 +207,13 @@ InterfaceGuid = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
+@@ -193,13 +200,13 @@ InterfaceGuid = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
  Name          = RuntimeServicesTest\MiscRuntimeServicesTest
  Description   =
  
@@ -80,7 +67,7 @@ index 1e88a593..62645552 100644
  [Category Data]
  Revision      = 0x00010000
  CategoryGuid  = 52A69BBF-E19F-4e82-93D6-AAC46E2E1E06
-@@ -1074,10 +1088,17 @@ CategoryGuid  = CCD15FEC-6F73-4EEC-8395-3E69E4B940BF
+@@ -1074,10 +1081,17 @@ CategoryGuid  = CCD15FEC-6F73-4EEC-8395-3E69E4B940BF
  InterfaceGuid = CCD15FEC-6F73-4EEC-8395-3E69E4B940BF
  Name          = RiscvBootProtocolTest
  Description   = RISC-V Boot Protocol Test
