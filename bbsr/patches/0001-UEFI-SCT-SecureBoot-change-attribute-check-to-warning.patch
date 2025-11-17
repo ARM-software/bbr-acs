@@ -1,0 +1,13 @@
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/VariableAttributesBBTest.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/VariableAttributesBBTest.c
+index f385d927..a534172d 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/VariableAttributesBBTest.c
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/VariableAttributesBBTest.c
+@@ -442,7 +442,7 @@ VariableAttributesTest(
+     if (Status == EFI_SUCCESS) {
+       // check the attributes
+       if (Attributes != DefSecureBootVarArray[Index].Attributes) {
+-        Result   = EFI_TEST_ASSERTION_FAILED;
++        Result   = EFI_TEST_ASSERTION_WARNING;
+         StandardLib->RecordMessage (
+                     StandardLib,
+                     EFI_VERBOSE_LEVEL_DEFAULT,

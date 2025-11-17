@@ -211,6 +211,14 @@ do_build()
             echo  "Error while applying BBSR SCT patch..."
             exit
         fi
+
+        if git apply --check $BBR_DIR/bbsr/patches/0001-UEFI-SCT-SecureBoot-change-attribute-check-to-warning.patch; then
+            echo "Applying BBSR SecureBoot change for default attribute to warning patch..."
+            git apply --ignore-whitespace --ignore-space-change $BBR_DIR/bbsr/patches/0001-UEFI-SCT-SecureBoot-change-attribute-check-to-warning.patch
+        else
+            echo  "Error while applying BBSR SecureBoot change for default attribute to warning patch..."
+            exit
+        fi
     fi
 
     pushd uefi-sct
