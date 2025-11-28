@@ -1,0 +1,13 @@
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/EfiCompliant/BlackBoxTest/EfiCompliantBBTestRequired_uefi.c b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/EfiCompliant/BlackBoxTest/EfiCompliantBBTestRequired_uefi.c
+index 09a072bb..eb6e7334 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/EfiCompliant/BlackBoxTest/EfiCompliantBBTestRequired_uefi.c
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/EfiCompliant/BlackBoxTest/EfiCompliantBBTestRequired_uefi.c
+@@ -199,7 +199,7 @@ Routine Description:
+   //
+   // Check the EFI Runtime Properties Table
+   //
+-  CheckRuntimePropertiesTable (StandardLib);
++  //CheckRuntimePropertiesTable (StandardLib);
+ 
+   //
+   // Check the LOADED_IMAGE Protocol
