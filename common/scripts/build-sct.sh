@@ -202,6 +202,16 @@ do_build()
         exit
     fi
 
+    if [ $BUILD_PLAT = SBBR ]; then
+        if git apply --check $BBR_DIR/sbbr/patches/0001-SCT-Disable-EFI_RT_PROPERTIES_TABLE-compliance-tests.patch; then
+            echo "Applying Disable EFI RT Properties Table patch..."
+            git apply --ignore-whitespace --ignore-space-change $BBR_DIR/sbbr/patches/0001-SCT-Disable-EFI_RT_PROPERTIES_TABLE-compliance-tests.patch
+        else
+           echo  "Error while applying Disable EFI RT Properties Table patch..."
+           exit
+        fi
+    fi
+
     # Apply BBSR patch for Systemready
     if [[ $BUILD_TYPE != S ]]; then
         if git apply --check $BBR_DIR/bbsr/patches/0001-BBSR-Patch-for-UEFI-SCT-Build.patch; then
