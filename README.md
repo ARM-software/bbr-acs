@@ -380,12 +380,12 @@ Use the following commands to run FWTS tests for **SBBR**, **EBBR**, or **BBSR**
 
 - **SBBR**
   ```bash
-  ~/fwts_workspace/bin/fwts -r stdout -q --uefi-set-var-multiple=1 --uefi-get-mn-count-multiple=1 --sbbr aest cedt slit srat hmat pcct pdtt bgrt bert einj erst hest sdei nfit iort mpam ibft ras2
+  ~/fwts_workspace/bin/fwts -r stdout -q --uefi-set-var-multiple=1 --uefi-get-mn-count-multiple=1 --sbbr aest cedt slit srat hmat pcct pdtt bgrt bert einj erst hest sdei nfit iort mpam ibft ras2 smccc
   ```
 
 - **EBBR**
   ```bash
-  ~/fwts_workspace/bin/fwts --ebbr
+  ~/fwts_workspace/bin/fwts --ebbr -r stdout smccc
   ```
 
 - **BBSR**  
