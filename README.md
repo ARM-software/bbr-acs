@@ -82,9 +82,9 @@ For more information, see the **[BBSR specification](https://developer.arm.com/d
 
 | Recipe       | Version | Code Quality | Specification |
 |-------------------|:----------:|:-------------------:| :-------------------: |
-| SBBR | v2.1.1 | BET | Based on SBBR recipe of BBR v2.1 |
-| EBBR | v2.2.1 | BET | Based on EBBR recipe of BBR v2.1 |
-| BBSR | v1.3.0 | EAC | Written for BBSR v1.3 |
+| SBBR | v2.1.2 | BET | Based on SBBR recipe of BBR v2.1 |
+| EBBR | v2.2.2 | BET | Based on EBBR recipe of BBR v2.1 and EBBR v2.2|
+| BBSR | v1.3.1 | EAC | Written for BBSR v1.3 |
 
 - The compliance suite is **not** a substitute for design verification.
 - To review ACS logs, Arm licensees can contact Arm directly via their partner managers.
@@ -95,7 +95,9 @@ For more information, see the **[BBSR specification](https://developer.arm.com/d
 
 | BBR‑ACS Tag       | BBR Recipe | SystemReady Release |
 |-------------------|:----------:|:-------------------:|
-| `v25.04_SR_3.0.1` |   SBBR     |    `v25.04_SR_3.1.0` |
+| `v25.12_SBBR_2.1.2` |   SBBR     |    `v25.12_DT_3.1.1` |
+| `v25.12_EBBR_2.2.2` |   EBBR     |    `v25.12_DT_3.1.1` |
+| `v25.12_BBSR_1.3.1` |   BBSR     |    `v25.12_DT_3.1.1` |
 
 ---
 
@@ -380,12 +382,12 @@ Use the following commands to run FWTS tests for **SBBR**, **EBBR**, or **BBSR**
 
 - **SBBR**
   ```bash
-  ~/fwts_workspace/bin/fwts -r stdout -q --uefi-set-var-multiple=1 --uefi-get-mn-count-multiple=1 --sbbr aest cedt slit srat hmat pcct pdtt bgrt bert einj erst hest sdei nfit iort mpam ibft ras2 smccc
+  ~/fwts_workspace/bin/fwts -r stdout -q --uefi-set-var-multiple=1 --uefi-get-mn-count-multiple=1 --sbbr aest cedt slit srat hmat pcct pdtt bgrt bert einj erst hest sdei nfit iort mpam ibft ras2
   ```
 
 - **EBBR**
   ```bash
-  ~/fwts_workspace/bin/fwts --ebbr -r stdout smccc
+  ~/fwts_workspace/bin/fwts --ebbr -r stdout
   ```
 
 - **BBSR**  
