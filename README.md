@@ -93,11 +93,9 @@ For more information, see the **[BBSR specification](https://developer.arm.com/d
 
 ### BBR‑ACS Tag Mapping to SystemReady ACS Releases
 
-| BBR‑ACS Tag       | BBR Recipe | SystemReady Release |
+| SystemReady Release   | BBR Recipes | BBR-ACS Tag |
 |-------------------|:----------:|:-------------------:|
-| `v25.12_SBBR_2.1.2` |   SBBR     |    `v25.12_DT_3.1.1` |
-| `v25.12_EBBR_2.2.2` |   EBBR     |    `v25.12_DT_3.1.1` |
-| `v25.12_BBSR_1.3.1` |   BBSR     |    `v25.12_DT_3.1.1` |
+| `v25.12_DT_3.1.1` |   EBBR, BBSR     | `v25.12_EBBR_2.2.2`, `v25.12_BBSR_1.3.1`    |
 
 ---
 
