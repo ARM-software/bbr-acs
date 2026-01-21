@@ -1886,21 +1886,21 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <td rowspan=1 colspan=1>❌ Function_Test</td>
 </tr>
 <tr>
-<td rowspan=4 colspan=1>❌ TCG2ProtocolTest</td>
-<td rowspan=1 colspan=1>❌ GetActivePcrBanks_Conf</td>
-<td rowspan=1 colspan=1>❌ GetActivePcrBanks_Conf</td>
+<td rowspan=4 colspan=1>✅ TCG2ProtocolTest</td>
+<td rowspan=1 colspan=1>✅ GetActivePcrBanks_Conf</td>
+<td rowspan=1 colspan=1>✅ GetActivePcrBanks_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ GetCapability_Conf</td>
-<td rowspan=1 colspan=1>❌ GetCapability_Conf</td>
+<td rowspan=1 colspan=1>✅ GetCapability_Conf</td>
+<td rowspan=1 colspan=1>✅ GetCapability_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ HashLogExtendEvent_Conf</td>
-<td rowspan=1 colspan=1>❌ HashLogExtendEvent_Conf</td>
+<td rowspan=1 colspan=1>✅ HashLogExtendEvent_Conf</td>
+<td rowspan=1 colspan=1>✅ HashLogExtendEvent_Conf</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ SubmitCommand_Conf</td>
-<td rowspan=1 colspan=1>❌ SubmitCommand_Conf</td>
+<td rowspan=1 colspan=1>✅ SubmitCommand_Conf</td>
+<td rowspan=1 colspan=1>✅ SubmitCommand_Conf</td>
 </tr>
 </tr>
 </table>
