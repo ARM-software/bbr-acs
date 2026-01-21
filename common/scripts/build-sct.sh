@@ -87,6 +87,7 @@ echo "Build type: $BUILD_TYPE"
 
 SBBR_TEST_DIR=$BBR_DIR/common/sct-tests/sbbr-tests
 BBSR_TEST_DIR=$BBR_DIR/bbsr/sct-tests
+EBBR_TEST_DIR=$BBR_DIR/ebbr/sct-tests
 
 if [[ $BUILD_TYPE = S ]]; then
     ## These tests are hosted locally in BBSR folder
@@ -101,6 +102,11 @@ if [[ $BUILD_TYPE = S ]]; then
         sed -i 's|SctPkg/TestCase/UEFI/EFI/Protocol/TCG2/BlackBoxTest/TCG2ProtocolBBTest.inf|#SctPkg/TestCase/UEFI/EFI/Protocol/TCG2/BlackBoxTest/TCG2ProtocolBBTest.inf|g' $BBR_DIR/common/sct-tests/sbbr-tests/BBR_SCT.dsc
     fi
     sed -i 's|SctPkg/TestCase/UEFI/EFI/RuntimeServices/TCGMemoryOverwriteRequest/BlackBoxTest/TCGMemoryOverwriteRequestBBTest.inf|#SctPkg/TestCase/UEFI/EFI/RuntimeServices/TCGMemoryOverwriteRequest/BlackBoxTest/TCGMemoryOverwriteRequestBBTest.inf|g' $BBR_DIR/common/sct-tests/sbbr-tests/BBR_SCT.dsc
+fi
+
+if [[ $BUILD_PLAT = SBBR ]]; then
+    ## These tests are hosted locally in EBBR folder
+    sed -i 's|SctPkg/TestCase/UEFI/EFI/Generic/EfiConformanceProfileTableTest/BlackBoxTest/EfiConformanceProfileTableTest.inf|#SctPkg/TestCase/UEFI/EFI/Generic/EfiConformanceProfileTableTest/BlackBoxTest/EfiConformanceProfileTableTest.inf|g' $BBR_DIR/common/sct-tests/sbbr-tests/BBR_SCT.dsc
 fi
 
 do_build()
@@ -121,12 +127,16 @@ do_build()
     #Build base tools
     source $TOP_DIR/$UEFI_PATH/edksetup.sh
     make -C $TOP_DIR/$UEFI_PATH/BaseTools
-    
+
     #Copy over extra files needed for SBBR tests
     cp -r $SBBR_TEST_DIR/SbbrBootServices uefi-sct/SctPkg/TestCase/UEFI/EFI/BootServices/
     cp -r $SBBR_TEST_DIR/SbbrEfiSpecVerLvl $SBBR_TEST_DIR/SbbrRequiredUefiProtocols $SBBR_TEST_DIR/SbbrSysEnvConfig uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/
     cp $SBBR_TEST_DIR/BBR_SCT.dsc uefi-sct/SctPkg/UEFI/
     cp $SBBR_TEST_DIR/build_bbr.sh uefi-sct/SctPkg/
+
+    if [[ $BUILD_PLAT = EBBR ]]; then
+        cp -r $EBBR_TEST_DIR/EfiConformanceProfileTableTest uefi-sct/SctPkg/TestCase/UEFI/EFI/Generic/
+    fi
 
     # copy BBSR SCT tests to edk2-test
     if [[ $BUILD_TYPE != S ]]; then

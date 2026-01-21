@@ -42,7 +42,7 @@
 #
 # Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 #
-# Copyright (c) 2016-2025, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2016-2026, ARM Ltd. All rights reserved.<BR>
 #
 #
 #/*++
@@ -555,6 +555,11 @@ SctPkg/TestCase/UEFI/EFI/Generic/SbbrEfiSpecVerLvl/BlackBoxTest/EfiSpecVerLvlBBT
 ## 3.4.4 Configuration Tables
 SctPkg/TestCase/UEFI/EFI/BootServices/SbbrBootServices/BlackBoxTest/SbbrBootServicesBBTest.inf
 # End of UEFI Boot Services - SBBR v1.0 3.4
+#
+# UEFI Generic Services - EBBR v2.2.0
+#
+SctPkg/TestCase/UEFI/EFI/Generic/EfiConformanceProfileTableTest/BlackBoxTest/EfiConformanceProfileTableTest.inf
+#End of  UEFI Generic Services - EBBR v2.4.2.1
 
 #
 # Required UEFI Runtime Services Tests - SBBR v1.0 Appendix B
