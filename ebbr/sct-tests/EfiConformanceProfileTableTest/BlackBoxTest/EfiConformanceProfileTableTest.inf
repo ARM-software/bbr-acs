@@ -1,0 +1,61 @@
+## @file
+#
+#  Copyright 2006 - 2016 Unified EFI, Inc.<BR>
+#  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+#/*++
+#
+# Module Name:
+#
+#   EfiConformanceProfileTableTest.inf
+#
+# Abstract:
+#
+#   Component description file for EFI Conformance Profile Table Black-Box Test.
+#
+#--*/
+
+[Defines]
+  INF_VERSION          = 0x00010005
+  BASE_NAME            = EfiConformanceProfileTableTest
+  FILE_GUID            = 376111a7-b0ca-4e5f-8c04-68f5fea9577f
+  MODULE_TYPE          = UEFI_DRIVER
+  VERSION_STRING       = 1.0
+  ENTRY_POINT          = InitializeEfiConformanceProfileTableBbTest
+
+[Sources.common]
+  EfiConformanceProfileTableTestMain.h
+  EfiConformanceProfileTableTestMain.c
+  EfiConformanceProfileTableTestFunction.c
+  Guid.h
+  Guid.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SctPkg/SctPkg.dec
+  SctPkg/UEFI/UEFI.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  SctLib
+  EfiTestLib
+  UefiLib
+
+[Protocols]
+  gEfiTestRecoveryLibraryGuid
+  gEfiTestLoggingLibraryGuid
+
+[Guids]
+  gEfiConfProfilesTableGuid
+  gEfiConfProfilesEbbrSpec21Guid
+  gEfiConfProfilesEbbrSpec22Guid
