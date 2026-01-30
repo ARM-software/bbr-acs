@@ -58,6 +58,7 @@ Abstract:
 #include <AArch64/AArch64.h>
 #include "Guid.h"
 #include <Library/ArmLib.h>
+#include <Library/BaseMemoryLib.h>
 #include "SctLib.h"
 #include "SysEnvConfigBBTestFunction.h"
 #include "SysEnvConfigBBTestMain.h"
