@@ -306,9 +306,10 @@ BBTestOsDiskFormatTest (
           //
           // Checking partition type GUID against EFI partition type GUID.
           //
-          CopyGuid (
+          SctCopyMem (
                       &PartitionTypeGuid,
-                      &GptPartitionEntry->PartitionTypeGUID
+                      &GptPartitionEntry->PartitionTypeGUID,
+		      sizeof (EFI_GUID)
                       );
 
           iStatus = SctCompareGuid (
