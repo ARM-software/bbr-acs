@@ -1,8 +1,8 @@
 diff --git a/uefi-sct/SctPkg/CommonGenFramework.sh b/uefi-sct/SctPkg/CommonGenFramework.sh
-index e7b7ac72..70083fd9 100755
+index c9ba7d04..a59b2945 100755
 --- a/uefi-sct/SctPkg/CommonGenFramework.sh
 +++ b/uefi-sct/SctPkg/CommonGenFramework.sh
-@@ -379,6 +379,15 @@ then
+@@ -411,6 +411,15 @@ then
      cp $ProcessorType/ImageServicesBBTest.efi                  $Framework/Test/ > NUL
      cp $ProcessorType/MiscBootServicesBBTest.efi               $Framework/Test/ > NUL
  
@@ -18,73 +18,29 @@ index e7b7ac72..70083fd9 100755
      cp $ProcessorType/VariableServicesBBTest.efi               $Framework/Test/ > NUL
      cp $ProcessorType/TimeServicesBBTest.efi                   $Framework/Test/ > NUL
      cp $ProcessorType/MiscRuntimeServicesBBTest.efi            $Framework/Test/ > NUL
-@@ -534,4 +543,7 @@ then
+@@ -569,4 +578,7 @@ then
      CopyDependency PciRootBridgeIo
      CopyDependency PxeBaseCode
      CopyDependency ConfigKeywordHandler
--fi
-\ No newline at end of file
 +  if [ $SECUREBOOT_ENABLE -eq 1 ]; then
 +    CopyDependency SecureBoot
 +  fi
-+fi
+ fi
 diff --git a/uefi-sct/SctPkg/Config/Data/Category.ini b/uefi-sct/SctPkg/Config/Data/Category.ini
-index 1e88a593..5237dd47 100644
+index fbe7659f..070d73ef 100644
 --- a/uefi-sct/SctPkg/Config/Data/Category.ini
 +++ b/uefi-sct/SctPkg/Config/Data/Category.ini
-@@ -172,6 +172,13 @@ InterfaceGuid = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
- Name          = RuntimeServicesTest\VariableServicesTest
- Description   =
- 
+@@ -1081,3 +1081,17 @@ CategoryGuid  = 14BC21EC-6D04-4684-A892-1B465ACAC423
+ InterfaceGuid = 71652D04-BF38-434A-BCB8-6547D7FD8384
+ Name          = GenericTest\EfiConformanceProfileTableTest
+ Description   = Efi Conformance Profile Table Test
++
 +[Category Data]
 +Revision      = 0x00010000
 +CategoryGuid  = d250c2ca-0fe7-4edf-9319-6eef4f6b0d12
 +InterfaceGuid = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
 +Name          = RuntimeServicesTest\BBSRVariableSizeTest
 +Description   =
-+
- [Category Data]
- Revision      = 0x00010000
- CategoryGuid  = 0C1D662C-EA60-48F5-9D77-22F853499C4A
-@@ -193,13 +200,13 @@ InterfaceGuid = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
- Name          = RuntimeServicesTest\MiscRuntimeServicesTest
- Description   =
- 
--[Category Data]
--Revision      = 0x00010000
--CategoryGuid  = 265E661D-D51E-454B-BBC9-665F46EC0A04
--InterfaceGuid = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
--Name          = RuntimeServicesTest\TCGMemoryOverwriteRequestTest
--Description   = Test TCG Platform Reset Attack Mitigation EFI variables
--
-+[Category Data]
-+Revision      = 0x00010000
-+CategoryGuid  = 265E661D-D51E-454B-BBC9-665F46EC0A04
-+InterfaceGuid = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
-+Name          = RuntimeServicesTest\TCGMemoryOverwriteRequestTest
-+Description   = Test TCG Platform Reset Attack Mitigation EFI variables
-+
- [Category Data]
- Revision      = 0x00010000
- CategoryGuid  = 52A69BBF-E19F-4e82-93D6-AAC46E2E1E06
-@@ -1074,10 +1081,17 @@ CategoryGuid  = CCD15FEC-6F73-4EEC-8395-3E69E4B940BF
- InterfaceGuid = CCD15FEC-6F73-4EEC-8395-3E69E4B940BF
- Name          = RiscvBootProtocolTest
- Description   = RISC-V Boot Protocol Test
--
--[Category Data]
--Revision      = 0x00010000
--CategoryGuid  = 607f766c-7455-42be-930b-e4d76db2720f
--InterfaceGuid = 607f766c-7455-42be-930b-e4d76db2720f
--Name          = TCG2ProtocolTest
--Description   = TCG2 Protocol Test
-+
-+[Category Data]
-+Revision      = 0x00010000
-+CategoryGuid  = 607f766c-7455-42be-930b-e4d76db2720f
-+InterfaceGuid = 607f766c-7455-42be-930b-e4d76db2720f
-+Name          = TCG2ProtocolTest
-+Description   = TCG2 Protocol Test
 +
 +[Category Data]
 +Revision      = 0x00010000
