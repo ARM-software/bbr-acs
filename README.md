@@ -382,11 +382,14 @@ Use the following commands to run FWTS tests for **SBBR**, **EBBR**, or **BBSR**
   ```bash
   ~/fwts_workspace/bin/fwts -r stdout -q --uefi-set-var-multiple=1 --uefi-get-mn-count-multiple=1 --sbbr aest cedt slit srat hmat pcct pdtt bgrt bert einj erst hest sdei nfit iort mpam ibft ras2
   ```
+  > For the detailed FWTS test list covered by SBBR, refer to the [SBBR FWTS test-list](docs/fwts_sbbr_testlist.md).
+
 
 - **EBBR**
   ```bash
   ~/fwts_workspace/bin/fwts --ebbr -r stdout
   ```
+  > For the detailed FWTS test list covered by EBBR, refer to the [EBBR FWTS test-list](docs/fwts_ebbr_testlist.md).
 
 - **BBSR**  
   **For ACPI-Based System Image:**
@@ -397,6 +400,7 @@ Use the following commands to run FWTS tests for **SBBR**, **EBBR**, or **BBSR**
   ```bash
   ~/fwts_workspace/bin/fwts uefirtauthvar
   ```
+  > For the detailed FWTS test list covered by BBSR, refer to the [BBSR FWTS test-list](docs/fwts_bbsr_testlist.md).
 
 **Notes:**
 
