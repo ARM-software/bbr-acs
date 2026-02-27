@@ -214,16 +214,6 @@ do_build()
         exit
     fi
 
-    if [ $BUILD_PLAT = SBBR ]; then
-        if git apply --check $BBR_DIR/sbbr/patches/0001-SCT-Disable-EFI_RT_PROPERTIES_TABLE-compliance-tests.patch; then
-            echo "Applying Disable EFI RT Properties Table patch..."
-            git apply --ignore-whitespace --ignore-space-change $BBR_DIR/sbbr/patches/0001-SCT-Disable-EFI_RT_PROPERTIES_TABLE-compliance-tests.patch
-        else
-           echo  "Error while applying Disable EFI RT Properties Table patch..."
-           exit
-        fi
-    fi
-
     # Apply SCT patch (EBBR only) - applies in edk2-test repo (current dir is $TOP_DIR/$SCT_PATH)
     if [[ "$BUILD_PLAT" == "EBBR" ]]; then
             if git apply --check "$BBR_DIR/ebbr/patches/0001-sct-getnextmonotoniccount-handle-device-error.patch"; then
