@@ -18,14 +18,16 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <th rowspan=1 colspan=1>Testcase</th>
 </tr>
 <tr>
-<td rowspan=6 colspan=1>✅ GenericTest</td>
-<td rowspan=2 colspan=1>✅ EFICompliantTest</td>
+<td rowspan=7 colspan=1>🔲 GenericTest</td>
+<td rowspan=3 colspan=1>✅ EFICompliantTest</td>
 <td rowspan=1 colspan=1>✅ PlatformSpecificElements</td>
 </tr>
 <tr>
 <td rowspan=1 colspan=1>✅ RequiredElements</td>
+<tr>
+<td rowspan=1 colspan=1>✅ Conformance Profiles Table BB Test</td>
 </tr>
-<td rowspan=1 colspan=1>✅ SbbrRequiredUefiProtocols<sup>[arm]</sup></td>
+<td rowspan=1 colspan=1>❌ SbbrRequiredUefiProtocols<sup>[arm]</sup></td>
 <td rowspan=1 colspan=1>❌ MediaIoProtocols<sup>[arm]</sup></td>
 </tr>
 <td rowspan=1 colspan=1>✅ SbbrEfiSpecVerLvl<sup>[arm]</sup></td>
@@ -363,7 +365,7 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <td rowspan=1 colspan=1>✅ QueryCapsuleCapabilities_Func</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>❌ ResetSystem_Func</td>
+<td rowspan=1 colspan=1>✅ ResetSystem_Func</td>
 </tr>
 <tr>
 <td rowspan=1 colspan=1>✅ UpdateCapsule_Conf</td>
@@ -1905,14 +1907,31 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <td rowspan=1 colspan=1>❌ SetDataFunction</td>
 </tr>
 <tr>
-<td rowspan=2 colspan=1>✅ FirmwareManagementTest</td>
-<td rowspan=2 colspan=1>✅ FirmwareManagementProtocol</td>
-<td rowspan=1 colspan=1>✅ Conformance_Test</td>
+  <td rowspan="8" colspan="1">✅ FirmwareManagementTest</td>
+  <td rowspan="8" colspan="1">✅ FirmwareManagementProtocol</td>
+  <td rowspan="1" colspan="1">✅ Conformance_Test-CheckImage</td>
 </tr>
 <tr>
-<td rowspan=1 colspan=1>✅ Function_Test</td>
+  <td rowspan="1" colspan="1">✅ Conformance_Test-GetImage</td>
 </tr>
 <tr>
+  <td rowspan="1" colspan="1">✅ Conformance_Test-GetImageInfo</td>
+</tr>
+<tr>
+  <td rowspan="1" colspan="1">✅ Conformance_Test-SetImage</td>
+</tr>
+<tr>
+  <td rowspan="1" colspan="1">✅ Conformance_Test-SetPackageInfo</td>
+</tr>
+<tr>
+  <td rowspan="1" colspan="1">✅ Function_Test-GetImage</td>
+</tr>
+<tr>
+  <td rowspan="1" colspan="1">✅ Function_Test-GetImageInfo</td>
+</tr>
+<tr>
+  <td rowspan="1" colspan="1">✅ Function_Test-GetPackageInfo</td>
+</tr>
 <td rowspan=4 colspan=1>❌ TCG2ProtocolTest</td>
 <td rowspan=1 colspan=1>❌ GetActivePcrBanks_Conf</td>
 <td rowspan=1 colspan=1>❌ GetActivePcrBanks_Conf</td>
@@ -1931,3 +1950,4 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 </tr>
 </tr>
 </table>
+
