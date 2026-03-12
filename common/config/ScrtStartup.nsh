@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (c) 2021-2025, Arm Limited or its affiliates. All rights reserved.
+# Copyright (c) 2021-2026, Arm Limited or its affiliates. All rights reserved.
 #  SPDX-License-Identifier : Apache-2.0
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
@@ -86,7 +86,7 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
 :StartSCRT
         cp SCRT.conf SCRT_run_progress.flag
         Load SCRTDRIVER.efi
-        SCRTAPP -f SCRT.conf
+        SCRTAPP.efi -f SCRT.conf
     endif
 endfor
 
