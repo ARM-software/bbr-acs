@@ -84,7 +84,7 @@ For more information, see the **[BBSR specification](https://developer.arm.com/d
 |-------------------|:----------:|:-------------------:| :-------------------: |
 | SBBR | v2.1.2 | BET | Based on SBBR recipe of BBR v2.1 |
 | EBBR | v2.2.3| BET | Based on EBBR recipe of BBR v2.1 and EBBR v2.2|
-| BBSR | v1.3.2 | EAC | Written for BBSR v1.3 |
+| BBSR | v1.3.1 | EAC | Written for BBSR v1.3 |
 
 - The compliance suite is **not** a substitute for design verification.
 - To review ACS logs, Arm licensees can contact Arm directly via their partner managers.
@@ -95,7 +95,7 @@ For more information, see the **[BBSR specification](https://developer.arm.com/d
 
 | SystemReady Release   | BBR Recipes | BBR-ACS Tag |
 |-------------------|:----------:|:-------------------:|
-| `v26.03_DT_3.1.2` |   EBBR, BBSR     | `v26.03_EBBR_2.2.3`, `v26.03_BBSR_1.3.2`    |
+| `v26.03_DT_3.1.2` |   EBBR, BBSR     | `v26.03_EBBR_2.2.3`    |
 
 ---
 
