@@ -59,7 +59,7 @@ EBBR platforms typically:
 
 EBBR ensures embedded devices can benefit from standard firmware interfaces while remaining lightweight. Typical supported operating systems include Fedora, Debian, openSUSE/SLES, and Ubuntu.
 
-For more information, see the **[BBR specification](https://developer.arm.com/documentation/den0044/latest)** and **[BBSR specification](https://developer.arm.com/documentation/den0107/latest/)**.
+For more information, see the **[BBR specification](https://developer.arm.com/documentation/den0044/latest)**, **[EBBR specification](https://github.com/ARM-software/ebbr/releases/tag/v2.2.0)** and **[BBSR specification](https://developer.arm.com/documentation/den0107/latest/)**.
 
 ---
 
@@ -83,8 +83,8 @@ For more information, see the **[BBSR specification](https://developer.arm.com/d
 | Recipe       | Version | Code Quality | Specification |
 |-------------------|:----------:|:-------------------:| :-------------------: |
 | SBBR | v2.1.2 | BET | Based on SBBR recipe of BBR v2.1 |
-| EBBR | v2.2.2 | BET | Based on EBBR recipe of BBR v2.1 and EBBR v2.2|
-| BBSR | v1.3.1 | EAC | Written for BBSR v1.3 |
+| EBBR | v2.2.3| BET | Based on EBBR recipe of BBR v2.1 and EBBR v2.2|
+| BBSR | v1.3.2 | EAC | Written for BBSR v1.3 |
 
 - The compliance suite is **not** a substitute for design verification.
 - To review ACS logs, Arm licensees can contact Arm directly via their partner managers.
@@ -95,7 +95,7 @@ For more information, see the **[BBSR specification](https://developer.arm.com/d
 
 | SystemReady Release   | BBR Recipes | BBR-ACS Tag |
 |-------------------|:----------:|:-------------------:|
-| `v25.12_DT_3.1.1` |   EBBR, BBSR     | `v25.12_EBBR_2.2.2`, `v25.12_BBSR_1.3.1`    |
+| `v26.03_DT_3.1.2` |   EBBR, BBSR     | `v26.03_EBBR_2.2.3`, `v26.03_BBSR_1.3.2`    |
 
 ---
 
@@ -402,6 +402,7 @@ Use the following commands to run FWTS tests for **SBBR**, **EBBR**, or **BBSR**
 
 - By default, `build-standalone-fwts.sh` builds the latest FWTS version supported by **Arm SystemReady**, as defined in the upstream configuration.
 - To build a specific FWTS version supported by Arm SystemReady, set the `USER_DEFINED_FWTS_VERSION` variable in `build-standalone-fwts.sh`. Currently supported versions:
+  - `26.01.00`
   - `25.09.00`
   - `25.01.00`
   - `24.09.00`
@@ -431,5 +432,5 @@ Arm BBR‑ACS is distributed under the **Apache v2.0 License**.
 
 ---
 
-*Copyright (c) 2021–2025, Arm Limited and Contributors. All rights reserved.*
+*Copyright (c) 2021–2026, Arm Limited and Contributors. All rights reserved.*
 
