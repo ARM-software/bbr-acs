@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (c) 2021-2026, Arm Limited or its affiliates. All rights reserved.
+#  Copyright (c) 2021-2026, Arm Limited or its affiliates. All rights reserved.
 #  SPDX-License-Identifier : Apache-2.0
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,14 +48,14 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
             SCRTAPP.efi -g SCRT.log
 
             #Save the logs in acs_results
-            mkdir FS%i:\acs_results\scrt_results
+            mkdir FS%i:\acs_results_template\acs_results\scrt_results
             if exist SCRT.log then
-                mv SCRT.log  FS%i:\acs_results\scrt_results\SCRT.log
+                mv SCRT.log  FS%i:\acs_results_template\acs_results\scrt_results\SCRT.log
             else
-                echo "SCRT run failed" > FS%i:\acs_results\scrt_results\SCRT.log
+                echo "SCRT run failed" > FS%i:\acs_results_template\acs_results\scrt_results\SCRT.log
             endif
 
-            cp SCRT.conf FS%i:\acs_results\scrt_results\SCRT.conf
+            cp SCRT.conf FS%i:\acs_results_template\acs_results\scrt_results\SCRT.conf
             goto Done
         endif
 
@@ -66,15 +66,15 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
         endif
 
         echo "Note: The System will automatically reset as part of SCRT testing"
-        if  exist FS%i:\acs_results\scrt_results\SCRT.log then
+        if  exist FS%i:\acs_results_template\acs_results\scrt_results\SCRT.log then
             echo "SCRT is already run."
             echo "Press any key to run SCRT again."
             echo "WARNING: Ensure you have backed up the existing logs."
             FS%i:\acs_tests\bbr\SCT\stallforkey.efi 5
             if %lasterror% == 0 then
                 #Backup the existing logs
-                cp FS%i:\acs_results\scrt_results\SCRT.log FS%i:\acs_results\scrt_results\SCRT.log_previous_run
-                rm -q FS%i:\acs_results\scrt_results\SCRT.log
+                cp FS%i:\acs_results_template\acs_results\scrt_results\SCRT.log FS%i:\acs_results_template\acs_results\scrt_results\SCRT.log_previous_run
+                rm -q FS%i:\acs_results_template\acs_results\scrt_results\SCRT.log
                 goto StartSCRT
             else
                 goto Done
