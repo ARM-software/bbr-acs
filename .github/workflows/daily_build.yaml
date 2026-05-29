@@ -56,6 +56,12 @@ jobs:
           echo "CapsuleApp.efi not found for EBBR, raising an error."
           exit 1
         fi
+    - name: Check for UefiDump.efi (EBBR)
+      run: |
+        if [ ! -e "bbr-acs/ebbr/scripts/edk2/Build/MdeModule/DEBUG_GCC5/AARCH64/UefiDump.efi" ]; then
+          echo "UefiDump.efi not found for EBBR, raising an error."
+          exit 1
+        fi
     - name: Get required source codes and tools for SBBR
       run: |
         cd $GITHUB_WORKSPACE  # Go back to the root directory of the repository

@@ -150,6 +150,9 @@ bbr-acs/<ebbr|sbbr>/scripts/edk2-test/uefi-sct/<SBBR|EBBR>-SCT   # e.g. SBBR-SCT
 **Notes:**
 - The UEFI application `CapsuleApp.efi` is also built and can be found at:  
   `bbr-acs/<ebbr|sbbr>/scripts/edk2/Build/MdeModule/DEBUG_GCC5/AARCH64`
+- For **EBBR** builds only, `UefiDump.efi` is also built and can be found at:
+  `bbr-acs/ebbr/scripts/edk2/Build/MdeModule/DEBUG_GCC5/AARCH64/UefiDump.efi`
+  It dumps the EBBR profile table to `\acs_results_template\acs_results\uefi_dump\ebbr_profile_table.log`, and falls back to `ebbr_profile_table.log` in the current working directory if that path does not exist.
 - The standalone build does not include the BBSR SCT suite, as some BBSR tests depend on the KEYS_DIR. These tests are only supported when built through the arm-systemready repository.
 
 ---
