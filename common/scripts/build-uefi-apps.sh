@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (c) 2021, 2023-2024, Arm Limited or its affiliates. All rights reserved.
+# Copyright (c) 2021, 2023-2024, 2026 Arm Limited or its affiliates. All rights reserved.
 #  SPDX-License-Identifier : Apache-2.0
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
@@ -84,7 +84,7 @@ do_build()
     fi
 
     export EDK2_TOOLCHAIN=$UEFI_TOOLCHAIN
-    export PACKAGES_PATH=$TOP_DIR/$UEFI_PATH
+    export PACKAGES_PATH=$TOP_DIR/$UEFI_PATH:$BBR_DIR
     export PYTHON_COMMAND=/usr/bin/python3
     export WORKSPACE=$TOP_DIR/$UEFI_PATH
 
@@ -97,6 +97,11 @@ do_build()
         # Shell.efi is required to run the standalone SCT. Copy it into the SBBR/EBBR-SCT
         # package and place it as EFI/BOOT/bootaa64.efi for UEFI boot.
         build -a AARCH64 -t GCC5 -p ShellPkg/ShellPkg.dsc
+    fi
+
+    # Build the standalone generic UEFI dump application.
+    if [[ $BUILD_PLAT = EBBR ]]; then
+        build -a $TARGET_ARCH -t $UEFI_TOOLCHAIN -p ebbr/uefi_app/UefiDump.dsc
     fi
     popd
 }
@@ -115,24 +120,52 @@ do_clean()
 
 do_package ()
 {
+    BUILD_PATH="$TOP_DIR/$UEFI_PATH/Build/MdeModule"
+    UEFI_BUILD_DIR="$BUILD_PATH/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}"
+    CAPSULE_APP="$UEFI_BUILD_DIR/CapsuleApp.efi"
+    UEFIDUMP_APP="$UEFI_BUILD_DIR/UefiDump.efi"
+    SHELL_DIR="$TOP_DIR/$UEFI_PATH/Build/Shell/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}"
+    SHELL_APP="$SHELL_DIR/ShellPkg/Application/Shell/Shell/$UEFI_BUILD_MODE/Shell.efi"
+    UEFI_SCT_BOOT="$TOP_DIR/edk2-test/uefi-sct/${BUILD_PLAT}-SCT/EFI/BOOT/bootaa64.efi"
+
     echo "Packaging CapsuleApp...";
 
-    if [ $BUILD_TYPE = F ]; then
-        sbsign --key $KEYS_DIR/TestDB1.key --cert $KEYS_DIR/TestDB1.crt $TOP_DIR/$UEFI_PATH/Build/MdeModule/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/CapsuleApp.efi --output $TOP_DIR/$UEFI_PATH/Build/MdeModule/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/CapsuleApp.efi
-    fi
-
-    if [ -f $TOP_DIR/$UEFI_PATH/Build/MdeModule/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/CapsuleApp.efi ]; then
-     echo "CapsuleApp.efi successfully generated at $TOP_DIR/$UEFI_PATH/Build/MdeModule/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/CapsuleApp.efi"
+    if [ -f "$CAPSULE_APP" ]; then
+        echo "CapsuleApp.efi successfully generated at $CAPSULE_APP"
+        if [ "$BUILD_TYPE" = "F" ]; then
+            sbsign \
+                --key "$KEYS_DIR/TestDB1.key" \
+                --cert "$KEYS_DIR/TestDB1.crt" \
+                "$CAPSULE_APP" \
+                --output "$CAPSULE_APP"
+        fi
     else
-     echo "Error: CapsuleApp.efi could not be generated. Please check the logs"
+        echo "Error: CapsuleApp.efi could not be generated. Please check the logs"
     fi
 
-    if [ $BUILD_TYPE = S ]; then
-     # Shell.efi is required to run the standalone SCT. Copy it into the SBBR/EBBR-SCT
-     # package and place it as EFI/BOOT/bootaa64.efi for UEFI boot.
-     cp $TOP_DIR/$UEFI_PATH/Build/Shell/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}/ShellPkg/Application/Shell/Shell/$UEFI_BUILD_MODE/Shell.efi $TOP_DIR/edk2-test/uefi-sct/${BUILD_PLAT}-SCT/EFI/BOOT/bootaa64.efi
+    if [[ "$BUILD_PLAT" = "EBBR" ]]; then
+        if [ -f "$UEFIDUMP_APP" ]; then
+            echo "UefiDump.efi successfully generated at $UEFIDUMP_APP"
+            if [ "$BUILD_TYPE" = "F" ]; then
+                sbsign \
+                    --key "$KEYS_DIR/TestDB1.key" \
+                    --cert "$KEYS_DIR/TestDB1.crt" \
+                    "$UEFIDUMP_APP" \
+                    --output "$UEFIDUMP_APP"
+            fi
+        else
+            echo "Error: UefiDump.efi could not be generated. Please check the logs"
+        fi
+    fi
+
+    if [ "$BUILD_TYPE" = "S" ]; then
+        # Shell.efi is required to run the standalone SCT. Copy it into the SBBR/EBBR-SCT
+        # package and place it as EFI/BOOT/bootaa64.efi for UEFI boot.
+        cp \
+            "$SHELL_APP" \
+            "$UEFI_SCT_BOOT"
     fi
 }
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-source $DIR/framework.sh $@
+source "$DIR/framework.sh" "$@"
