@@ -15,22 +15,22 @@
 /*++
 
 Module Name:
- EfiConformanceProfileTableTestFunction.c
+ EfiEbbrProfileTableTestFunction.c
 
 Abstract:
-  Source file for EFI Conformance Profile Table Black-Box Test - Function Test.
+  Source file for EFI EBBR Profile Table Black-Box Test - Function Test.
 
 --*/
 
 #include "SctLib.h"
-#include "EfiConformanceProfileTableTestMain.h"
+#include "EfiEbbrProfileTableTestMain.h"
 
 //
 // Prototypes (external)
 //
 
 EFI_STATUS
-EfiConformanceProfileTableTest (
+EfiEbbrProfileTableTest (
   IN EFI_BB_TEST_PROTOCOL       *This,
   IN VOID                       *ClientInterface,
   IN EFI_TEST_LEVEL             TestLevel,
@@ -42,12 +42,12 @@ EfiConformanceProfileTableTest (
 //
 
 EFI_STATUS
-EfiConformanceProfileTableTestSub1 (
+EfiEbbrProfileTableTestSub1 (
   IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL   *StandardLib,
   IN EFI_TEST_LOGGING_LIBRARY_PROTOCOL    *LoggingLib
   );
 
- /* EfiConformanceProfileTableTest - Entry point for EFI Conformance Profile Table Function Test.
+ /* EfiEbbrProfileTableTest - Entry point for EFI EBBR Profile Table Function Test.
  *  @param This             A pointer to the EFI_BB_TEST_PROTOCOL instance.
  *  @param ClientInterface  A pointer to the interface to be tested.
  *  @param TestLevel        Test "thoroughness" control.
@@ -56,7 +56,7 @@ EfiConformanceProfileTableTestSub1 (
  *  @return Other value     Something failed.
  */
 EFI_STATUS
-EfiConformanceProfileTableTest (
+EfiEbbrProfileTableTest (
   IN EFI_BB_TEST_PROTOCOL       *This,
   IN VOID                       *ClientInterface,
   IN EFI_TEST_LEVEL             TestLevel,
@@ -90,25 +90,26 @@ EfiConformanceProfileTableTest (
     return EFI_SUCCESS;
   }
 
-  Status = EfiConformanceProfileTableTestSub1 (StandardLib, LoggingLib);
+  Status = EfiEbbrProfileTableTestSub1 (StandardLib, LoggingLib);
 
   return Status;
 }
 
- /* EfiConformanceProfileTableTestSub1 - Entry point for EFI Conformance Profile Table Sub Function Test.
+ /* EfiEbbrProfileTableTestSub1 - Entry point for EFI EBBR Profile Table Sub Function Test.
  *  @param StandardLib    A pointer to the Standard library.
  *  @param LoggingLib     A pointer to the Logging library.
  *  @return EFI_SUCCESS     Successfully.
  *  @return Other value     Something failed.
  */
 EFI_STATUS
-EfiConformanceProfileTableTestSub1 (
+EfiEbbrProfileTableTestSub1 (
   IN EFI_STANDARD_TEST_LIBRARY_PROTOCOL   *StandardLib,
   IN EFI_TEST_LOGGING_LIBRARY_PROTOCOL    *LoggingLib
   )
 {
   BOOLEAN                          Ebbr21Found = FALSE;
   BOOLEAN                          Ebbr22Found = FALSE;
+  BOOLEAN                          Ebbr23Found = FALSE;
   EFI_STATUS                       Status;
   EFI_TEST_ASSERTION               AssertionType;
   UINTN                            Profile;
@@ -125,7 +126,7 @@ EfiConformanceProfileTableTestSub1 (
   if (LoggingLib != NULL) {
     LoggingLib->EnterFunction (
                   LoggingLib,
-                  L"EfiConformanceProfileTableTestSub1",
+                  L"EfiEbbrProfileTableTestSub1",
                   L"EBBR R/2.4.1"
                   );
   }
@@ -136,6 +137,9 @@ EfiConformanceProfileTableTestSub1 (
     EntryGuid = (EFI_GUID *)((UINT8 *)ConfProfTable + sizeof(*ConfProfTable));
 
     for (Profile = 0; Profile < (UINTN)ConfProfTable->NumberOfProfiles; Profile++, EntryGuid++) {
+      if (SctCompareGuid (EntryGuid, &gEfiConfProfilesEbbrSpec23Guid) == 0) {
+        Ebbr23Found = TRUE;
+      }
       if (SctCompareGuid (EntryGuid, &gEfiConfProfilesEbbrSpec22Guid) == 0) {
         Ebbr22Found = TRUE;
       }
@@ -144,10 +148,16 @@ EfiConformanceProfileTableTestSub1 (
       }
     }
 
-    if (!Ebbr21Found && !Ebbr22Found) {
+    if (!Ebbr21Found && !Ebbr22Found && !Ebbr23Found) {
       Status = EFI_NOT_FOUND;
       AssertionType = EFI_TEST_ASSERTION_WARNING;
       AssertionDesc = L"EBBR profile not found in EFI Conformance Profiles Table, (NumberOfProfiles=%d). %a:%d Status - %r";
+      UnicodeSPrint (AssertionMessage, sizeof(AssertionMessage), AssertionDesc,
+              (INT32)ConfProfTable->NumberOfProfiles, __FILE__, (UINTN)__LINE__, Status);
+    } else if (Ebbr21Found && Ebbr22Found && Ebbr23Found) {
+      Status = EFI_SUCCESS;
+      AssertionType = EFI_TEST_ASSERTION_PASSED;
+      AssertionDesc = L"EBBR_2.1, EBBR_2.2 and EBBR_2.3 profiles found in EFI Conformance Profiles Table, (NumberOfProfiles=%d). %a:%d Status - %r";
       UnicodeSPrint (AssertionMessage, sizeof(AssertionMessage), AssertionDesc,
               (INT32)ConfProfTable->NumberOfProfiles, __FILE__, (UINTN)__LINE__, Status);
     } else if (Ebbr21Found && Ebbr22Found) {
@@ -157,7 +167,11 @@ EfiConformanceProfileTableTestSub1 (
       UnicodeSPrint (AssertionMessage, sizeof(AssertionMessage), AssertionDesc,
               (INT32)ConfProfTable->NumberOfProfiles, __FILE__, (UINTN)__LINE__, Status);
     } else {
-      EbbrProfileName = Ebbr22Found ? L"EBBR_2.2" : L"EBBR_2.1";
+      if (Ebbr23Found) {
+        EbbrProfileName = L"EBBR_2.3";
+      } else {
+        EbbrProfileName = Ebbr22Found ? L"EBBR_2.2" : L"EBBR_2.1";
+      }
       Status = EFI_SUCCESS;
       AssertionType = EFI_TEST_ASSERTION_PASSED;
       AssertionDesc = L"Found %s profile in EFI Conformance Profiles Table. %a:%d Status - %r";
@@ -174,15 +188,15 @@ EfiConformanceProfileTableTestSub1 (
   StandardLib->RecordAssertion (
     StandardLib,
     AssertionType,
-    gEfiConformanceProfileTableTestAssertionGuid001,
-    L"EFI Conformance Profile Table test",
+    gEfiEbbrProfileTableTestAssertionGuid001,
+    L"EFI EBBR Profile Table test",
     AssertionMessage
     );
 
   if (LoggingLib != NULL) {
     LoggingLib->ExitFunction (
                   LoggingLib,
-                  L"EfiConformanceProfileTableTestSub1",
+                  L"EfiEbbrProfileTableTestSub1",
                   L"EBBR R/2.4.1"
                   );
   }

@@ -16,26 +16,26 @@
 #
 # Module Name:
 #
-#   EfiConformanceProfileTableTest.inf
+#   EfiEbbrProfileTableTest.inf
 #
 # Abstract:
 #
-#   Component description file for EFI Conformance Profile Table Black-Box Test.
+#   Component description file for EFI EBBR Profile Table Black-Box Test.
 #
 #--*/
 
 [Defines]
   INF_VERSION          = 0x00010005
-  BASE_NAME            = EfiConformanceProfileTableTest
+  BASE_NAME            = EfiEbbrProfileTableTest
   FILE_GUID            = 376111a7-b0ca-4e5f-8c04-68f5fea9577f
   MODULE_TYPE          = UEFI_DRIVER
   VERSION_STRING       = 1.0
-  ENTRY_POINT          = InitializeEfiConformanceProfileTableBbTest
+  ENTRY_POINT          = InitializeEfiEbbrProfileTableBbTest
 
 [Sources.common]
-  EfiConformanceProfileTableTestMain.h
-  EfiConformanceProfileTableTestMain.c
-  EfiConformanceProfileTableTestFunction.c
+  EfiEbbrProfileTableTestMain.h
+  EfiEbbrProfileTableTestMain.c
+  EfiEbbrProfileTableTestFunction.c
   Guid.h
   Guid.c
 
@@ -59,3 +59,4 @@
   gEfiConfProfilesTableGuid
   gEfiConfProfilesEbbrSpec21Guid
   gEfiConfProfilesEbbrSpec22Guid
+  gEfiConfProfilesEbbrSpec23Guid

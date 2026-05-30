@@ -36,8 +36,8 @@ Refer to [UEFI SCT Test Case Specification](https://uefi-sct-testcasespec.readth
 <td rowspan=1 colspan=1>✅ SbbrSysEnvConfig<sup>[arm]</sup></td>
 <td rowspan=1 colspan=1>✅ BootExcLevel<sup>[arm]</sup></td>
 </tr>
-<td rowspan=1 colspan=1>✅ EfiConformanceProfileTableTest<sup>[arm]</sup></td>
-<td rowspan=1 colspan=1>✅ EfiConformanceProfileTableTest_func<sup>[arm]</sup></td>
+<td rowspan=1 colspan=1>✅ EfiEbbrProfileTableTest<sup>[arm]</sup></td>
+<td rowspan=1 colspan=1>✅ EfiEbbrProfileTableTest_func<sup>[arm]</sup></td>
 </tr>
 <td rowspan=1 colspan=1>❌ PlatformResetAttackMitigationPsciTest<sup>[arm]</sup></td>
 <td rowspan=1 colspan=1>❌ PlatformResetAttackMitigationPsciTest_<sup>[arm]</sup></td>

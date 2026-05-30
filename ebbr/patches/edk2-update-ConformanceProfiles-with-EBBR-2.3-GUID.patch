@@ -1,0 +1,26 @@
+diff --git a/MdePkg/Include/Guid/ConformanceProfiles.h b/MdePkg/Include/Guid/ConformanceProfiles.h
+index bf89ab6..307ca3e 100644
+--- a/MdePkg/Include/Guid/ConformanceProfiles.h
++++ b/MdePkg/Include/Guid/ConformanceProfiles.h
+@@ -60,6 +60,9 @@ typedef struct {
+ #define EFI_CONFORMANCE_PROFILE_EBBR_2_2_GUID \
+     { 0x9073eed4, 0xe50d, 0x11ee, \
+     { 0xb8, 0xb0, 0x8b, 0x68, 0xda, 0x62, 0xfc, 0x80 }}
++#define EFI_CONFORMANCE_PROFILE_EBBR_2_3_GUID \
++    { 0x7721fc77, 0xa724, 0x11ef, \
++    { 0x8e, 0xaa, 0xf7, 0xc9, 0xb1, 0x94, 0xba, 0x75 }}
+ 
+ extern EFI_GUID  gEfiConfProfilesTableGuid;
+ extern EFI_GUID  gEfiConfProfilesUefiSpecGuid;
+diff --git a/MdePkg/MdePkg.dec b/MdePkg/MdePkg.dec
+index 8f02cf1..223b174 100644
+--- a/MdePkg/MdePkg.dec
++++ b/MdePkg/MdePkg.dec
+@@ -800,6 +800,7 @@
+   ## Include/Guid/ConformanceProfiles.h
+   gEfiConfProfilesEbbrSpec21Guid     = { 0xcce33c35, 0x74ac, 0x4087, { 0xbc, 0xe7, 0x8b, 0x29, 0xb0, 0x2e, 0xeb, 0x27 }}
+   gEfiConfProfilesEbbrSpec22Guid     = { 0x9073eed4, 0xe50d, 0x11ee, { 0xb8, 0xb0, 0x8b, 0x68, 0xda, 0x62, 0xfc, 0x80 }}
++  gEfiConfProfilesEbbrSpec23Guid     = { 0x7721fc77, 0xa724, 0x11ef, { 0x8e, 0xaa, 0xf7, 0xc9, 0xb1, 0x94, 0xba, 0x75 }}
+ 
+   #
+   # GUID defined in PI1.0

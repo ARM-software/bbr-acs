@@ -1,4 +1,25 @@
 #
+# Copyright 2006 - 2016 Unified EFI, Inc. All
+# Rights Reserved, subject to all existing rights in all
+# matters included within this Test Suite, to which United
+# EFI, Inc. makes no claim of right.
+#
+# Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2016 - 2026, Arm Limited or its affiliates. All rights reserved.
+# SPDX-License-Identifier : Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 # The material contained herein is not a license, either
 # expressly or impliedly, to any intellectual property owned
 # or controlled by any of the authors or developers of this
@@ -34,16 +55,6 @@
 # WAY OUT OF THIS OR ANY OTHER AGREEMENT RELATING TO THIS
 # DOCUMENT, WHETHER OR NOT SUCH PARTY HAD ADVANCE NOTICE OF
 # THE POSSIBILITY OF SUCH DAMAGES.
-#
-# Copyright 2006 - 2016 Unified EFI, Inc. All
-# Rights Reserved, subject to all existing rights in all
-# matters included within this Test Suite, to which United
-# EFI, Inc. makes no claim of right.
-#
-# Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
-#
-# Copyright (c) 2016-2026, ARM Ltd. All rights reserved.<BR>
-#
 #
 #/*++
 #
@@ -556,9 +567,9 @@ SctPkg/TestCase/UEFI/EFI/Generic/SbbrEfiSpecVerLvl/BlackBoxTest/EfiSpecVerLvlBBT
 SctPkg/TestCase/UEFI/EFI/BootServices/SbbrBootServices/BlackBoxTest/SbbrBootServicesBBTest.inf
 # End of UEFI Boot Services - SBBR v1.0 3.4
 #
-# UEFI Generic Services - EBBR v2.2.0
+# UEFI Generic Services - EBBR v2.4.2.1
 #
-SctPkg/TestCase/UEFI/EFI/Generic/EfiConformanceProfileTableTest/BlackBoxTest/EfiConformanceProfileTableTest.inf
+SctPkg/TestCase/UEFI/EFI/Generic/EfiCompliant/EfiEbbrProfileTableTest/BlackBoxTest/EfiEbbrProfileTableTest.inf
 #End of  UEFI Generic Services - EBBR v2.4.2.1
 
 #

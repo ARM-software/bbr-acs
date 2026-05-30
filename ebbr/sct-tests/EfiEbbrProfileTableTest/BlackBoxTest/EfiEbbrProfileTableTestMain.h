@@ -15,10 +15,10 @@
 /*++
 
 Module Name:
-  EfiConformanceProfileTableTestMain.h
+  EfiEbbrProfileTableTestMain.h
 
 Abstract:
-  Header file for EFI Conformance Profile Table Black-Box Test.
+  Header file for EFI EBBR Profile Table Black-Box Test.
 
 --*/
 
@@ -38,13 +38,13 @@ Abstract:
 // Definitions
 //
 
-#define EFI_CONFORMANCE_PROFILE_TABLE_BB_TEST_REVISION    0x00010000
+#define EFI_EBBR_PROFILE_TABLE_BB_TEST_REVISION    0x00010000
 
-#define EFI_CONFORMANCE_PROFILE_TABLE_BB_TEST_GUID        \
+#define EFI_EBBR_PROFILE_TABLE_BB_TEST_GUID        \
   { 0x14bc21ec, 0x6d04, 0x4684, {0xa8, 0x92, 0x1b, 0x46, 0x5a, 0xca, 0xc4, 0x23 }}
 
 EFI_STATUS
-EfiConformanceProfileTableTest (
+EfiEbbrProfileTableTest (
   IN EFI_BB_TEST_PROTOCOL       *This,
   IN VOID                       *ClientInterface,
   IN EFI_TEST_LEVEL             TestLevel,
