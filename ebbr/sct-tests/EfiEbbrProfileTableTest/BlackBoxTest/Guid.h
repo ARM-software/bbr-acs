@@ -16,7 +16,7 @@
 
 Module Name:
 
-  guid.c
+  guid.h
 
 Abstract:
 
@@ -24,8 +24,10 @@ Abstract:
 
 --*/
 
-#include "Efi.h"
-#include "Guid.h"
+#define EFI_EBBR_PROFILE_TABLE_TEST_GUID \
+{ 0x94d76c82, 0x2e23, 0x495a, {0xaa, 0xdd, 0xd2, 0xb7, 0x4a, 0x24, 0xed, 0x1d }}
 
+#define EFI_EBBR_PROFILE_TABLE_TEST_ASSERTION_001_GUID \
+{ 0x62c450fe, 0x0d70, 0x468d, {0x87, 0x54, 0xda, 0xca, 0xb1, 0xf9, 0x75, 0x5e }}
 
-EFI_GUID gEfiConformanceProfileTableTestAssertionGuid001 = EFI_CONFORMANCE_PROFILE_TABLE_TEST_ASSERTION_001_GUID;
+extern EFI_GUID gEfiEbbrProfileTableTestAssertionGuid001;

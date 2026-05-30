@@ -1,6 +1,6 @@
-From be471b7a69d36c1373bd2354647d6f5cca1180a4 Mon Sep 17 00:00:00 2001
+From e378a3e209422549a05c6f6467f112546702d3af Mon Sep 17 00:00:00 2001
 From: Sathisha S <sathisha.shivaramappa@arm.com>
-Date: Wed, 29 Oct 2025 13:57:00 +0000
+Date: Thu, 4 Jun 2026 08:56:16 +0000
 Subject: [PATCH] edk2-test-bbr-build
 
 Signed-off-by: Sathisha S <sathisha.shivaramappa@arm.com>
@@ -11,10 +11,10 @@ Signed-off-by: Sathisha S <sathisha.shivaramappa@arm.com>
  3 files changed, 242 insertions(+), 6 deletions(-)
 
 diff --git a/uefi-sct/SctPkg/CommonGenFramework.sh b/uefi-sct/SctPkg/CommonGenFramework.sh
-index 089faac7..78c01cd2 100755
+index 194fdd4a..c9ba7d04 100755
 --- a/uefi-sct/SctPkg/CommonGenFramework.sh
 +++ b/uefi-sct/SctPkg/CommonGenFramework.sh
-@@ -344,4 +344,197 @@ then
+@@ -376,4 +376,197 @@ then
    CopyDependency Ebc
    CopyDependency PxeBaseCode
  fi
@@ -165,7 +165,7 @@ index 089faac7..78c01cd2 100755
 +    cp $ProcessorType/RequiredUefiProtocolsBBTest.efi          $Framework/Test/ > NUL
 +
 +    # UEFI Generic Services - EBBR v2.4.2.1
-+    cp $ProcessorType/EfiConformanceProfileTableTest.efi       $Framework/Test/ > NUL
++    cp $ProcessorType/EfiEbbrProfileTableTest.efi       $Framework/Test/ > NUL
 +
 +    # *********************************************
 +    # Copy ENTS binary
@@ -213,7 +213,7 @@ index 089faac7..78c01cd2 100755
 +    CopyDependency ConfigKeywordHandler
 +fi
 diff --git a/uefi-sct/SctPkg/Config/Data/Category.ini b/uefi-sct/SctPkg/Config/Data/Category.ini
-index 16f9d637..ece926b7 100644
+index fcbd220e..ee046b5e 100644
 --- a/uefi-sct/SctPkg/Config/Data/Category.ini
 +++ b/uefi-sct/SctPkg/Config/Data/Category.ini
 @@ -88,6 +88,27 @@ InterfaceGuid = 71652D04-BF38-434A-BCB8-6547D7FD8384
@@ -272,7 +272,7 @@ index 16f9d637..ece926b7 100644
  [Category Data]
  Revision      = 0x00010000
  CategoryGuid  = 5B1B31A1-9562-11D2-8E3F-00A0C969723B
-@@ -1033,12 +1068,12 @@ InterfaceGuid = 8D59D32B-C655-4AE9-9B15-F25904992A43
+@@ -1026,12 +1061,12 @@ InterfaceGuid = 8D59D32B-C655-4AE9-9B15-F25904992A43
  Name          = IHV\ConsoleSupportTest\AbsolutePointerProtocolTest
  Description   = Absolute Pointer Protocol Test on IHV Drivers
  
@@ -291,7 +291,7 @@ index 16f9d637..ece926b7 100644
  
  [Category Data]
  Revision      = 0x00010000
-@@ -1046,3 +1081,10 @@ CategoryGuid  = 607f766c-7455-42be-930b-e4d76db2720f
+@@ -1039,3 +1074,10 @@ CategoryGuid  = 607f766c-7455-42be-930b-e4d76db2720f
  InterfaceGuid = 607f766c-7455-42be-930b-e4d76db2720f
  Name          = TCG2ProtocolTest
  Description   = TCG2 Protocol Test
@@ -300,8 +300,8 @@ index 16f9d637..ece926b7 100644
 +Revision      = 0x00010000
 +CategoryGuid  = 14BC21EC-6D04-4684-A892-1B465ACAC423
 +InterfaceGuid = 71652D04-BF38-434A-BCB8-6547D7FD8384
-+Name          = GenericTest\EfiConformanceProfileTableTest
-+Description   = Efi Conformance Profile Table Test
++Name          = GenericTest\EFICompliantTest\EfiEbbrProfileTableTest
++Description   = Efi EBBR Profile Table Test
 diff --git a/uefi-sct/SctPkg/Library/SctGuidLib/SctGuidLib.inf b/uefi-sct/SctPkg/Library/SctGuidLib/SctGuidLib.inf
 index 8f918b26..2bbd22c6 100644
 --- a/uefi-sct/SctPkg/Library/SctGuidLib/SctGuidLib.inf

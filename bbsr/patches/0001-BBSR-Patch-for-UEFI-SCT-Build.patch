@@ -32,8 +32,8 @@ index fbe7659f..070d73ef 100644
 +++ b/uefi-sct/SctPkg/Config/Data/Category.ini
 @@ -1081,3 +1081,17 @@ CategoryGuid  = 14BC21EC-6D04-4684-A892-1B465ACAC423
  InterfaceGuid = 71652D04-BF38-434A-BCB8-6547D7FD8384
- Name          = GenericTest\EfiConformanceProfileTableTest
- Description   = Efi Conformance Profile Table Test
+ Name          = GenericTest\EfiEbbrProfileTableTest
+ Description   = Efi EBBR Profile Table Test
 +
 +[Category Data]
 +Revision      = 0x00010000

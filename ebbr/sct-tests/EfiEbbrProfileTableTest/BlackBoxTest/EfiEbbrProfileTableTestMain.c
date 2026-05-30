@@ -15,10 +15,10 @@
 /*++
 
 Module Name:
-  EfiConformanceProfileTableTestMain.c
+  EfiEbbrProfileTableTestMain.c
 
 Abstract:
-  Header file for EFI Conformance Profile Table Black-Box Test.
+  Header file for EFI EBBR Profile Table Black-Box Test.
 
 --*/
 
@@ -27,17 +27,17 @@ Abstract:
 //
 
 #include "SctLib.h"
-#include "EfiConformanceProfileTableTestMain.h"
+#include "EfiEbbrProfileTableTestMain.h"
 
 //
 // Declarations
 //
 
 EFI_BB_TEST_PROTOCOL_FIELD gBBTestProtocolField = {
-  EFI_CONFORMANCE_PROFILE_TABLE_BB_TEST_REVISION,
-  EFI_CONFORMANCE_PROFILE_TABLE_BB_TEST_GUID,
-  L"Efi Conformance Profile Table Test",
-  L"Efi Conformance Profile Table Black-Box Test"
+  EFI_EBBR_PROFILE_TABLE_BB_TEST_REVISION,
+  EFI_EBBR_PROFILE_TABLE_BB_TEST_GUID,
+  L"Efi EBBR Profile Table Test",
+  L"Efi EBBR Profile Table Black-Box Test"
 };
 
 EFI_GUID gSupportProtocolGuid[] = {
@@ -48,13 +48,13 @@ EFI_GUID gSupportProtocolGuid[] = {
 
 EFI_BB_TEST_ENTRY_FIELD gBBTestEntryField[] = {
   {
-    EFI_CONFORMANCE_PROFILE_TABLE_TEST_GUID,
-    L"EfiConformanceProfileTableTest_func",
-    L"Test that checks whether EFI Conformance Profile Table supports specific EBBR profile table(2.1 or 2.2) or not" ,
+    EFI_EBBR_PROFILE_TABLE_TEST_GUID,
+    L"EfiEbbrProfileTableTest_func",
+    L"Test that checks whether EFI EBBR Profile Table supports specific EBBR profile table(2.1, 2.2 or 2.3) or not" ,
     EFI_TEST_LEVEL_DEFAULT,
     gSupportProtocolGuid,
     EFI_TEST_CASE_AUTO,
-    EfiConformanceProfileTableTest
+    EfiEbbrProfileTableTest
   },
     0
 };
@@ -67,14 +67,14 @@ EFI_BB_TEST_PROTOCOL *gBBTestProtocolInterface;
 
 EFI_STATUS
 EFIAPI
-InitializeEfiConformanceProfileTableBbTest (
+InitializeEfiEbbrProfileTableBbTest (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
   );
 
 EFI_STATUS
 EFIAPI
-UnloadEfiConformanceProfileTableBbTest (
+UnloadEfiEbbrProfileTableBbTest (
   IN EFI_HANDLE       ImageHandle
   );
 
@@ -93,7 +93,7 @@ UnloadEfiConformanceProfileTableBbTest (
  */
 EFI_STATUS
 EFIAPI
-InitializeEfiConformanceProfileTableBbTest (
+InitializeEfiEbbrProfileTableBbTest (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
@@ -105,7 +105,7 @@ InitializeEfiConformanceProfileTableBbTest (
            &ImageHandle,
            &gBBTestProtocolField,
            gBBTestEntryField,
-           UnloadEfiConformanceProfileTableBbTest,
+           UnloadEfiEbbrProfileTableBbTest,
            &gBBTestProtocolInterface
            );
 }
@@ -118,7 +118,7 @@ InitializeEfiConformanceProfileTableBbTest (
  */
 EFI_STATUS
 EFIAPI
-UnloadEfiConformanceProfileTableBbTest (
+UnloadEfiEbbrProfileTableBbTest (
   IN EFI_HANDLE       ImageHandle
   )
 {
