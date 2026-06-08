@@ -1,5 +1,5 @@
 diff --git a/uefi-sct/SctPkg/CommonGenFramework.sh b/uefi-sct/SctPkg/CommonGenFramework.sh
-index c9ba7d04..a59b2945 100755
+index c42e8904..28c3a438 100755
 --- a/uefi-sct/SctPkg/CommonGenFramework.sh
 +++ b/uefi-sct/SctPkg/CommonGenFramework.sh
 @@ -411,6 +411,15 @@ then
@@ -27,12 +27,12 @@ index c9ba7d04..a59b2945 100755
 +  fi
  fi
 diff --git a/uefi-sct/SctPkg/Config/Data/Category.ini b/uefi-sct/SctPkg/Config/Data/Category.ini
-index fbe7659f..070d73ef 100644
+index d70c18c5..9228dc0f 100644
 --- a/uefi-sct/SctPkg/Config/Data/Category.ini
 +++ b/uefi-sct/SctPkg/Config/Data/Category.ini
 @@ -1081,3 +1081,17 @@ CategoryGuid  = 14BC21EC-6D04-4684-A892-1B465ACAC423
  InterfaceGuid = 71652D04-BF38-434A-BCB8-6547D7FD8384
- Name          = GenericTest\EfiEbbrProfileTableTest
+ Name          = GenericTest\EFICompliantTest\EfiEbbrProfileTableTest
  Description   = Efi EBBR Profile Table Test
 +
 +[Category Data]
