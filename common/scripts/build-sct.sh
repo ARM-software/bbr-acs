@@ -48,8 +48,7 @@ TEST_DB1_KEY=$KEYS_DIR/TestDB1.key
 TEST_DB1_CRT=$KEYS_DIR/TestDB1.crt
 SCT_FRAMEWORK_PREFIX="$TOP_DIR/$SCT_PATH/uefi-sct/Build/bbrSct"
 SCT_FRAMEWORK_ROOT="$SCT_FRAMEWORK_PREFIX/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}"
-SCT_FRAMEWORK="$SCT_FRAMEWORK_ROOT/SctPackage${TARGET_ARCH}/\
-    ${TARGET_ARCH}"
+SCT_FRAMEWORK="$SCT_FRAMEWORK_ROOT/SctPackage${TARGET_ARCH}/${TARGET_ARCH}"
 
 BUILD_PLAT=$1
 BUILD_TYPE=$2
@@ -383,8 +382,9 @@ SecureBootSign() {
     echo "KEYS_DIR = $KEYS_DIR"
 
     for f in "$1"/*.efi; do
-        echo "sbsign --key $TEST_DB1_KEY --cert $TEST_DB1_CRT $f --output $f"
-        sbsign --key $TEST_DB1_KEY --cert $TEST_DB1_CRT $f --output $f
+        echo "sbsign --key $TEST_DB1_KEY --cert $TEST_DB1_CRT \"$f\" --output \"$f\""
+        sbsign --key "$TEST_DB1_KEY" --cert "$TEST_DB1_CRT" "$f" \
+            --output "$f"
     done
 }
 
@@ -393,8 +393,9 @@ SecureBootSignDependency() {
     echo "KEYS_DIR = $KEYS_DIR"
 
     for f in "$SCT_FRAMEWORK/Dependency/$1BBTest"/*.efi; do
-        echo "sbsign --key $TEST_DB1_KEY --cert $TEST_DB1_CRT $f --output $f"
-        sbsign --key $TEST_DB1_KEY --cert $TEST_DB1_CRT $f --output $f
+        echo "sbsign --key $TEST_DB1_KEY --cert $TEST_DB1_CRT \"$f\" --output \"$f\""
+        sbsign --key "$TEST_DB1_KEY" --cert "$TEST_DB1_CRT" "$f" \
+            --output "$f"
     done
 }
 
