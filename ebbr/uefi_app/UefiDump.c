@@ -376,8 +376,8 @@ WriteHexDumpFile(
     return EFI_INVALID_PARAMETER;
   }
 
-  MaxGuidCount = (BufferSize >= 4) ? ((BufferSize - 4) / sizeof(EFI_GUID)) : 0;
-  EstimatedSize = ((((BufferSize + 15) / 16) + 1) * 80) + 128 + (MaxGuidCount * 80) + 1;
+  MaxGuidCount = (BufferSize >= 4) ? ((BufferSize - 4) / sizeof (EFI_GUID)) : 0;
+  EstimatedSize = ((((BufferSize + 15) / 16) + 1) * 80) + 128 + (MaxGuidCount * 200) + 1;
   Status = gBS->AllocatePool(EfiBootServicesData, EstimatedSize, (VOID **)&Text);
   if (EFI_ERROR(Status)) {
     return Status;
@@ -442,18 +442,39 @@ WriteHexDumpFile(
   Remaining = EstimatedSize - (UINTN)(Cursor - Text);
   Cursor += AsciiSPrint(Cursor, Remaining, "NumberOfProfiles: %u\n", (UINT32)NumberOfProfiles);
 
-  for (Index = 0; Index < GuidCount; Index++) {
-    UINTN GuidOffset;
-    UINTN ByteIndex;
+  Remaining = EstimatedSize - (UINTN)(Cursor - Text);
+  Cursor += AsciiSPrint (
+              Cursor,
+              Remaining,
+              "INFO: Extracted %u GUID(s) from EBBR profile table\n",
+              (UINT32)GuidCount
+              );
 
-    GuidOffset = 4 + (Index * sizeof(EFI_GUID));
+  for (Index = 0; Index < GuidCount; Index++) {
+    EFI_GUID  GuidValue;
+    UINTN     GuidOffset;
+
+    GuidOffset = 4 + (Index * sizeof (EFI_GUID));
+    CopyMem (&GuidValue, Data + GuidOffset, sizeof (GuidValue));
+
     Remaining = EstimatedSize - (UINTN)(Cursor - Text);
-    Cursor += AsciiSPrint(Cursor, Remaining, "EBBR profile table GUID[%u]: ", (UINT32)Index);
-    for (ByteIndex = 0; ByteIndex < sizeof(EFI_GUID); ByteIndex++) {
-      Remaining = EstimatedSize - (UINTN)(Cursor - Text);
-      Cursor += AsciiSPrint(Cursor, Remaining, "%02X", Data[GuidOffset + ByteIndex]);
-    }
-    *Cursor++ = '\n';
+    Cursor += AsciiSPrint (
+                Cursor,
+                Remaining,
+                "INFO: EBBR profile table GUID[%u] : %08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X\n",
+                (UINT32)Index,
+                GuidValue.Data1,
+                GuidValue.Data2,
+                GuidValue.Data3,
+                GuidValue.Data4[0],
+                GuidValue.Data4[1],
+                GuidValue.Data4[2],
+                GuidValue.Data4[3],
+                GuidValue.Data4[4],
+                GuidValue.Data4[5],
+                GuidValue.Data4[6],
+                GuidValue.Data4[7]
+                );
   }
 
   Status = WriteBinaryFile(
