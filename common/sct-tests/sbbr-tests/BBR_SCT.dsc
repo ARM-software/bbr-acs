@@ -271,6 +271,7 @@ SctPkg/TestCase/UEFI/EFI/Protocol/TCG2/BlackBoxTest/TCG2ProtocolBBTest.inf
 SctPkg/TestCase/UEFI/EFI/Generic/PlatformResetAttackMitigationPsciTest/BlackBoxTest/PlatformResetAttackMitigationPsciBBTest.inf
 !if $(ENABLE_SECUREBOOT_TESTS) == TRUE
 SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/SecureBootBBTest.inf
+SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBootAuthVariablePersistenceTest/BlackBoxTest/SecureBootAuthVariablePersistenceBBTest.inf
 !endif
 
 SctPkg/TestCase/UEFI/EFI/RuntimeServices/BBSRVariableSizeTest/BlackBoxTest/BBSRVariableSizeBBTest.inf
