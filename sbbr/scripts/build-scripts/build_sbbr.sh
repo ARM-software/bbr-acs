@@ -18,18 +18,28 @@
 
 TOP_DIR=`pwd`
 
-create_scripts_link()
+create_scripts_link ()
 {
- ln -s $TOP_DIR/../../common/scripts/framework.sh             $TOP_DIR/build-scripts/framework.sh
- ln -s $TOP_DIR/../../common/scripts/parse_params.sh          $TOP_DIR/build-scripts/parse_params.sh
- ln -s $TOP_DIR/../../common/scripts/build-sct.sh             $TOP_DIR/build-scripts/build-sct.sh
- ln -s $TOP_DIR/../../common/scripts/build-uefi-apps.sh       $TOP_DIR/build-scripts/build-uefi-apps.sh
+    ln -s \
+        $TOP_DIR/../../common/scripts/framework.sh \
+        $TOP_DIR/build-scripts/framework.sh
+    ln -s \
+        $TOP_DIR/../../common/scripts/parse_params.sh \
+        $TOP_DIR/build-scripts/parse_params.sh
+    ln -s \
+        $TOP_DIR/../../common/scripts/build-sct.sh \
+        $TOP_DIR/build-scripts/build-sct.sh
+    ln -s \
+        $TOP_DIR/../../common/scripts/build-uefi-apps.sh \
+        $TOP_DIR/build-scripts/build-uefi-apps.sh
 }
 
-init_dir()
+init_dir ()
 {
- mkdir -p $TOP_DIR/build-scripts/config
- cp -r $TOP_DIR/../config/*                                 $TOP_DIR/build-scripts/config/
+    mkdir -p $TOP_DIR/build-scripts/config
+    cp -r \
+        $TOP_DIR/../config/* \
+        $TOP_DIR/build-scripts/config/
 }
 
 create_scripts_link
