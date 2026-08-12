@@ -11,6 +11,7 @@
   - [Manual Intervention Tests for EBBR](#manual-intervention-tests-for-ebbr)
 - [Running Standalone SCT](#running-standalone-sct)
 - [Firmware Test Suite (FWTS)](#firmware-test-suite-fwts)
+- [PCIe Option ROM Architecture Audit](docs/PcieOptionRomArchAudit.md)
 - [Building Standalone FWTS](#building-standalone-fwts)
 - [Run FWTS Binary](#run-fwts-binary)
   - [Running FWTS for Different Recipes](#running-fwts-for-different-recipes)
@@ -150,6 +151,8 @@ bbr-acs/<ebbr|sbbr>/scripts/edk2-test/uefi-sct/<SBBR|EBBR>-SCT   # e.g. SBBR-SCT
 **Notes:**
 - The UEFI application `CapsuleApp.efi` is also built and can be found at:  
   `bbr-acs/<ebbr|sbbr>/scripts/edk2/Build/MdeModule/DEBUG_GCC5/AARCH64`
+- For **SBBR** builds, `PcieOptionRomArchAudit.efi` is also generated at:
+  `bbr-acs/sbbr/scripts/edk2/Build/MdeModule/DEBUG_GCC5/AARCH64/PcieOptionRomArchAudit.efi`. It audits live PCIe option ROMs for embedded UEFI driver architectures. See [PCIe Option ROM Architecture Audit](docs/PcieOptionRomArchAudit.md) for usage and result interpretation.
 - For **EBBR** builds only, `UefiDump.efi` is also built and can be found at:
   `bbr-acs/ebbr/scripts/edk2/Build/MdeModule/DEBUG_GCC5/AARCH64/UefiDump.efi`
   It dumps the EBBR profile table to `\acs_results_template\acs_results\uefi_dump\ebbr_profile_table.log`, and falls back to `ebbr_profile_table.log` in the current working directory if that path does not exist.

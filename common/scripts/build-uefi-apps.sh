@@ -99,9 +99,14 @@ do_build()
         build -a AARCH64 -t GCC5 -p ShellPkg/ShellPkg.dsc
     fi
 
-    # Build the standalone generic UEFI dump application.
+    # Build the EBBR UEFI dump application.
     if [[ $BUILD_PLAT = EBBR ]]; then
         build -a $TARGET_ARCH -t $UEFI_TOOLCHAIN -p ebbr/uefi_app/UefiDump.dsc
+    fi
+
+    # Build the SBBR PCIe option ROM architecture audit application.
+    if [[ $BUILD_PLAT = SBBR ]]; then
+        build -a $TARGET_ARCH -t $UEFI_TOOLCHAIN -p sbbr/uefi_app/PcieOptionRomArchAudit.dsc
     fi
     popd
 }
@@ -124,6 +129,7 @@ do_package ()
     UEFI_BUILD_DIR="$BUILD_PATH/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}"
     CAPSULE_APP="$UEFI_BUILD_DIR/CapsuleApp.efi"
     UEFIDUMP_APP="$UEFI_BUILD_DIR/UefiDump.efi"
+    PCIE_OPTION_ROM_ARCH_AUDIT_APP="$UEFI_BUILD_DIR/PcieOptionRomArchAudit.efi"
     SHELL_DIR="$TOP_DIR/$UEFI_PATH/Build/Shell/${UEFI_BUILD_MODE}_${UEFI_TOOLCHAIN}/${TARGET_ARCH}"
     SHELL_APP="$SHELL_DIR/ShellPkg/Application/Shell/Shell/$UEFI_BUILD_MODE/Shell.efi"
     UEFI_SCT_BOOT="$TOP_DIR/edk2-test/uefi-sct/${BUILD_PLAT}-SCT/EFI/BOOT/bootaa64.efi"
@@ -158,6 +164,20 @@ do_package ()
         fi
     fi
 
+    if [[ "$BUILD_PLAT" = "SBBR" ]]; then
+        if [ -f "$PCIE_OPTION_ROM_ARCH_AUDIT_APP" ]; then
+            echo "PcieOptionRomArchAudit.efi successfully generated at $PCIE_OPTION_ROM_ARCH_AUDIT_APP"
+            if [ "$BUILD_TYPE" = "F" ]; then
+                sbsign \
+                    --key "$KEYS_DIR/TestDB1.key" \
+                    --cert "$KEYS_DIR/TestDB1.crt" \
+                    "$PCIE_OPTION_ROM_ARCH_AUDIT_APP" \
+                    --output "$PCIE_OPTION_ROM_ARCH_AUDIT_APP"
+            fi
+        else
+            echo "Error: PcieOptionRomArchAudit.efi could not be generated. Please check the logs"
+        fi
+    fi
     if [ "$BUILD_TYPE" = "S" ]; then
         # Shell.efi is required to run the standalone SCT. Copy it into the SBBR/EBBR-SCT
         # package and place it as EFI/BOOT/bootaa64.efi for UEFI boot.
