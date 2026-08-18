@@ -165,6 +165,8 @@ do_build()
     sctpkg_efi_dir="uefi-sct/SctPkg/TestCase/UEFI/EFI"
     cp -r "$SBBR_TEST_DIR/SbbrBootServices" \
         "$sctpkg_efi_dir/BootServices/"
+    cp -r "$SBBR_TEST_DIR/SBBRRuntimeServices" \
+        "$sctpkg_efi_dir/RuntimeServices/"
     cp -r \
         "$SBBR_TEST_DIR/SbbrEfiSpecVerLvl" \
         "$SBBR_TEST_DIR/SbbrRequiredUefiProtocols" \

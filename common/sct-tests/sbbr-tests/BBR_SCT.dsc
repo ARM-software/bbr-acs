@@ -591,6 +591,7 @@ SctPkg/TestCase/UEFI/EFI/Generic/EfiCompliant/EfiEbbrProfileTableTest/BlackBoxTe
 ## 10. EFI_UPDATE_CAPSULE
 ## 11. EFI_RESET_SYSTEM
 #SctPkg/TestCase/UEFI/EFI/RuntimeServices/MiscRuntimeServices/BlackBoxTest/MiscRuntimeServicesBBTest.inf
+SctPkg/TestCase/UEFI/EFI/RuntimeServices/SBBRRuntimeServices/BlackBoxTest/SBBRRuntimeServicesBBTest.inf
 #
 ## 12. EFI_SET_VIRTUAL_ADDRESS_MAP
 ## 13. EFI_CONVERT_POINTER
