@@ -159,7 +159,7 @@ index 194fdd4a..c9ba7d04 100755
 +    cp $ProcessorType/EfiSpecVerLvlBBTest.efi                  $Framework/Test/ > NUL
 +
 +    # Runtime Services Tests - SBBR v1.0 Appendix B
-+    #cp $ProcessorType/SBBRRuntimeServicesBBTest.efi            $Framework/Test/ > NUL
++    cp $ProcessorType/SBBRRuntimeServicesBBTest.efi            $Framework/Test/ > NUL
 +
 +    # Tests SBBR Appendix C
 +    cp $ProcessorType/RequiredUefiProtocolsBBTest.efi          $Framework/Test/ > NUL
