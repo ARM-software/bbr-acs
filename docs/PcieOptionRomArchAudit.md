@@ -69,6 +69,12 @@ Report mode prints every scanned PCIe device, even if it has no option ROM. Devi
 - `EFI_COMPROMISED_DATA`: an option ROM is malformed or cannot be parsed.
 - `EFI_DEVICE_ERROR`: a PCI device could not be inspected.
 
+The final summary reports `BBR (UEFI 6.3.3.1 UEFI Drivers) Result Summary` with one of these outcomes:
+
+- `FAIL`: one or more PCIe option ROM devices contain UEFI driver images but no AARCH64 UEFI driver. Each affected device is listed with the reason `UEFI driver image(s) present but no AARCH64 UEFI driver found`.
+- `PASS`: PCIe devices with option ROMs were found, and their UEFI driver images include AARCH64 format.
+- `SKIP`: no PCIe devices with an option ROM were found. The summary prints `Reason: No PCIe devices with Option ROM were found.`
+
 - `HIT`: the option ROM contains one or more UEFI driver images, and does not contain an AARCH64 UEFI driver image.
 - `legacy-x86`: a PC-AT compatible legacy option ROM image was found.
 - `ia32-uefi`, `x64-uefi`, `arm64-uefi`, `ebc-uefi`, `other-uefi`: presence of UEFI **driver** images for those machine types within the option ROM.

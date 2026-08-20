@@ -161,6 +161,8 @@ AuditLog (
 {
   VA_LIST  Marker;
   CHAR16   Buffer[1024];
+  CHAR8    AsciiBuffer[1024];
+  UINTN    Index;
   UINTN    Size;
 
   if (mLogFile == NULL) {
@@ -171,8 +173,16 @@ AuditLog (
   UnicodeVSPrint (Buffer, sizeof (Buffer), Format, Marker);
   VA_END (Marker);
 
-  Size = StrSize (Buffer);
-  ShellWriteFile (mLogFile, &Size, Buffer);
+  //
+  // Write byte-oriented text so UEFI Shell's "cat" does not render the
+  // UTF-16 NUL byte after every character as a dot.
+  //
+  Size = StrLen (Buffer);
+  for (Index = 0; Index < Size; Index++) {
+    AsciiBuffer[Index] = (Buffer[Index] <= 0x7f) ? (CHAR8)Buffer[Index] : '?';
+  }
+
+  ShellWriteFile (mLogFile, &Size, AsciiBuffer);
 }
 
 #define LOG(...)  AuditLog (__VA_ARGS__)
@@ -1624,27 +1634,39 @@ PrintFinalSummary (
   LOG (L"Inspection errors          : %u\n", (UINT32)Stats->InspectionErrors);
   LOG (L"Non-compliant devices      : %u\n", (UINT32)Stats->Hits);
 
-  if (NonCompliantDeviceCount == 0) {
-    return;
-  }
-
-  LOG (L"\nNon-compliant device summary:\n");
-  LOG (L"----------------------------------------\n");
-  for (Index = 0; Index < NonCompliantDeviceCount; Index++) {
+  LOG (L"\n");
+  if (Stats->DevicesWithRom == 0) {
     LOG (
-      L"  BDF=%04x:%02x:%02x.%x %s [%04x:%04x] DeviceName=%s\n",
-      (UINT32)NonCompliantDevices[Index].Segment,
-      (UINT32)NonCompliantDevices[Index].Bus,
-      (UINT32)NonCompliantDevices[Index].Device,
-      (UINT32)NonCompliantDevices[Index].Function,
-      VendorIdToStr (NonCompliantDevices[Index].VendorId),
-      (UINT32)NonCompliantDevices[Index].VendorId,
-      (UINT32)NonCompliantDevices[Index].DeviceId,
-      NonCompliantDevices[Index].DeviceName
+      L"BBR (UEFI 6.3.3.1 UEFI Drivers) Result Summary: SKIP\n"
       );
     LOG (
-      L"    Reason: UEFI driver image(s) (IA32/X64/EBC) present but no "
-      L"AARCH64 UEFI driver found\n"
+      L"Reason: No PCIe devices with Option ROM were found.\n"
+      );
+  } else if (Stats->Hits != 0) {
+    LOG (
+      L"BBR (UEFI 6.3.3.1 UEFI Drivers) Result Summary: FAIL\n"
+      );
+    LOG (L"\n----------------------------------------\n");
+    for (Index = 0; Index < NonCompliantDeviceCount; Index++) {
+      LOG (
+        L"  BDF=%04x:%02x:%02x.%x %s [%04x:%04x] DeviceName=%s\n",
+        (UINT32)NonCompliantDevices[Index].Segment,
+        (UINT32)NonCompliantDevices[Index].Bus,
+        (UINT32)NonCompliantDevices[Index].Device,
+        (UINT32)NonCompliantDevices[Index].Function,
+        VendorIdToStr (NonCompliantDevices[Index].VendorId),
+        (UINT32)NonCompliantDevices[Index].VendorId,
+        (UINT32)NonCompliantDevices[Index].DeviceId,
+        NonCompliantDevices[Index].DeviceName
+        );
+      LOG (
+        L"    Reason: UEFI driver image(s) present but no "
+        L"AARCH64 UEFI driver found\n"
+        );
+    }
+  } else {
+    LOG (
+      L"BBR (UEFI 6.3.3.1 UEFI Drivers) Result Summary: PASS\n"
       );
   }
 }
@@ -1884,7 +1906,7 @@ UefiMain (
     }
 
     Hit = (BOOLEAN)(
-            (Audit.HasIa32Uefi || Audit.HasX64Uefi || Audit.HasEbcUefi) &&
+            (Audit.DriverImageCount != 0) &&
             !Audit.HasArm64Uefi
             );
     AccumulateRunStats (&Stats, &Audit, Hit);
