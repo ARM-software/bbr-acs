@@ -2,7 +2,15 @@ diff --git a/uefi-sct/SctPkg/CommonGenFramework.sh b/uefi-sct/SctPkg/CommonGenFr
 index c42e8904..28c3a438 100755
 --- a/uefi-sct/SctPkg/CommonGenFramework.sh
 +++ b/uefi-sct/SctPkg/CommonGenFramework.sh
-@@ -411,6 +411,15 @@ then
+@@ -115,6 +115,7 @@ CopyDependency()
+     ls -h $ProcessorType/$1_*.bin  >> temp.txt 2>NUL
+     ls -h $ProcessorType/$1_*.der  >> temp.txt 2>NUL
+     ls -h $ProcessorType/$1_*.auth  >> temp.txt 2>NUL
++    ls -h $ProcessorType/$1_*.esl  >> temp.txt 2>NUL
+   fi
+     ls -h $ProcessorType/$1_*.cmp   >> temp.txt 2>NUL
+     ls -h $ProcessorType/$1_*.ucmp  >> temp.txt 2>NUL
+@@ -411,6 +411,16 @@ then
      cp $ProcessorType/ImageServicesBBTest.efi                  $Framework/Test/ > NUL
      cp $ProcessorType/MiscBootServicesBBTest.efi               $Framework/Test/ > NUL
  
@@ -12,6 +20,7 @@ index c42e8904..28c3a438 100755
 +    cp $ProcessorType/TCG2ProtocolBBTest.efi                   $Framework/Test/ > NUL
 +  if [ $SECUREBOOT_ENABLE -eq 1 ]; then
 +    cp $ProcessorType/SecureBootBBTest.efi                     $Framework/Test/ > NUL
++    cp $ProcessorType/SecureBootAuthVariablePersistenceTest.efi $Framework/Test/ > NUL
 +  fi
 +    cp $ProcessorType/PlatformResetAttackMitigationPsciTest.efi $Framework/Test/ > NUL
 +
@@ -26,11 +35,49 @@ index c42e8904..28c3a438 100755
 +    CopyDependency SecureBoot
 +  fi
  fi
+diff --git a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Images/GNUmakefile b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Images/GNUmakefile
+index 1446315a..71e3721e 100644
+--- a/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Images/GNUmakefile
++++ b/uefi-sct/SctPkg/TestCase/UEFI/EFI/RuntimeServices/SecureBoot/BlackBoxTest/Dependency/Images/GNUmakefile
+@@ -38,2 +38,11 @@ FUTURE_DATE4=$(shell date --rfc-3339=date -d "+3 day")
+ PAST_DATE=$(shell date --rfc-3339=date -d "-1 year")
++# Timestamps later than the existing Secure Boot update fixtures.
++PERSISTENCE_TIME_T1:=$(shell date -u -d "+4 days" "+%Y-%m-%d %H:%M:%S")
++PERSISTENCE_TIME_T2:=$(shell date -u -d "$(PERSISTENCE_TIME_T1) UTC + 1 minute" "+%Y-%m-%d %H:%M:%S")
++
++TEST_KEK4_KEY=$(TARGET)_TestKEK4.key
++TEST_KEK4_CRT=$(TARGET)_TestKEK4.crt
++TEST_KEK4_ESL=$(BIN_DIR)/SecureBoot_TestKEK4.esl
++TEST_KEK4_T1_AUTH=$(BIN_DIR)/SecureBoot_TestKEK4T1.auth
++TEST_KEK4_T2_AUTH=$(BIN_DIR)/SecureBoot_TestKEK4T2.auth
+ 
+@@ -55,3 +64,13 @@ endif
+ # Build all required certificates, signature lists, images, and .auth files for Secureboot test scenarios
+-all: TestKEK2 TestKEK3 KEKSigList1.auth KEKSigList3.auth TestImage1.bin TestImage2.bin TestImage3.bin TestImage4.bin TestImage5.bin TestImage6.bin TestImage7.bin TestImage8.bin TestImage9.bin TestImage10.bin NullKEK.auth NullDB.auth NullDBX.auth TestKEK1.auth TestDB1.auth TestDBX1.auth SignCert1 dbSigList1.auth SignCert2 SignCert3 SignCert4 SignCert5 RevokedCert1 RevokedCert2 RevokedCert3 RevokedCert4 dbSigList2.auth dbSigList3.auth dbSigList4.auth dbxRevokedList1.auth dbSigList5.auth unsignedKeyUpdate Image19ACert Image19BCert TestImage19.bin Image20ACert Image20BCert TestImage20.bin Image19BCert.auth
++all: TestKEK4Persistence TestKEK2 TestKEK3 KEKSigList1.auth KEKSigList3.auth TestImage1.bin TestImage2.bin TestImage3.bin TestImage4.bin TestImage5.bin TestImage6.bin TestImage7.bin TestImage8.bin TestImage9.bin TestImage10.bin NullKEK.auth NullDB.auth NullDBX.auth TestKEK1.auth TestDB1.auth TestDBX1.auth SignCert1 dbSigList1.auth SignCert2 SignCert3 SignCert4 SignCert5 RevokedCert1 RevokedCert2 RevokedCert3 RevokedCert4 dbSigList2.auth dbSigList3.auth dbSigList4.auth dbxRevokedList1.auth dbSigList5.auth unsignedKeyUpdate Image19ACert Image19BCert TestImage19.bin Image20ACert Image20BCert TestImage20.bin Image19BCert.auth
++
++# Generate the TestKEK4 payload and two PK-authenticated updates. T2 uses
++# the same payload with a timestamp one minute newer than T1.
++.PHONY: TestKEK4Persistence
++TestKEK4Persistence: $(TEST_PK1_CRT) $(TEST_PK1_KEY)
++	$(RM) $(TEST_KEK4_KEY) $(TEST_KEK4_CRT) $(TEST_KEK4_ESL) $(TEST_KEK4_T1_AUTH) $(TEST_KEK4_T2_AUTH)
++	openssl req -x509 -sha256 -newkey rsa:2048 -subj /CN=UEFI_SCT_TestKEK4/ -keyout $(TEST_KEK4_KEY) -out $(TEST_KEK4_CRT) -nodes -days 4000
++	cert-to-efi-sig-list $(TEST_KEK4_CRT) $(TEST_KEK4_ESL)
++	sign-efi-sig-list -t "$(PERSISTENCE_TIME_T1)" -c $(TEST_PK1_CRT) -k $(TEST_PK1_KEY) KEK $(TEST_KEK4_ESL) $(TEST_KEK4_T1_AUTH)
++	sign-efi-sig-list -t "$(PERSISTENCE_TIME_T2)" -c $(TEST_PK1_CRT) -k $(TEST_PK1_KEY) KEK $(TEST_KEK4_ESL) $(TEST_KEK4_T2_AUTH)
+ 
+@@ -284 +303,6 @@ clean:
+ 	$(RM) $(BIN_DIR)/$(TARGET)_*.der
++	$(RM) $(TEST_KEK4_KEY)
++	$(RM) $(TEST_KEK4_CRT)
++	$(RM) $(TEST_KEK4_ESL)
++	$(RM) $(TEST_KEK4_T1_AUTH)
++	$(RM) $(TEST_KEK4_T2_AUTH)
 diff --git a/uefi-sct/SctPkg/Config/Data/Category.ini b/uefi-sct/SctPkg/Config/Data/Category.ini
 index d70c18c5..9228dc0f 100644
 --- a/uefi-sct/SctPkg/Config/Data/Category.ini
 +++ b/uefi-sct/SctPkg/Config/Data/Category.ini
-@@ -1081,3 +1081,17 @@ CategoryGuid  = 14BC21EC-6D04-4684-A892-1B465ACAC423
+@@ -1081,3 +1081,24 @@ CategoryGuid  = 14BC21EC-6D04-4684-A892-1B465ACAC423
  InterfaceGuid = 71652D04-BF38-434A-BCB8-6547D7FD8384
  Name          = GenericTest\EFICompliantTest\EfiEbbrProfileTableTest
  Description   = Efi EBBR Profile Table Test
@@ -41,6 +88,13 @@ index d70c18c5..9228dc0f 100644
 +InterfaceGuid = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
 +Name          = RuntimeServicesTest\BBSRVariableSizeTest
 +Description   =
++
++[Category Data]
++Revision      = 0x00010000
++CategoryGuid  = 9ADFC05F-CEBE-496A-9C8A-D746DD0DBFD0
++InterfaceGuid = AFF115FB-387B-4C18-8C41-6AFC7F03BB90
++Name          = RuntimeServicesTest\SecureBootAuthVariablePersistenceTest
++Description   = Verify authenticated Secure Boot variables persist across reset
 +
 +[Category Data]
 +Revision      = 0x00010000

@@ -1,0 +1,60 @@
+## @file
+#
+#  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+#/*++
+#
+# Module Name:
+#
+#   SecureBootAuthVariablePersistenceBBTest.inf
+#
+# Abstract:
+#
+#   Component description file for Secure Boot variable persistence black-box test.
+#
+#--*/
+
+[Defines]
+  INF_VERSION          = 0x00010005
+  BASE_NAME            = SecureBootAuthVariablePersistenceTest
+  FILE_GUID            = 685b09ea-78d5-4cff-bb35-cc4d82cdaf55
+  MODULE_TYPE          = UEFI_DRIVER
+  VERSION_STRING       = 1.0
+  ENTRY_POINT          = InitializeSecureBootAuthVariablePersistenceBbTest
+
+[Sources.common]
+  SecureBootAuthVariablePersistenceBBTestMain.h
+  SecureBootAuthVariablePersistenceBBTestMain.c
+  SecureBootAuthVariablePersistenceBBTestFunction.c
+  ../../SecureBoot/BlackBoxTest/SecureBootBBTestSupport.c
+  Guid.h
+  Guid.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SctPkg/SctPkg.dec
+  SctPkg/UEFI/UEFI.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  SctLib
+  EfiTestLib
+
+[Guids]
+  gEfiGlobalVariableGuid
+  gEfiImageSecurityDatabaseGuid
+
+[Protocols]
+  gEfiTestRecoveryLibraryGuid
+  gEfiTestLoggingLibraryGuid
+  gEfiTestProfileLibraryGuid
+  gEfiLoadedImageProtocolGuid

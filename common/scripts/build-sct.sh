@@ -186,6 +186,8 @@ do_build()
         sctpkg_runtime_dir="$sctpkg_efi_dir/RuntimeServices"
         cp -r "$BBSR_TEST_DIR/BBSRVariableSizeTest" \
             "$sctpkg_runtime_dir"
+        cp -r "$BBSR_TEST_DIR/SecureBootAuthVariablePersistenceTest" \
+            "$sctpkg_runtime_dir"
         cp -r "$BBSR_TEST_DIR/PlatformResetAttackMitigationPsciTest" \
             "$generic_test_dir/"
     fi
@@ -346,6 +348,7 @@ check-to-warning.patch"
             echo "Error applying BBSR SecureBoot patch..."
             exit
         fi
+
     fi
 
     pushd uefi-sct
@@ -489,4 +492,3 @@ do_package ()
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $DIR/framework.sh $@
-
