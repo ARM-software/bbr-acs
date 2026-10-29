@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # @file
-# Copyright (c) 2025, Arm Limited or its affiliates. All rights reserved.
+# Copyright (c) 2025-2026, Arm Limited or its affiliates. All rights reserved.
 # SPDX-License-Identifier : Apache-2.0
 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,7 @@ echo -off
 set bbr_recipe sbbr  # Change to ebbr if needed
 
 # Run the SCT test
-for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F then
+for %i in 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 then
     if exist FS%i:\StandaloneSctStartup.nsh then
         echo "Running SCT test (%bbr_recipe%) from FS%i:"
         FS%i:\StandaloneSctStartup.nsh %bbr_recipe%
@@ -29,6 +29,6 @@ for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F then
     endif
 endfor
 
-echo "ERROR: StandaloneSctStartup.nsh not found on any FS0..FSF."
+echo "ERROR: StandaloneSctStartup.nsh not found on any FS0..FS20."
 
 :DoneSCT

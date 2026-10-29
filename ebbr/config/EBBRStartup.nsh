@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (c) 2021-2025, Arm Limited or its affiliates. All rights reserved.
+# Copyright (c) 2021-2026, Arm Limited or its affiliates. All rights reserved.
 #  SPDX-License-Identifier : Apache-2.0
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@
 
 echo -off
 
-for %i in 0 1 2 3 4 5 6 7 8 9 A B C D E F
+for %i in 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
     if exist FS%i:\acs_tests\bbr\SCT then
         #
         # Found EFI SCT harness
